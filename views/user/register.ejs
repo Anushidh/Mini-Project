@@ -1,0 +1,157 @@
+<%- include("../partials/header") %>
+    
+    <!--breadcrumbs area start-->
+<div class="breadcrumbs_area other_bread">
+  <div class="container">   
+      <div class="row">
+          <div class="col-12">
+              <div class="breadcrumb_content">
+                  <ul>
+                      <li><a href="/">home</a></li>
+                      <li>/</li>
+                      <li>Register</li>
+                  </ul>
+              </div>
+          </div>
+      </div>
+  </div>         
+</div>
+<!--breadcrumbs area end-->
+
+             <!-- customer login start -->
+               <div class="customer_login">
+               <div class="container">
+               <div class="row">
+                <!--register area start-->
+                <div class="col-lg-6 col-md-6">
+                    <div class="account_form register">
+                        <h2>Register</h2>
+                        <form id="signupForm" action="/signup" method="post" onsubmit="return validateForm()">
+                            <p>   
+                                <label>Name <span>*</span></label>
+                                <input type="text" name="name" id="name">
+                            </p>
+                            <span class="text-danger d-none" style="font-size: 12px; margin-left: 10px;" id="nameError"></span>
+                            <p>   
+                                <label>Email address  <span>*</span></label>
+                                <input type="text" name="email" id="email">
+                             </p>
+                             <span class="text-danger d-none" style="font-size: 12px; margin-left: 10px;" id="emailError"></span>
+                             <p>   
+                                <label>Password <span>*</span></label>
+                                <input type="password" name="password" id="password">
+                             </p>
+                             <span class="text-danger d-none" style="font-size: 12px; margin-left: 10px;" id="passwordError"></span>
+                             <p>   
+                                <label>Confirm Password <span>*</span></label>
+                                <input type="password" name="confirmPassword" id="confirmPassword">
+                            </p>
+                            <span class="text-danger d-none" style="font-size: 12px; margin-left: 10px;" id="confirmPasswordError"></span>
+                             <p>   
+                                <label>Mobile Number <span>*</span></label>
+                                <input type="text" name="phone" id="phone">
+                            </p>
+                            <span class="text-danger d-none" style="font-size: 12px; margin-left: 10px;" id="phoneError"></span>
+                            <div class="login_submit">
+                                <button type="submit">Register</button>
+                            </div>
+                        </form>
+                    </div>    
+                </div>
+                <!--register area end-->
+            </div>
+        </div>    
+    </div>
+    <!-- customer login end -->
+
+    <%- include("../partials/footer") %>
+
+    <script>
+       
+        function validateForm() {
+        console.log('1');
+        const name = document.getElementById("name");
+        const email = document.getElementById("email");
+        const phone = document.getElementById("phone");
+        const password = document.getElementById("password");
+        const confirmPassword = document.getElementById("confirmPassword");
+
+        const nameRegex = /^[a-zA-Z0-9_]+$/;
+        const emailRegX = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+        const phoneRegex = /^\d{10}$/;
+        const passRegX = /^.{6,}$/;
+
+
+        // Name validation
+        if (name.value === "" || name.value === null) {
+            document.getElementById("nameError").classList.remove('d-none');
+            document.getElementById("nameError").innerHTML = "Name must be filled!";
+            return false;
+        } else if (!name.value.match(nameRegex)) {
+            document.getElementById("nameError").classList.remove('d-none');
+            document.getElementById("nameError").innerHTML = "Invalid name";
+            return false;
+        } else {
+            document.getElementById('nameError').innerHTML = "";
+            document.getElementById('nameError').classList.add('d-none');
+        }
+
+        // Email validation
+        if (email.value === "" || email.value === null) {
+            document.getElementById("emailError").classList.remove('d-none');
+            document.getElementById("emailError").innerHTML = "Email must be filled!";
+            return false;
+        } else if (!email.value.match(emailRegX)) {
+            document.getElementById("emailError").classList.remove('d-none');
+            document.getElementById("emailError").innerHTML = "Invalid Email Address";
+            return false;
+        } else {
+            document.getElementById("emailError").innerHTML = "";
+            document.getElementById("emailError").classList.add('d-none');
+        }
+
+        // Phone validation
+        if (phone.value === "" || phone.value === null) {
+            document.getElementById("phoneError").classList.remove('d-none');
+            document.getElementById("phoneError").innerHTML = "Phone number must be filled!";
+            return false;
+        } else if (!phone.value.match(phoneRegex)) {
+            document.getElementById("phoneError").classList.remove('d-none');
+            document.getElementById("phoneError").innerHTML = "Invalid Phone Number";
+            return false;
+        } else {
+            document.getElementById("phoneError").innerHTML = "";
+            document.getElementById("phoneError").classList.add('d-none');
+        }
+
+        // Password validation
+        if (password.value === "" || password.value === null) {
+            document.getElementById("passwordError").classList.remove('d-none');
+            document.getElementById("passwordError").innerHTML = "Password must be filled!";
+            return false;
+        } else if (!password.value.match(passRegX)) {
+            document.getElementById("passwordError").classList.remove('d-none');
+            document.getElementById("passwordError").innerHTML = "Password must contain at least 6 characters.";
+            return false;
+        } else {
+            document.getElementById("passwordError").classList.add('d-none');
+        }
+
+        // Confirm password validation
+
+    const confirmPasswordValue = confirmPassword.value.trim();
+    if (confirmPasswordValue === "" || confirmPasswordValue === null) {
+        document.getElementById("confirmPasswordError").classList.remove('d-none');
+        document.getElementById("confirmPasswordError").innerHTML = "Confirm Password must be filled!";
+        return false;
+    } else if (confirmPasswordValue !== password.value) {
+        document.getElementById("confirmPasswordError").classList.remove('d-none');
+        document.getElementById("confirmPasswordError").innerHTML = "Passwords do not match.";
+        return false;
+    } else {
+        document.getElementById("confirmPasswordError").classList.add('d-none');
+    }
+        return true; // Allow form submission if all validations pass
+    }
+
+    </script>

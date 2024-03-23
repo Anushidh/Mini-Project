@@ -1,0 +1,207 @@
+<%- include("../partials/adminHeader") %>
+
+
+    <style>
+        .col-md-3 {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            margin: 10px;
+        }
+
+        .error-message {
+            color: red;
+            margin-top: 5px;
+        }
+
+        .form-label {
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .d-grid {
+            margin-top: 20px;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            color: #fff;
+            border: 1px solid #007bff;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+    </style>
+
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Coupons </h2>
+
+            </div>
+
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <form method="post" action="/admin/add-coupon">
+
+                            <!-- <body onload="setDefaultStartDate()"> -->
+
+                                <div class="mb-4">
+                                    <label for="coupon-name" class="form-label">Coupon Name</label>
+                                    <input type="text" id="coupon-name" name="couponName" placeholder="Type here"
+                                        class="form-control" />
+                                    <!-- <div id="error-coupon-name" class="error-message"></div> -->
+                                </div>
+
+                                <!-- <div class="mb-4">
+                                    <label for="coupon-code" class="form-label">Coupon Code</label>
+                                    <input type="text" id="coupon-code" name="couponCode" placeholder="Enter coupon code" class="form-control" />
+                                     <div id="error-coupon-code" class="error-message"></div> 
+                                </div> -->
+
+                                <div>
+                                    <label for="startingDate" class="form-label">Start Date</label>
+                                    <input type="date" name="startDate" class="form-control" required="true"
+                                        id="startingDate" />
+                                    <!-- <div id="error-start-date" class="error-message"></div> -->
+                                </div>
+
+                                <div>
+                                    <label for="expiringDate" class="form-label">End Date</label>
+                                    <input type="date" name="endDate" class="form-control" id="expiringDate"
+                                        required="true" />
+                                    <!-- <div id="error-end-date" class="error-message"></div> -->
+                                </div>
+
+                                <!-- <div>
+                                    <label for="offer-price" class="form-label">Offer Price</label>
+                                    <input type="text" name="offerPrice" placeholder="Type here" class="form-control" />
+                                    <div id="error-offer-price" class="error-message"></div>
+                                </div> -->
+
+                                <div>
+                                    <label for="minimum-price" class="form-label">Discount Amount</label>
+                                    <input type="text" name="discountAmount" placeholder="Type here"
+                                        class="form-control" />
+                                    <!-- <div id="error-discount-amount" class="error-message"></div> -->
+                                </div>
+
+                                <div class="d-grid">
+                                    <button class="btn btn-primary mt-20"
+                                        type="submit">Add Coupon</button>
+                                </div>
+
+                                <!-- Container for global error messages -->
+                                <div id="err-msg" class="error-message"></div>
+
+                            </body>
+                        </form>
+
+                    </div>
+                    <div class="col-md-7 ml-105">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Coupon Code</th>
+                                        <th>Created On</th>
+                                        <th>Expire On</th>
+                                        <th>Discount Amount</th>
+                                        <th>Delete</th>
+
+                                    </tr>
+                                </thead>
+
+                                <% for (let i=0; i < coupons.length; i++) { %>
+                               
+                                    <tbody>
+
+                                        <td class="text-start">
+                                            <%= coupons[i].couponName %>
+                                        </td>
+                                        <td class="text-start">
+                                            <%= coupons[i].couponCode %>
+                                        </td>
+                                        <td class="text-start">
+                                            <%= new Date(coupons[i].createdOn).toLocaleDateString() %>
+                                        </td>
+                                        <td class="text-start">
+                                            <%= new Date(coupons[i].expiryDate).toLocaleDateString() %>
+                                        </td>
+                                        <td class="text-start">
+                                            <%= coupons[i].discount %>
+                                        </td>
+                                        
+                                        <td width="10%"><a onclick="deleteCoupon('<%= coupons[i]._id %>')"
+                                            class="btn btn-sm btn-danger rounded font-sm mt-15">Delete</a> </td>
+
+                                    </tbody>
+                                    <% } %>
+
+
+                            </table>
+
+                        </div>
+                    </div> <!-- .col// -->
+                </div> <!-- .row // -->
+            </div> <!-- card body .// -->
+        </div> <!-- card .// -->
+    </section> <!-- content-main end// -->
+
+
+
+    <%- include("../partials/adminFooter") %>
+
+    <script>
+        function deleteCoupon(couponId) {
+    console.log("clicked", couponId);
+    Swal.fire({
+        title: 'Are you sure you want to delete this coupon?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: "/admin/deleteCoupon/" + couponId,
+                type: 'get',
+            }).done((res) => {
+                if (res) {
+                    Swal.fire(
+                        'Successful',
+                        `${res.message}`,
+                        'success'
+                    ).then(() => {
+                        location.reload();
+                    }).then(() => {
+                        location.href = '/admin/coupons';
+                    });
+                }
+            }).fail((error) => {
+                console.log(error);
+            });
+        }
+    });
+}
+
+    </script>

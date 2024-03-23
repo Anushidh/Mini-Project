@@ -1,0 +1,226 @@
+<%- include("../partials/adminHeader") %>
+
+<div class="content-header">
+    <div>
+        <h2 class="content-title card-title">Category Offer Management</h2>  
+    </div>
+    <!-- <div style="float: right; margin-right: 10px;">
+        <button style="background-color: green; color: white; border: none; padding: 10px 20px; cursor: pointer;">Add Offer</button>
+    </div> -->
+    <div>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryOfferModal"
+            data-bs-whatever="@getbootstrap">Add Offer +</button>
+    </div>
+</div>
+
+<div class="right mt-5">
+  <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col"><b>No</b></th>
+          <th scope="col"><b>Offer Name</b></th>
+          <th scope="col"><b>Category</b></th>
+          <!-- <th scope="col"><b>Brand</b></th> -->
+          <th scope="col"><b>Discount</b></th>
+          <th scope="col"><b>Starting Date</b></th>
+          <th scope="col"><b>Ending Date</b></th>
+          <th scope="col"><b>Delete</b></th>
+          <th scope="col"><b>Edit</b></th>
+        </tr>
+      </thead>
+      <tbody>
+          <% for(let i = 0; i < catoffers.length; i++) { %>
+              <tr>
+                  <td><%= i + 1 %></td>
+                  <td><%= catoffers[i].name %></td>
+                  <td><%= catoffers[i].categoryOffer.category.name %></td>
+                  <td><%= catoffers[i].discount %> %</td>
+                  <td><%= catoffers[i].startingDate.toLocaleDateString() %></td>
+                  <td><%= catoffers[i].endingDate.toLocaleDateString() %></td>
+                  <td width="10%"><a onclick="deleteOffer('<%= catoffers[i]._id %>')"
+                    class="btn btn-sm btn-danger rounded font-sm mt-15">Delete</a> </td> 
+                    <td>
+                      <button type="button" class="btn btn-primary edit-category-offer-btn" 
+                          style="padding: 5px 10px; font-size: 12px;" 
+                          data-bs-toggle="modal" data-bs-target="#editCategoryOfferModal" 
+                          data-offer-id="<%= catoffers[i]._id %>"
+                          data-offer-name="<%= catoffers[i].name %>"
+                          data-category-name="<%= catoffers[i].categoryOffer.category.name %>"
+                          data-discount="<%= catoffers[i].discount %>"
+                          data-starting-date="<%= catoffers[i].startingDate %>"
+                          data-ending-date="<%= catoffers[i].endingDate %>"
+                      >
+                      Edit Offer +
+                      </button>
+                  </td>   
+              </tr>
+          <% } %>
+      </tbody>
+      
+    </table>
+</div>
+
+<div class="modal fade" id="addCategoryOfferModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Add Category Offer</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <form action="/admin/add-catOffer" method="post" id="addCategoryOfferForm">
+                  <div class="mb-3">
+                      <label for="offerName" class="col-form-label">Offer Name</label>
+                      <input type="text" class="form-control" name="name" id="offerName" required>
+                  </div>
+                  <div class="mb-3">
+                      <label for="category" class="col-form-label">Category</label>
+                      <select name="category" id="category" class="form-select" required>
+                        <% for( let i = 0; i < categories.length; i++ ) { %>
+                              <option value="<%= categories[i]._id %>"><%= categories[i].name %></option>
+                              <% } %>
+                      </select>
+                  </div>
+                  <div class="mb-3">
+                      <label for="discount" class="col-form-label">Discount %</label>
+                      <input type="number" class="form-control" name="discount" id="discount" required>
+                  </div>
+                  <div class="mb-3">
+                      <label for="startingDate" class="col-form-label">Starting Date</label>
+                      <input type="date" class="form-control" name="startingDate" id="startingDate" required>
+                  </div>
+                  <div class="mb-3">
+                      <label for="endingDate" class="col-form-label">Ending Date</label>
+                      <input type="date" class="form-control" name="endingDate" id="endingDate" required>
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      <button type="submit" class="btn btn-primary">Add Category Offer</button>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- Edit Category Offer Modal -->
+<div class="modal fade" id="editCategoryOfferModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Edit Category Offer</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <form action="/admin/edit-catOffer" method="post" id="editCategoryOfferForm">
+                  <!-- Input fields to edit category offer -->
+                  <input type="hidden" name="offerId" id="editOfferId">
+                  <div class="mb-3">
+                      <label for="editOfferName" class="col-form-label">Offer Name</label>
+                      <input type="text" class="form-control" name="name" id="editOfferName">
+                  </div>
+                  <div class="mb-3">
+                      <label for="editCategory" class="col-form-label">Category</label>
+                      <select name="category" id="editCategory" class="form-select">
+                        <% for( let i = 0; i < categories.length; i++ ) { %>
+                          <option value="<%= categories[i]._id %>"><%= categories[i].name %></option>
+                          <% } %>
+                      </select>
+                  </div>
+                  <div class="mb-3">
+                      <label for="editDiscount" class="col-form-label">Discount %</label>
+                      <input type="number" class="form-control" name="discount" id="editDiscount">
+                  </div>
+                  <div class="mb-3">
+                      <label for="editStartingDate" class="col-form-label">Starting Date</label>
+                      <input type="date" class="form-control" name="startingDate" id="editStartingDate">
+                  </div>
+                  <div class="mb-3">
+                      <label for="editEndingDate" class="col-form-label">Ending Date</label>
+                      <input type="date" class="form-control" name="endingDate" id="editEndingDate">
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      <button type="submit" class="btn btn-primary">Update Offer</button>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </div>
+</div>
+
+<%- include("../partials/adminFooter") %>
+
+<script>
+
+// JavaScript to populate the edit modal fields with category offer details
+function populateEditCategoryModal(offerId, offerName, categoryName, discount, startDate, endDate) {
+    document.getElementById('editOfferId').value = offerId;
+    document.getElementById('editOfferName').value = offerName;
+    document.getElementById('editDiscount').value = discount;
+    document.getElementById('editStartingDate').value = startDate;
+    document.getElementById('editEndingDate').value = endDate;
+
+    // Set the selected category in the dropdown
+    var select = document.getElementById('editCategory');
+    for (var i = 0; i < select.options.length; i++) {
+        if (select.options[i].text === categoryName) {
+            select.selectedIndex = i;
+            break;
+        }
+    }
+
+    // Show the edit modal
+    var editModal = new bootstrap.Modal(document.getElementById('editCategoryOfferModal'));
+    editModal.show();
+}
+
+// Add event listeners to all "Edit Category Offer" buttons
+document.querySelectorAll('.edit-category-offer-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        // Extract offer details from the data attributes of the button
+        var offerId = this.getAttribute('data-offer-id');
+        var offerName = this.getAttribute('data-offer-name');
+        var categoryName = this.getAttribute('data-category-name');
+        var discount = this.getAttribute('data-discount');
+        var startDate = this.getAttribute('data-starting-date');
+        var endDate = this.getAttribute('data-ending-date');
+
+        // Populate the edit modal with category offer details
+        populateEditCategoryModal(offerId, offerName, categoryName, discount, startDate, endDate);
+    });
+});
+
+
+function deleteOffer(offerId) {
+    console.log("clicked", offerId);
+    Swal.fire({
+        title: 'Are you sure you want to delete this offer?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: "/admin/delete-catOffer/" + offerId,
+                type: 'get',
+            }).done((res) => {
+                if (res) {
+                    Swal.fire(
+                        'Successful',
+                        'Offer deleted successfully',
+                        'success'
+                    ).then(() => {
+                        location.reload();
+                    });
+                }
+            }).fail((error) => {
+                console.log(error);
+            });
+        }
+    });
+}
+</script>

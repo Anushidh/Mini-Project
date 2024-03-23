@@ -1,0 +1,336 @@
+<%- include("../partials/header") %>
+
+    <!--breadcrumbs area start-->
+    <div class="breadcrumbs_area other_bread">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="breadcrumb_content">
+                        <ul>
+                            <li><a href="/login">home</a></li>
+                            <li>/</li>
+                            <li>cart</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs area end-->
+
+    <!--shopping cart area start -->
+    <div class="shopping_cart_area">
+        <div class="container">
+            <form action="#" method="post">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="table_desc">
+                            <div class="cart_page table-responsive">
+                                <table>
+                                    <thead>
+                                        <tr>
+
+                                            <th class="product_thumb">Image</th>
+                                            <th class="product_name">Product</th>
+                                            <th class="product-price">Price</th>
+                                            <th class="product_size">Size</th>
+                                            <th class="product_quantity">Quantity</th>
+                                            <th class="product_total">Total</th>
+                                            <th class="product_remove">Delete</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% for (let i=0; i < allCartItems.length; i++) { %>
+
+                                            <tr>
+
+                                                <td class=" image product_thumb"><a href="#"><img
+                                                            src="/uploads/product-images/<%=allCartItems[i].product.productImage[0] %>"
+                                                            alt=""></a></td>
+                                                <td class="product_name"><a href="#">
+                                                        <%= allCartItems[i].product.productName %>
+                                                    </a></td>
+                                                <td class="product-price">
+                                                    <%= currencyFormat(allCartItems[i].product.salePrice) %>
+                                                </td>
+                                                <td class="product_size">
+                                                    <%= allCartItems[i].size %>
+                                                </td>
+                                                <td class="product_quantity">
+                                                    <input id="quantity<%= allCartItems[i].product._id %>" min="1"
+                                                        max="5" value="<%= allCartItems[i].quantity %>" type="number"
+                                                        onchange="updateQuantityAndMax('<%= allCartItems[i].item._id %>', '<%= allCartItems[i]._id %>', this.value, '<%= allCartItems[i].size %>', '<%= allCartItems[i].product.salePrice %>')">
+                                                </td>
+
+                                                <td class="product_total">
+                                                    <%= currencyFormat(allCartItems[i].product.salePrice *
+                                                        allCartItems[i].quantity) %>
+                                                </td>
+                                                <td class="product_remove">
+                                                    <a href="#"
+                                                        onclick="productRemove('<%= allCartItems[i].item._id %>', '<%= allCartItems[i]._id %>', '<%= allCartItems[i].size %>')">
+                                                        <i class="fa fa-trash-o"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            <% } %>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="cart_submit">
+                                <button type="submit">update cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--coupon code area start-->
+                <div class="coupon_area">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6">
+                            <div class="coupon_code left">
+                                <h3>Coupon</h3>
+                                <div class="coupon_inner">
+                                    <p>Enter your coupon code if you have one.</p>
+                                    <input placeholder="Coupon code" type="text">
+                                    <button type="submit">Apply coupon</button>
+                                </div>
+                            </div>
+                            <button id="remove_coupon_button" type="button" style="background-color: lightcoral; color: black; margin-left: 60px; border: none;">Remove coupon</button>
+                        </div>
+                        <div class="col-lg-6 col-md-6">
+                            <div class="coupon_code right">
+                                <h3>Cart Totals</h3>
+                                <div class="coupon_inner">
+                                    <div class="cart_subtotal" id="totalAmount">
+                                        <p>Total</p>
+                                        <p class="cart_amount">
+                                            <%= totalAmount %>
+                                        </p>
+                                    </div>
+                                    <!-- <div class="cart_subtotal ">
+                                       <p>Shipping</p>
+                                       <p class="cart_amount"><span>Flat Rate:</span> £255.00</p>
+                                   </div> -->
+                                    <!-- <a href="#">Calculate shipping</a> -->
+
+                                    <!-- <div class="cart_subtotal">
+                                       <p>Total</p>
+                                       <p class="cart_amount">£215.00</p>
+                                   </div> -->
+                                    <div class="checkout_btn">
+                                        <a href="/checkoutPage">Proceed to Checkout</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--coupon code area end-->
+
+            </form>
+        </div>
+    </div>
+    <!--shopping cart area end -->
+
+    <%- include("../partials/footer") %>
+
+        <script>
+
+
+// function validateQuantity(itemId, selectedSize) {
+//     // Retrieve the maximum quantity from the element or server response
+//     const maxQuantity = parseInt(document.getElementById(`quantity${itemId}`).getAttribute('max'));
+//     console.log(maxQuantity);
+//     // Retrieve the current quantity entered by the user
+//     const currentQuantity = parseInt(document.getElementById(`quantity${itemId}`).value);
+//     console.log(currentQuantity);
+
+//     // Compare current quantity with maximum quantity
+//     if (currentQuantity > maxQuantity) {
+//         // Display an error message to the user
+//         // Swal.fire({
+//         //     icon: 'error',
+//         //     title: 'Error',
+//         //     text: `The quantity cannot exceed the maximum allowed quantity of ${maxQuantity}.`
+//         // });
+//         console.log('1');
+//         // Prevent the form submission
+//         return false;
+//     }
+//     // If validation passes, return true to allow form submission
+//     return true;
+// }
+
+    function updateQuantityAndMax(itemId, cartId, newQuantity, selectedSize, price) {
+    // Validate quantity before sending to the server
+    //  if (!validateQuantity(itemId, selectedSize)) {
+    //     return; // Stop further execution if validation fails
+    // }
+    $.ajax({
+        url: '/quantity-change',
+        type: 'POST',
+        data: {
+            productId: itemId,
+            cartId: cartId,
+            quantity: newQuantity,
+            selectedSize: selectedSize
+        },
+        success: function(response) {
+            if (response) {
+                // Update the quantity displayed in the UI
+                document.getElementById('quantity' + itemId).value = response.message.quantity;
+
+                // Update the total amount displayed in the UI
+                document.getElementById('totalAmount').innerHTML = response.message.totalAmount;
+
+
+                // Calculate the total price for the product
+            let totalPrice = response.message.quantity * price;
+
+            // Format the total price as a currency string
+            let formattedTotalPrice = totalPrice.toLocaleString('en-in', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
+
+            // Set the formatted total price as the innerHTML of the product-price table cell
+            document.getElementById('productPrice' + itemId).innerHTML = formattedTotalPrice;
+
+                // Calculate and update the total price for the product
+                // let total = response.message.quantity * price;
+                // document.getElementById('productPrice' + itemId).innerHTML = total.toLocaleString('en-in', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
+            }
+        },
+        error: function(error) {
+            console.error('Error updating quantity:', error);
+        }
+    });
+}  
+
+
+
+                          
+
+            function productRemove(productId, cartId, size) {
+                // console.log(cartId);
+                // console.log(productId);
+                // console.log(size);
+                Swal.fire({
+                    title: 'Do you want to remove this item from cart?',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/remove-cart-item/' + productId,
+                            data: {
+                                cartId: cartId,
+                                size: size
+                            },
+                            type: 'post',
+                        }).done((res) => {
+                            Swal.fire('Success', `${res.message}`, 'success').then(() => {
+                                location.reload();
+                            });
+                            console.log(`${res.message}`);
+                        }).fail((error) => {
+                            console.log(error);
+                        });
+                    }
+                });
+
+            }
+
+
+    // Add event listener to the apply coupon button inside the coupon_code div
+    document.querySelector('.coupon_code button[type="submit"]').addEventListener('click', function(event) {
+    event.preventDefault(); // Prevent default form submission behavior
+    
+    var couponCode = document.querySelector('.coupon_code input').value; // Get the entered coupon code
+
+    // Send AJAX request to apply the coupon
+    $.ajax({
+        url: "/applyCoupon",
+        type: 'POST',
+        data: { couponCode: couponCode },
+        success: function(response) {
+            if (response.success) {
+                // Update the order total displayed on the page
+                var totalAmountElement = document.querySelector('#totalAmount .cart_amount');
+                if (totalAmountElement) {
+                totalAmountElement.innerText = '₹' + response.cart.totalPrice;
+        }
+                 // Display a success message to the user
+                 Swal.fire({
+                    icon: 'success',
+                    title: 'Coupon Applied!',
+                    text: 'Discount applied successfully.'
+                })
+            } else {
+                // Display an error message if the coupon code is invalid or coupon is expired
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Coupon Error',
+                    text: response.message // Display the message received from the server
+                });
+            }
+        },
+        error: function(xhr, status, error) {
+            // Handle AJAX errors
+            console.error(xhr.responseText);
+            // Display an error message
+            Swal.fire({
+                icon: 'error',
+                title: 'Server Error',
+                text: 'An error occurred while processing your request. Please try again later.'
+            });
+        }
+    });
+});
+
+// Add event listener to the remove coupon button
+document.getElementById('remove_coupon_button').addEventListener('click', function(event) {
+    event.preventDefault(); // Prevent default button behavior
+
+    // Send AJAX request to remove the coupon
+    $.ajax({
+        url: "/removeCoupon",
+        type: 'POST',
+        success: function(response) {
+            if (response.success) {
+                // Update the order total displayed on the page
+                var totalAmountElement = document.querySelector('#totalAmount .cart_amount');
+                if (totalAmountElement) {
+                    totalAmountElement.innerText = '₹' + response.cart.totalPrice;
+                }
+
+                // Display a success message to the user
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Coupon Removed!',
+                    text: 'Coupon removed successfully.'
+                });
+            } else {
+                // Display an error message if the coupon removal was unsuccessful
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Coupon Removal Error',
+                    text: response.message // Display the message received from the server
+                });
+            }
+        },
+        error: function(xhr, status, error) {
+            // Handle AJAX errors
+            console.error(xhr.responseText);
+            // Display an error message
+            Swal.fire({
+                icon: 'error',
+                title: 'Server Error',
+                text: 'An error occurred while processing your request. Please try again later.'
+            });
+        }
+    });
+});
+
+
+        </script>

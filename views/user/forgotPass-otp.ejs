@@ -1,0 +1,52 @@
+<%- include("../partials/header") %>
+
+<div class="breadcrumbs_area other_bread">
+  <div class="container">   
+      <div class="row">
+          <div class="col-12">
+              <div class="breadcrumb_content">
+                  <ul>
+                      <li><a href="home.ejs">home</a></li>
+                      <li>/</li>
+                      <li>Verify OTP</li>
+                  </ul>
+              </div>
+          </div>
+      </div>
+  </div>         
+</div>
+<!--breadcrumbs area end-->
+
+
+<!-- customer login start -->
+<div class="customer_login">
+  <div class="container">
+      <div class="row">
+         <!--login area start-->
+          <div class="col-lg-6 col-md-6">
+              <div class="account_form">
+                  <h2>Verify OTP</h2>
+                  <form action="/verifyForgotPassOtp" method="post">
+                       <p>   
+                          <label>Enter OTP <span>*</span></label>
+                          <input type="text" required="" name="otp">
+                       </p>   
+                      <div class="login_submit">
+                         <a href="/resendOtp">Resend OTP</a>
+                          <label for="remember">
+                              <input id="remember" type="checkbox">
+                              Remember me
+                          </label>
+                          <button type="submit" name="newotp">Verify</button>
+                          
+                      </div>
+
+                  </form>
+               </div>    
+          </div>
+          <!--login area start-->
+        </div>
+      </div>    
+  </div>
+
+<%- include("../partials/footer") %>

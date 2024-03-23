@@ -1,0 +1,338 @@
+<%- include("../partials/header") %>
+ 
+    <!--breadcrumbs area start-->
+    <div class="breadcrumbs_area other_bread">
+        <div class="container">   
+            <div class="row">
+                <div class="col-12">
+                    <div class="breadcrumb_content">
+                        <ul>
+                            <li><a href="/">home</a></li>
+                            <li>/</li>
+                            <li>my account</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>         
+    </div>
+    <!--breadcrumbs area end-->
+    
+    <!-- my account start  -->
+    <section class="main_content_area">
+        <div class="container">   
+            <div class="account_dashboard">
+                <div class="row">
+                    <div class="col-sm-12 col-md-3 col-lg-3">
+                        <!-- Nav tabs -->
+                        <div class="dashboard_tab_button">
+                            <ul role="tablist" class="nav flex-column dashboard-list">
+                                <li><a href="#dashboard" data-bs-toggle="tab" class="nav-link active">Dashboard</a></li>
+                                <li> <a href="#orders" data-bs-toggle="tab" class="nav-link">Orders</a></li>
+                                <li><a href="#downloads" data-bs-toggle="tab" class="nav-link">Downloads</a></li>
+                                <li><a href="#address" data-bs-toggle="tab" class="nav-link">My Address</a></li>
+                                <li><a href="#account-details" data-bs-toggle="tab" class="nav-link">Add Address</a></li>
+                                <li><a href="#change-password" data-bs-toggle="tab" class="nav-link">Change Password</a></li>
+                                <li><a href="/logout" class="nav-link">logout</a></li>
+                            </ul>
+                        </div>    
+                    </div>
+                    <div class="col-sm-12 col-md-9 col-lg-9">
+                        <!-- Tab panes -->
+                        <div class="tab-content dashboard_content">
+                            <div class="tab-pane fade show active" id="dashboard">
+                                <h3>Dashboard </h3>
+                                <p>From your account dashboard. you can easily check &amp; view your <a href="#">recent orders</a>, manage your <a href="#">shipping and billing addresses</a> and <a href="#">Edit your password and account details.</a></p>
+                            </div>
+                            <div class="tab-pane fade" id="orders">
+                                <h3>Orders</h3>
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Order</th>
+                                                <th>Date</th>
+                                                <th>Status</th>
+                                                <th>Total</th>
+                                                <th>Actions</th>
+                                                <th></th>	 	 	 	
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% for (let i = 0; i < userOrders.length; i++) { %>
+                                            <tr>
+                                                <td><%= i + 1 %></td>
+                                                <td><%= formatDate(userOrders[i].orderDate) %></td>
+                                                <td><span class="success"><%= userOrders[i].orderStatus %></span></td>
+                                                <td>₹<%= userOrders[i].totalAmount %></td>
+                                                <td><a href="/order-details/<%= userOrders[i]._id %>" class="view">view</a></td>
+                                                <td>
+                                                    <a href="/order-details/<%= userOrders[i]._id %>" class="view"></a>
+                                                    <% if (userOrders[i].orderStatus === 'confirmed' || userOrders[i].orderStatus === 'pending') { %>
+                                                    <button class="cancel-btn" data-order-id="<%= userOrders[i]._id %>">Cancel</button>
+                                                    <% } else { %>
+                                                    <span>Cancelled</span>
+                                                    <% } %>
+                                                </td>
+                                            </tr>
+                                            <% } %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="downloads">
+                                <h3>Downloads</h3>
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Product</th>
+                                                <th>Downloads</th>
+                                                <th>Expires</th>
+                                                <th>Download</th>	 	 	 	
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Shopnovilla - Free Real Estate PSD Template</td>
+                                                <td>May 10, 2022</td>
+                                                <td><span class="danger">Expired</span></td>
+                                                <td><a href="#" class="view">Click Here To Download Your File</a></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Organic - ecommerce html template</td>
+                                                <td>Sep 11, 2022</td>
+                                                <td>Never</td>
+                                                <td><a href="#" class="view">Click Here To Download Your File</a></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="address" style="margin-left: 60px;">
+                                <div style="display: flex; flex-wrap: wrap;">
+                                <div style="display: flex; margin-right: 20px; margin-bottom: 20px;">
+                                <% for (let i = 0; i < allAddress.length; i++) { %>
+                                    <div class="address-item" style="margin-right: 50px;">
+                                <a href="/edit-address" class="view">Edit</a>
+                                <p><strong style="font-weight: bold; color: #333;">Name:</strong> <span style="padding-left: 10px;"><%= allAddress[i].name %></span></p>
+                                <p><strong style="font-weight: bold; color: #333;">House:</strong> <span style="padding-left: 10px;"><%= allAddress[i].house %></span></p>
+                                <p><strong style="font-weight: bold; color: #333;">City:</strong> <span style="padding-left: 10px;"><%= allAddress[i].city %></span></p>
+                                <p><strong style="font-weight: bold; color: #333;">State:</strong> <span style="padding-left: 10px;"><%= allAddress[i].state %></span></p>
+                                <p><strong style="font-weight: bold; color: #333;">Pincode:</strong> <span style="padding-left: 10px;"><%= allAddress[i].pincode %></span></p>
+                            </div>
+                            <% } %>
+                            </div>
+                            </div>
+                        </div>
+                               
+                            
+                            <div class="tab-pane fade" id="account-details">
+                                <h3>Add Address</h3>
+                                <div class="login">
+                                    <div class="login_form_container">
+                                        <div class="account_login_form">
+                                            <form id="addressForm" action="/add-address" method="POST">
+                                                <label for="name">Name</label>
+                                                <input type="text" id="name" name="name" required><br>
+                                                <label for="house">House</label>
+                                                <input type="text" id="house" name="house" required><br>
+                                                <label for="city">City</label>
+                                                <input type="text" id="city" name="city" required><br>
+                                                <label for="state">State</label>
+                                                <input type="text" id="state" name="state" required><br>
+                                                <label for="pincode">Pin-code</label>
+                                                <input type="text" id="pincode" name="pincode" required><br>
+                                                <input type="hidden" id="userId" name="userId" value="<%= loginStatus._id %>">
+                                                <div style="text-align: center; margin-top: 10px;">
+                                                    <button type="submit">Save</button>
+                                                </div>
+                                            </form> 
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="change-password">
+                                <h3>Change Password</h3>
+                                <form id="changePasswordForm">
+                                    <div class="form-group">
+                                        <label for="currentPassword">Current Password:</label>
+                                        <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="newPassword">New Password:</label>
+                                        <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Change Password</button>
+                                    <span class="text-danger d-none" style="font-size: 12px; margin-left: 10px;" id="passwordError"></span>
+                                </form>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>  
+        </div>        	
+    </section>			
+    <!-- my account end   --> 
+
+
+    <%- include("../partials/footer") %>
+
+    <script>
+
+
+$(document).ready(function() {
+        $('#addressForm').submit(function(event) {
+            event.preventDefault(); // Prevent default form submission
+            
+            // Collect address details from form fields
+            var addressData = {
+                name: $('#name').val(),
+                house: $('#house').val(),
+                city: $('#city').val(),
+                state: $('#state').val(),
+                pincode: $('#pincode').val(),
+                userId: $('#userId').val() // Fetch user ID from hidden input field
+            };
+            
+            // Send AJAX request to backend
+            $.ajax({
+                type: 'POST',
+                url: '/add-address',
+                data: addressData,
+                success: function(response) {
+                    console.log('Address added successfully:', response);
+                    // Clear the form fields
+                    $('#name').val('');
+                    $('#house').val('');
+                    $('#city').val('');
+                    $('#state').val('');
+                    $('#pincode').val('');
+                },
+                error: function(error) {
+                    console.error('Error adding address:', error);
+                }
+            });
+        });
+    });
+
+    $(document).ready(function() {
+    $('#changePasswordForm').submit(function(event) {
+        event.preventDefault(); // Prevent the default form submission
+        
+        var currentPassword = $('#currentPassword').val();
+        var newPassword = $('#newPassword').val();
+        
+        // Check if passwords are the same
+        if (currentPassword === newPassword) {
+            // Show error message
+            $('#passwordError').text('Current password and new password cannot be the same.').removeClass('d-none');
+            return; // Stop further execution
+        }
+
+        // Get the form data
+        var formData = $(this).serialize();
+        
+        // Send an AJAX request to the server
+        $.ajax({
+            type: 'POST', // Use POST method
+            url: '/change-password', // Specify the server endpoint
+            data: formData, // Pass the form data
+            success: function(response) {
+                // Handle the success response
+                console.log('Password changed successfully');
+                // Show success message using SweetAlert2
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Password Changed',
+                    text: 'Your password has been changed successfully.'
+                });
+                // Clear the password fields
+                $('#currentPassword').val('');
+                $('#newPassword').val('');
+            },
+            error: function(xhr, status, error) {
+                // Handle any errors
+                console.error('Error changing password:', error);
+                // Show error message using SweetAlert2
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while changing your password. Please try again.'
+                });
+            }
+        });
+    });
+});
+document.getElementById('changePasswordForm').addEventListener('submit', function(event) {
+    const newPassword = document.getElementById('newPassword').value;
+    const currentPassword = document.getElementById('currentPassword').value;
+    console.log(newPassword);
+    console.log(currentPassword);
+    if (newPassword === currentPassword) {
+      event.preventDefault(); // Prevent form submission
+      document.getElementById('passwordError').style.display = 'block';
+      
+    }
+  });
+
+  $(document).ready(function() {
+    $('.cancel-btn').click(function() {
+        var orderId = $(this).data('order-id');
+        
+        // Display confirmation dialog using SweetAlert2
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Once cancelled, you will not be able to recover this order!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, cancel it!',
+            cancelButtonText: 'No, keep it'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // User confirmed the cancellation, make AJAX request
+                $.ajax({
+                    url: '/cancel-order',
+                    method: 'POST',
+                    data: { orderId: orderId },
+                    success: function(response) {
+                        // Update the button text to "Cancelled" upon successful cancellation
+                        $('.cancel-btn[data-order-id="' + orderId + '"]').text('Cancelled');
+                        // Show success message using SweetAlert2
+                        Swal.fire(
+                            'Cancelled!',
+                            'Your order has been cancelled.',
+                            'success'
+                        );
+                    },
+                    error: function(err) {
+                        console.error('Error cancelling order:', err);
+                        // Show error message using SweetAlert2
+                        Swal.fire(
+                            'Error!',
+                            'Failed to cancel the order. Please try again later.',
+                            'error'
+                        );
+                    }
+                });
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                // User clicked "No", keep the order
+                Swal.fire(
+                    'Cancelled',
+                    'Your order is safe :)',
+                    'error'
+                );
+            }
+        });
+    });
+});
+
+
+    </script>
+
+    
+    
+
+   

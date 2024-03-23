@@ -1,0 +1,45 @@
+<%- include("../partials/header") %>
+
+<div class="table-responsive">
+  <table style="width: 100%; border-collapse: collapse;">
+      <thead>
+          <tr style="border-bottom: 1px solid #ccc;">
+              <th style="padding: 8px; text-align: center;">Image</th>
+              <th style="padding: 8px; text-align: center;">Name</th>
+              <th style="padding: 8px; text-align: center;">Price</th>
+              <th style="padding: 8px; text-align: center;">Size</th>
+              <th style="padding: 8px; text-align: center;">Quantity</th>
+              <th style="padding: 8px; text-align: center;">Total</th>
+              <th style="padding: 8px; text-align: center;">Status</th>
+              <th style="display: none;">Order ID</th>
+          </tr>
+      </thead>
+      <tbody>
+        <% for (let i = 0; i < orderDetails.length; i++) { %>
+          <!-- Sample order item -->
+          <tr style="border-bottom: 1px solid #ccc;">
+              <td style="padding: 8px; text-align: center;">
+                  <img src="/uploads/product-images/<%=orderDetails[i].productDetails[0].productImage[0]%>" alt="Product Image" style="width: 50px; height: 50px;">
+              </td>
+              <td style="padding: 8px; text-align: center;"><%= orderDetails[i].productDetails[0].productName %></td>
+              <td style="padding: 8px; text-align: center;">₹<%= orderDetails[i].productDetails[0].salePrice %></td>
+              <td style="padding: 8px; text-align: center;"><%= orderDetails[i].orderedItems.size %></td>
+              <td style="padding: 8px; text-align: center;"><%= orderDetails[i].orderedItems.quantity %></td>
+              <td style="padding: 8px; text-align: center;">₹<%= orderDetails[i].productDetails[0].salePrice * orderDetails[i].orderedItems.quantity %></td>
+              <td style="padding: 8px; text-align: center;"><%= orderDetails[i].orderStatus %></td>
+              <td style="display: none;"><%= orderDetails[i]._id %></td>
+          </tr>
+          <!-- Repeat this block for each order item -->
+          <% } %>
+      </tbody>
+  </table>
+</div>
+
+<%- include("../partials/footer") %>
+
+<script>
+
+
+
+
+</script>

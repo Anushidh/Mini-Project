@@ -1,0 +1,177 @@
+<%- include("../partials/header") %>
+    
+    <!--breadcrumbs area start-->
+    <div class="breadcrumbs_area other_bread">
+        <div class="container">   
+            <div class="row">
+                <div class="col-12">
+                    <div class="breadcrumb_content">
+                        <ul>
+                            <li><a href="/">home</a></li>
+                            <li>/</li>
+                            <li>wishlist</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>         
+    </div>
+    <!--breadcrumbs area end-->
+    
+    <!--wishlist area start -->
+    <div class="wishlist_area">
+                <div class="container">   
+                    <form action="#"> 
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="table_desc wishlist">
+                                    <div class="cart_page table-responsive">
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th class="product_remove">Delete</th>
+                                                    <th class="product_thumb">Image</th>
+                                                    <th class="product_name">Product</th>
+                                                    <th class="product-price">Price</th>
+                                                    <th class="product_quantity">Stock Status</th>
+                                                    <th class="product_total">Add To Cart</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% for( let i=0; i < wishlist.length; i++ ) { %>
+                                                <tr>
+                                                   <td class="product_remove"><a href="#"
+                                                    onclick="productRemove('<%= wishlist[i].product._id %>')">X</a></td>
+                                                    <td class="image product_thumb"><a href="#"><img src="/uploads/product-images/<%= wishlist[i].product.productImage && wishlist[i].product.productImage.length > 0 ? wishlist[i].product.productImage[0] : '' %>" alt="" style="max-width: 100px; height: auto; display: block; margin: 0 auto;"></a></td>
+                                                    <td class="product_name"><a href="#"><%= wishlist[i].product.productName %>,<%= wishlist[i].size %></a></td>
+                                                    <td class="product-price">₹<%= wishlist[i].product.salePrice %></td>
+                                                    <td class="product_quantity"><%=stocks[i]%></td>
+                                                    <td class="product_total"><a href="#" onclick="addToCart('<%= wishlist[i].product._id %>')">Add To Cart</a></td>
+                                                    <div style="display: none;" id="productSize<%= wishlist[i].product._id %>">
+                                                        <%= wishlist[i].size %> <!-- Assuming product size is stored in 'size' field -->
+                                                    </div>
+                                                </tr>
+                                                <% } %>
+                                            </tbody>
+                                        </table>   
+                                    </div>  
+
+                                </div>
+                             </div>
+                         </div>
+
+                    </form> 
+                    <div class="row">
+                        <div class="col-12">
+                             <div class="wishlist_share">
+                                <h4>Share on:</h4>
+                                <ul>
+                                    <li><a href="#"><i class="fa fa-rss"></i></a></li>           
+                                    <li><a href="#"><i class="fa fa-vimeo"></i></a></li>           
+                                    <li><a href="#"><i class="fa fa-tumblr"></i></a></li>           
+                                    <li><a href="#"><i class="fa fa-pinterest"></i></a></li>        
+                                    <li><a href="#"><i class="fa fa-linkedin"></i></a></li>        
+                                </ul>      
+                            </div>
+                        </div> 
+                    </div>
+                    
+                </div>
+            </div>
+     <!--wishlist area end -->
+    
+     
+
+     <%- include("../partials/footer") %>
+
+     <script>
+        
+        function productRemove(productId) {
+    // Show a confirmation prompt
+    Swal.fire({
+        title: "Are you sure?",
+        text: "Once removed, you cannot undo this action.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Remove",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // User confirmed removal
+            console.log('clicked', productId);
+            $.ajax({
+                url: '/removeFromWishlist/' + productId,
+                type: 'post',
+                data: {
+                    productId: productId
+                }
+            })
+            .done((res) => {
+                console.log(res);
+
+                Swal.fire("Success", `${res.message}`, "success")
+                .then(() => {
+                    location.reload();
+                });
+            })
+            .fail((err) => {
+                console.log(err);
+            });
+        } else {
+            // User canceled removal
+            console.log('Removal cancelled');
+        }
+    });
+}
+
+function addToCart(prodId) {
+    console.log("Adding product to cart...");
+    console.log(prodId);
+
+    // Fetch the quantity from the user input
+    var quantity = 1; // Assuming your input field has id="quantity"
+    var size = $('#productSize' + prodId).text().trim(); 
+    // Log both quantity and size
+    console.log("Quantity:", quantity);
+    console.log("Size:", size);
+
+    $.ajax({
+        url: `/addToCart/${prodId}/${quantity}/${size}`,
+        method: 'POST',
+        success: (res) => {
+            // Log the response object
+            if (res.status === "true") {
+                Swal.fire({
+                    title: 'Added to Cart!',
+                    text: 'Continue Shopping',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            } else if (res.status === "Out of stock") {
+                Swal.fire({
+                    title: 'Stock!!',
+                    text: "The product is out of stock",
+                    icon: 'error',
+                    timer: 2000,
+                });
+            } else {
+                Swal.fire({
+                    title: 'You need to Login first',
+                    text: 'Continue Shopping',
+                    icon: 'warning',
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => { window.location.href = '/login'; });
+            }
+        },
+        error: (xhr, status, error) => {
+            console.error('Error:', error);
+            // Display an error message to the user (optional)
+            alert('An error occurred while processing your request. Please try again later.');
+        }
+    });
+}
+      </script>
+    

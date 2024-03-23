@@ -1,0 +1,446 @@
+<%- include("../partials/adminHeader") %>
+
+
+<style>
+    .error-message {
+        color: red;
+        margin-top: 5px;
+        font-size: 14px; /* Adjust font size as needed */
+    }
+</style>
+
+
+
+    <section class="content-main">
+        <div class="row">
+            <div class="col-9">
+                <div class="content-header">
+                    <h2 class="content-title">Edit Product</h2>
+
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card mb-4">
+
+                    <div class="card-body">
+                        <form method="post" action="/admin/editProduct/<%=product._id%>" enctype="multipart/form-data" onsubmit="return validateAndSubmit()"
+                            multiple>
+                            <div class="mb-4">
+                                <label for="product_name" class="form-label">Product Name</label>
+                                <input type="text" name="productName" value="<%= product.productName %>"
+                                    class="form-control border" id="product_name">
+                                    <div id="productName-error" class="error-message"></div>
+                            </div>
+                           
+                            <div class="mb-4">
+                                <label class="form-label">Full description</label>
+                                <textarea name="description" class="form-control border"
+                                    rows="4"><%= product.productDescription %></textarea>
+                                    <div id="description" class="error-message"></div>
+
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="mb-4">
+                                        <label class="form-label">Regular price</label>
+                                        <input placeholder="$" name="regularPrice" type="text"
+                                            value="<%= product.regularPrice %>" class="form-control border">
+                                            <div id="regularPrice-error" class="error-message"></div>
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-4">
+                                        <label class="form-label">Sale price</label>
+                                        <input name="salePrice" type="text" value="<%= product.salePrice %>"
+                                            class="form-control border">
+                                            <div id="salePrice-error" class="error-message"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="mb-4">
+                                        <label class="form-label">Small</label>
+                                        <input placeholder="" name="small_quantity" type="text" class="form-control border">
+                                        <div id="small-quantity-error" class="error-message"></div> <!-- Updated ID -->
+                                    </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="mb-4">
+                                            <label class="form-label">Medium</label>
+                                            <input placeholder="" name="medium_quantity" type="text" class="form-control border">
+                                            <div id="medium-quantity-error" class="error-message"></div> <!-- Updated ID -->
+                                        </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <div class="mb-4">
+                                               <label class="form-label">Large</label>
+                                               <input placeholder="" name="large_quantity" type="text" class="form-control border">
+                                               <div id="large-quantity-error" class="error-message"></div> <!-- Updated ID -->
+                                           </div>
+                                      </div> 
+                                </div>
+                            <div class="card mb-4">
+
+                                <div class="card-body">
+                                    <div class="row gx-2">
+                                        <div class="col-sm-6 mb-3">
+                                            <label class="form-label">Category</label>
+                                            <select class="form-select border" style="width: 150px;" name="category">
+                                                <% for (let i=0; i < cat.length; i++) { %>
+                                                    <option value="<%= cat[i]._id %>">
+                                                        <%= cat[i].name %>
+                                                    </option>
+                                                    <% } %>
+                                            </select>
+                                        </div>
+                                    </div> <!-- row.// -->
+                                </div>
+                            </div> <!-- card end// -->
+
+
+                            <div class="card mb-2">
+                                <div class="card-header">
+                                    <h4>Choose images</h4>
+                                </div>
+
+                                <div id="addedImagesContainer" class="col-md-6">
+                                    <% for (let i=0; i < product.productImage.length; i++) { %>
+                                        <div class="col-md-12 mb-4">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <img class="rounded" style="width: 50px; height: 60px;"
+                                                        src="/uploads/product-images/<%= product.productImage[i] %>"
+                                                        alt="image" data-filename="<%= product.productImage[i] %>">
+                                                    <span class="delete-icon"
+                                                        onclick="deleteImage('<%= product._id %>', '<%= product.productImage[i] %>')">❌</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <% } %>
+                                </div>
+
+
+                                <div class="card-body">
+                                    <div class="input-upload">
+                                        <img src="assets/imgs/theme/upload.svg" alt="">
+                                        <input class="form-control border" name="images" id="imageInput" type="file"
+                                            multiple>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <!-- card end// -->
+
+                            <div>
+
+                                <button class="btn btn-md rounded font-sm hover-up" id="updatebtn"
+                                     type="submit">Update</button>
+                            </div>
+                        </form>
+                    </div>
+                </div> <!-- card end// -->
+
+            </div>
+
+
+
+        </div>
+        </div>
+    </section>
+
+
+    <style>
+        .thumbnails-container {
+            display: flex;
+            overflow-x: auto;
+        }
+
+        .thumbnail {
+            margin-right: 10px;
+
+        }
+    </style>
+
+    <script>
+
+            // Array to store selected images
+const selectedImages = [];
+// Array to store selected image filenames
+const selectedImageFilenames = [];
+
+
+
+// Function to handle file input change
+document.getElementById("imageInput").addEventListener("change", handleFileSelect);
+
+function handleFileSelect(event) {
+    // Clear previous content
+    addedImagesContainer.innerHTML = "";
+
+    const files = event.target.files;
+
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+
+        // Image validation checks
+        isValidImage(file);
+    }
+}
+
+// Function to validate image files
+function isValidImage(file) {
+    // Define allowed image file types
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+
+    // Check if the file type is allowed
+    if (!allowedTypes.includes(file.type)) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid file type',
+            text: 'Please upload images of type JPEG, PNG, or GIF.',
+        });
+        return false;
+    }
+
+    // Define maximum allowed file size in bytes (1 MB in this example)
+    const maxSizeBytes = 1024 * 1024; // 1 MB
+
+    // Check if the file size exceeds the maximum allowed size
+    if (file.size > maxSizeBytes) {
+        Swal.fire({
+            icon: 'error',
+            title: 'File size exceeds the maximum allowed size',
+            text: 'Please upload images that are smaller than 1 MB.',
+        });
+        return false;
+    }
+     // Check if the filename already exists in the selectedImageFilenames array
+     if (selectedImageFilenames.includes(file.name)) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Duplicate image',
+            text: 'This image has already been selected. Please choose a different one.',
+        });
+        return false;
+    }
+    // If all validation checks pass, add the file to the selected images array
+    selectedImages.push(file);
+    selectedImageFilenames.push(file.name);
+    // Create thumbnail element
+    const thumbnail = document.createElement("div");
+    thumbnail.classList.add("thumbnail");
+
+    // Create image element
+    const img = document.createElement("img");
+    img.src = URL.createObjectURL(file);
+    img.alt = "thumbnail";
+
+    // Set a fixed width for the image
+    img.style.width = "50px"; // Adjust the width as needed
+    img.style.height = "auto";
+
+    // Create remove icon
+    const removeIcon = document.createElement("span");
+    removeIcon.classList.add("remove-icon");
+    removeIcon.innerHTML = "&times;"; // Multiplication symbol as a cross
+
+    // Event listener to remove the image on icon click
+    removeIcon.addEventListener("click", function () {
+        // Remove the file from the selected images array
+        const index = selectedImages.indexOf(file);
+        if (index !== -1) {
+            selectedImages.splice(index, 1);
+        }
+
+        // Remove the thumbnail from the container
+        thumbnail.remove();
+    });
+
+    // Append elements to thumbnail
+    thumbnail.appendChild(img);
+    thumbnail.appendChild(removeIcon);
+
+    // Append thumbnail to the container
+    addedImagesContainer.appendChild(thumbnail);
+
+    // Return true to indicate that the image is valid
+    return true;
+}
+
+
+        function deleteImage(productId, filename) {
+    // Use Swal.fire for confirmation
+    Swal.fire({
+        title: "Are you sure?",
+        text: "Once deleted, you will not be able to recover this image!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "No, cancel!",
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // User confirmed, proceed with deletion
+            deleteSingleImage(productId, filename);
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+            // User canceled the deletion
+            Swal.fire("Cancelled", "Your image is safe!", "info");
+        }
+    });
+}
+
+function deleteSingleImage(productId, filename) {
+    fetch("/admin/deleteImage", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ productId, filename }),
+    })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            return response.json();
+        })
+        .then((data) => {
+            // Handle success or error
+            if (data.success) {
+                removeImage(filename);
+            } else {
+                console.error("Error deleting image:", data.error);
+            }
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+        });
+}
+
+
+        // function deleteImage(productId, filename) {
+        //     deleteSingleImage(productId, filename);
+        // }
+
+        function deleteSingleImage(productId, filename) {
+            // alert("hi")
+            fetch("/admin/deleteImage", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ productId, filename }),
+            })
+                .then((response) => location.reload())
+                .then((data) => {
+                    // Handle success or error
+                    if (data.success) {
+                        removeImage(filename);
+                        // location.reload()
+                    } else {
+                        console.error("Error deleting image:", data.error);
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                });
+        }
+
+        // remove the deleted image
+        function removeImage(filename) {
+            const imageElement = document.querySelector(`[data-filename="${filename}"]`);
+
+            if (imageElement) {
+                imageElement.closest('.col-md-12').remove();
+            }
+        }
+
+
+        function validateAndSubmit() {
+          console.log('1');
+        if (validateForm()) {
+            // If validation passes, submit the form
+            document.forms[0].submit(); // Assuming this is the first (and only) form on your page
+        }
+        return false; // Prevent form submission when validation fails
+    }
+
+        function validateForm() {
+          console.log('2');
+            // Reset previous error messages
+            resetErrorMessages();
+
+            var isValid = true;
+
+            var productName = document.getElementsByName("productName")[0].value;
+            var regularPrice = document.getElementsByName("regularPrice")[0].value;
+            var salePrice = document.getElementsByName("salePrice")[0].value;
+            var smallQuantity = document.getElementsByName("small_quantity")[0].value;
+            var mediumQuantity = document.getElementsByName("medium_quantity")[0].value;
+            var largeQuantity = document.getElementsByName("large_quantity")[0].value;
+            console.log(smallQuantity + " " + mediumQuantity + " " + largeQuantity);
+            // Check if inputs are not empty
+            if (productName === "") {
+                displayErrorMessage("productName-error", "Product Name is required");
+                isValid = false;
+            }
+
+            // Check if prices are positive numbers
+            if (isNaN(regularPrice) || regularPrice <= 0) {
+                displayErrorMessage("regularPrice-error", "Regular price must be a positive number");
+                isValid = false;
+            }
+
+            if (isNaN(salePrice) || salePrice <= 0) {
+                displayErrorMessage("salePrice-error", "Sale price must be a positive number");
+                isValid = false;
+            }
+
+            // Check if sale price is less than regular price
+            if (parseFloat(salePrice) >= parseFloat(regularPrice)) {
+                displayErrorMessage("salePrice-error", "Sale price must be less than Regular price");
+                isValid = false;
+            }
+
+            if (!/^[1-9]\d*$/.test(smallQuantity)) {
+            displayErrorMessage("small-quantity-error", "Small quantity must be a positive integer");
+            isValid = false;
+            }
+
+            if (!/^[1-9]\d*$/.test(mediumQuantity)) {
+            displayErrorMessage("medium-quantity-error", "Medium quantity must be a positive integer");
+            isValid = false;
+            }
+
+            if (!/^[1-9]\d*$/.test(largeQuantity)) {
+            displayErrorMessage("large-quantity-error", "Large quantity must be a positive integer");
+            isValid = false;
+            }
+
+            // Additional checks can be added for other fields if needed
+            console.log('3');
+            return isValid;
+        }
+
+        function displayErrorMessage(elementId, message) {
+            var errorElement = document.getElementById(elementId);
+            errorElement.innerText = message;
+            errorElement.style.display = "block";
+        }
+
+        function resetErrorMessages() {
+            var errorElements = document.querySelectorAll(".error-message");
+            errorElements.forEach(function (element) {
+                element.innerText = "";
+                element.style.display = "none";
+            });
+        }
+
+
+    </script>
+
+    <%- include("../partials/adminFooter") %>

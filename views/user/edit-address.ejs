@@ -1,0 +1,71 @@
+<%- include("../partials/header") %>
+
+<div style="display: flex; justify-content: center; height: 100vh; align-items: center; margin-top: -100px;">
+  <div style="width: 50%; height: auto;">
+      <form action="/edit-address" method="POST" style="padding: 20px; border: 1px solid #ccc; border-radius: 5px;">
+          <div style="margin-bottom: 10px;">
+              <label for="name" style="display: inline-block; width: 100px;">Name:</label>
+              <input type="text" id="name" name="name" required style="width: 250px;">
+          </div>
+          <div style="margin-bottom: 10px;">
+              <label for="house" style="display: inline-block; width: 100px;">House:</label>
+              <input type="text" id="house" name="house" required style="width: 250px;">
+          </div>
+          <div style="margin-bottom: 10px;">
+              <label for="city" style="display: inline-block; width: 100px;">City:</label>
+              <input type="text" id="city" name="city" required style="width: 250px;">
+          </div>
+          <div style="margin-bottom: 10px;">
+              <label for="state" style="display: inline-block; width: 100px;">State:</label>
+              <input type="text" id="state" name="state" required style="width: 250px;">
+          </div>
+          <div style="margin-bottom: 10px;">
+              <label for="pincode" style="display: inline-block; width: 100px;">Pin Code:</label>
+              <input type="text" id="pincode" name="pincode" required style="width: 250px;">
+          </div>
+          <input type="hidden" id="userId" name="userId" value="<%= loginStatus._id %>">
+          <button type="submit" style="margin-left: 100px;">Submit</button>
+      </form>
+  </div>
+</div>
+
+
+<%- include("../partials/footer") %>
+
+<script>
+  $(document).ready(function() {
+    $('form[action="/edit-address"]').submit(function(event) {
+        event.preventDefault(); // Prevent default form submission
+        
+        // Collect address details from form fields
+        var addressData = {
+            name: $('#name').val(),
+            house: $('#house').val(),
+            city: $('#city').val(),
+            state: $('#state').val(),
+            pincode: $('#pincode').val(),
+            userId: $('#userId').val() // Fetch user ID from hidden input field
+        };
+        
+        // Send AJAX request to backend
+        $.ajax({
+            type: 'POST',
+            url: '/edit-address',
+            data: addressData,
+            success: function(response) {
+                console.log('Address added successfully:', response);
+                // Clear the form fields
+                $('#name').val('');
+                $('#house').val('');
+                $('#city').val('');
+                $('#state').val('');
+                $('#pincode').val('');
+            },
+            error: function(error) {
+                console.error('Error adding address:', error);
+            }
+        });
+    });
+});
+
+</script>

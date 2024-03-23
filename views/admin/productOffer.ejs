@@ -1,0 +1,234 @@
+<%- include("../partials/adminHeader") %>
+
+<div class="content-header">
+    <div>
+        <h2 class="content-title card-title">Product Offer Management</h2>  
+    </div>
+    <!-- <div style="float: right; margin-right: 10px;">
+        <button style="background-color: green; color: white; border: none; padding: 10px 20px; cursor: pointer;">Add Offer</button>
+    </div> -->
+    <div>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCoupon"
+            data-bs-whatever="@getbootstrap">Add Offer +</button>
+    </div>
+</div>
+
+
+<div class="right mt-5">
+    <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col"><b>No</b></th>
+            <th scope="col"><b>Offer Name</b></th>
+            <th scope="col"><b>Product</b></th>
+            <!-- <th scope="col"><b>Brand</b></th> -->
+            <th scope="col"><b>Discount</b></th>
+            <th scope="col"><b>Starting Date</b></th>
+            <th scope="col"><b>Ending Date</b></th>
+            <th scope="col"><b>Delete</b></th>
+            <th scope="col"><b>Edit</b></th>
+          </tr>
+        </thead>
+        <tbody>
+            <% for(let i = 0; i < prodoffers.length; i++) { %>
+                <tr>
+                    <td><%= i + 1 %></td>
+                    <td><%= prodoffers[i].name %></td>
+                    <td><%= prodoffers[i].productOffer.product.productName %></td>
+                    <td><%= prodoffers[i].discount %> %</td>
+                    <td><%= prodoffers[i].startingDate.toLocaleDateString() %></td>
+                    <td><%= prodoffers[i].endingDate.toLocaleDateString() %></td>
+                    <td width="10%"><a onclick="deleteOffer('<%= prodoffers[i]._id %>')"
+                        class="btn btn-sm btn-danger rounded font-sm mt-15">Delete</a> </td> 
+                        <td>
+                            <button type="button" class="btn btn-primary edit-offer-btn" 
+                                style="padding: 5px 10px; font-size: 12px;" 
+                                data-bs-toggle="modal" data-bs-target="#editCoupon" data-bs-whatever="@getbootstrap"
+                                data-offer-id="<%= prodoffers[i]._id %>"
+                                data-offer-name="<%= prodoffers[i].name %>"
+                                data-product-name="<%= prodoffers[i].productOffer.product.productName %>"
+                                data-discount="<%= prodoffers[i].discount %>"
+                                data-start-date="<%= prodoffers[i].startingDate %>"
+                                data-end-date="<%= prodoffers[i].endingDate %>"
+                            >
+                                Edit Offer +
+                            </button>
+                        </td>
+                        
+                    
+                    
+                </tr>
+            <% } %>
+        </tbody>
+        
+      </table>
+</div>
+
+
+<div class="modal fade" id="addCoupon" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Offer </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/admin/add-ProdOffer" method="post" id="prodOffer">
+                    <div class="mb-3">
+                        <label for="recipient-name" class="col-form-label">Offer Name</label>
+                        <input type="text" class="form-control" name="name" id="offerName" >
+                        <div id="error1" class="text-danger"></div>
+                    </div>
+                    <div class="mb-3">
+                      <label for="recipient-name" class="col-form-label">Product</label>
+                      <select name="product" id="productName" class="form-select">
+                        <% for( let i = 0; i < products.length; i++ ) { %>
+                        <option class="form-option" value="<%= products[i]._id %>"><%= products[i].productName %></option>
+                        <% } %>
+                      </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="recipient-name" class="col-form-label">Discount %</label>
+                        <input type="text" class="form-control" name="discount" id="prodOfferAmount">
+                        <div id="error2" class="text-danger"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="recipient-name" class="col-form-label">Starting date</label>
+                        <input type="date" class="form-control" name="startingDate" required="true" id="startingDate">
+                    </div>
+                    <div class="mb-3">
+                        <label for="recipient-name" class="col-form-label">Ending date</label>
+                        <input type="date" class="form-control" name="endingDate" required="true" id="expiringDate">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Create Offer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Offer Modal -->
+<div class="modal fade" id="editCoupon" tabindex="-1" aria-labelledby="editCouponLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCouponLabel">Edit Offer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Form for editing offer details -->
+                <form action="/admin/edit-ProdOffer" method="post" id="editProdOfferForm">
+                    <input type="hidden" id="editOfferId" name="offerId">
+                    <div class="mb-3">
+                        <label for="editOfferName" class="col-form-label">Offer Name</label>
+                        <input type="text" class="form-control" name="name" id="editOfferName">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editProductName" class="col-form-label">Product</label>
+                        <select name="product" id="editProductName" class="form-select">
+                        <% for( let i = 0; i < products.length; i++ ) { %>
+                            <option class="form-option" value="<%= products[i]._id %>"><%= products[i].productName %></option>
+                        <% } %>
+                    </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editOfferDiscount" class="col-form-label">Discount Amount</label>
+                        <input type="text" class="form-control" name="discount" id="editOfferDiscount">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editOfferStartDate" class="col-form-label">Starting Date</label>
+                        <input type="date" class="form-control" name="startingDate" id="editOfferStartDate">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editOfferEndDate" class="col-form-label">Ending Date</label>
+                        <input type="date" class="form-control" name="endingDate" id="editOfferEndDate">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Update Offer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include("../partials/adminFooter") %>
+
+<script>
+
+    // JavaScript to populate the edit modal fields with offer details
+function populateEditModal(offerId, offerName, productName, discount, startDate, endDate) {
+    document.getElementById('editOfferId').value = offerId;
+    document.getElementById('editOfferName').value = offerName;
+    document.getElementById('editOfferDiscount').value = discount;
+    document.getElementById('editOfferStartDate').value = startDate;
+    document.getElementById('editOfferEndDate').value = endDate;
+
+    // Set the selected product in the dropdown
+    var select = document.getElementById('editProductName');
+    for (var i = 0; i < select.options.length; i++) {
+        if (select.options[i].text === productName) {
+            select.selectedIndex = i;
+            break;
+        }
+    }
+
+    // Show the edit modal
+    var editModal = new bootstrap.Modal(document.getElementById('editCoupon'));
+    editModal.show();
+}
+
+// Add event listeners to all "Edit Offer" buttons
+document.querySelectorAll('.edit-offer-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        // Extract offer details from the data attributes of the button
+        var offerId = this.getAttribute('data-offer-id');
+        var offerName = this.getAttribute('data-offer-name');
+        var productName = this.getAttribute('data-product-name');
+        var discount = this.getAttribute('data-discount');
+        var startDate = this.getAttribute('data-start-date');
+        var endDate = this.getAttribute('data-end-date');
+
+        // Populate the edit modal with offer details
+        populateEditModal(offerId, offerName, productName, discount, startDate, endDate);
+    });
+});
+
+
+
+    function deleteOffer(offerId) {
+    console.log("clicked", offerId);
+    Swal.fire({
+        title: 'Are you sure you want to delete this offer?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: "/admin/delete-ProdOffer/" + offerId,
+                type: 'get',
+            }).done((res) => {
+                if (res) {
+                    Swal.fire(
+                        'Successful',
+                        'Offer deleted successfully',
+                        'success'
+                    ).then(() => {
+                        location.reload();
+                    });
+                }
+            }).fail((error) => {
+                console.log(error);
+            });
+        }
+    });
+}
+</script>

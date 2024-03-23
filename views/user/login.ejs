@@ -1,0 +1,56 @@
+<%- include("../partials/header") %>
+
+
+
+<!--breadcrumbs area start-->
+<div class="breadcrumbs_area other_bread">
+  <div class="container">   
+      <div class="row">
+          <div class="col-12">
+              <div class="breadcrumb_content">
+                  <ul>
+                      <li><a href="/">home</a></li>
+                      <li>/</li>
+                      <li>login</li>
+                  </ul>
+              </div>
+          </div>
+      </div>
+  </div>         
+</div>
+<!--breadcrumbs area end-->
+
+
+<div class="customer_login" style="display: flex; justify-content: center; align-items: center; height: 50vh;">
+    <div class="container">
+      <div class="row justify-content-center align-items-center">
+        <div class="col-lg-6 col-md-6">
+          <div class="account_form">
+            <h2>login</h2>
+            <form method="post">
+              <p>   
+                <label>Email <span>*</span></label>
+                <input type="text" required="" name="email">
+              </p>
+              <p>   
+                <label>Password <span>*</span></label>
+                <input type="password" required="" name="password">
+              </p>   
+              <div class="login_submit">
+                <a href="/verifyEmail">Lost your password?</a>
+                <label for="remember">
+                  <input id="remember" type="checkbox">
+                  Remember me
+                </label>
+                <button type="submit">login</button>
+              </div>
+            </form>
+          </div>    
+        </div>
+      </div>
+    </div>    
+  </div>
+  
+
+
+<%- include("../partials/footer") %>

@@ -1,0 +1,330 @@
+<%- include("../partials/header") %>
+ 
+    <!--breadcrumbs area start-->
+    <div class="breadcrumbs_area other_bread">
+        <div class="container">   
+            <div class="row">
+                <div class="col-12">
+                    <div class="breadcrumb_content">
+                        <ul>
+                            <li><a href="/">home</a></li>
+                            <li>/</li>
+                            <li>checkout</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>         
+    </div>
+    <!--breadcrumbs area end-->
+    
+    <!--Checkout page section-->
+    <div class="Checkout_section" id="accordion">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                     <div class="user-actions">
+                         <h3> 
+                             <i class="fa fa-file-o" aria-hidden="true"></i>
+                             Returning customer?
+                             <a class="Returning" href="#" data-bs-toggle="collapse" data-bs-target="#checkout_login" aria-expanded="true">Click here to login</a>     
+ 
+                         </h3>
+                          <div id="checkout_login" class="collapse" data-bs-parent="#accordion">
+                             <div class="checkout_info">
+                                 <p>If you have shopped with us before, please enter your details in the boxes below. If you are a new customer please proceed to the Billing & Shipping section.</p>  
+                                 <form action="#">  
+                                     <div class="form_group">
+                                         <label>Username or email <span>*</span></label>
+                                         <input type="text">     
+                                     </div>
+                                     <div class="form_group">
+                                         <label>Password  <span>*</span></label>
+                                         <input type="text">     
+                                     </div> 
+                                     <div class="form_group group_3 ">
+                                         <button type="submit">Login</button>
+                                         <label for="remember_box">
+                                             <input id="remember_box" type="checkbox">
+                                             <span> Remember me </span>
+                                         </label>     
+                                     </div>
+                                     <a href="#">Lost your password?</a>
+                                 </form>          
+                             </div>
+                         </div>    
+                     </div>
+                     <div class="user-actions">
+                         <h3> 
+                             <i class="fa fa-file-o" aria-hidden="true"></i>
+                             Returning customer?
+                             <a class="Returning" href="#" data-bs-toggle="collapse" data-bs-target="#checkout_coupon" aria-expanded="true">Click here to enter your code</a>     
+ 
+                         </h3>
+                          <div id="checkout_coupon" class="collapse" data-bs-parent="#accordion">
+                             <div class="checkout_info">
+                                 <form action="/applyCoupon" method="post">
+                                     <input id="coupon_code" name="couponCode" placeholder="Coupon code" type="text">
+                                     <button id="apply_coupon_button" type="submit">Apply coupon</button>
+                                 </form>
+                             </div>
+                         </div>  
+                         <button id="remove_coupon_button" type="button" style="background-color: lightcoral; color: black; margin-left: 60px; border: none;">Remove coupon</button>  
+                     </div>    
+                </div>
+             </div>
+            <div class="checkout_form">
+                <form action="/place-order" method="post">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6">
+                            <h3>Billing Details</h3>
+                            <div class="row">
+                                <div class="col-12 mb-20">
+                                    <label>Name<span>*</span></label>
+                                    <input type="text" id="name" name="name" value="<%= address.name %>" required>
+                                </div>
+                                <div class="col-12 mb-20">
+                                    <label>House<span>*</span></label>
+                                    <input type="text" id="house" name="house" value="<%= address.house %>" required>
+                                </div>
+                                <div class="col-12 mb-20">
+                                    <label>City</label>
+                                    <input type="text" id="city" name="city" value="<%= address.city %>">
+                                </div>
+                                <div class="col-12 mb-20">
+                                    <label>State</label>
+                                    <input type="text" id="state" name="state" value="<%= address.state %>">
+                                </div>
+                                <div class="col-12 mb-20">
+                                    <label>Pin-Code<span>*</span></label>
+                                    <input type="text" id="pincode" name="pincode" value="<%= address.pincode %>" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6">
+                            <h3>Your order</h3>
+                            <div class="order_table table-responsive">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Size</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% for (let i = 0; i < cartItems.length; i++) { %>
+                                            <% let item = cartItems[i]; %>
+                                            <tr>
+                                                <td><%= item.product.productName %> <strong> × <%= item.quantity %></strong></td>
+                                                <td><%= item.size %></td>
+                                                <td>₹<%= item.product.salePrice * item.quantity %></td>
+                                            </tr>
+                                        <% } %>
+                                    </tbody>
+                                    <tfoot>
+                                        <!-- <tr>
+                                            <th>Cart Subtotal</th>
+                                            <td></td>
+                                        </tr> -->
+                                        <tr class="order_total">
+                                            <th>Order Total</th>
+                                            <td><strong>₹<%= totalAmount %></strong></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <h3>Payment Method</h3>
+                            <div class="payment_method">
+                                <!-- <div class="panel-default">
+                                    <input id="payment_defult" name="payment_method" type="radio" value="PayPal" style="margin-right: 10px;">
+                                    <label for="payment_defult">PayPal <img src="assets/img/icon/papyel.png" alt=""></label>
+                                </div> -->
+                                <div class="panel-default">
+                                    <input id="payment_cod" name="payment_method" type="radio" value="Cash on Delivery" style="margin-right: 10px;">
+                                    <label for="payment_cod">Cash on Delivery</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="order_button" style="text-align: right;">
+                        <button id="proceedToPaymentBtn" type="submit">Place Order</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- <div class="panel-default">
+                                    <input id="payment" name="check_method" type="radio" data-bs-target="createp_account" />
+                                    <label for="payment" data-bs-toggle="collapse" data-bs-target="#method" aria-controls="method">Create an account?</label>
+
+                                    <div id="method" class="collapse one" data-bs-parent="#accordion">
+                                        <div class="card-body1">
+                                           <p>Please send a check to Store Name, Store Street, Store Town, Store State / County, Store Postcode.</p>
+                                        </div>
+                                    </div>
+                                </div>  -->
+    <!--Checkout page section end-->
+ 
+    <%- include("../partials/footer") %>
+
+    <script>
+
+
+
+    $(document).ready(function() {
+        $('form').on('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+        
+        // Serialize the form data
+        var formData = $(this).serialize();
+        console.log(formData);
+        // Send an AJAX request to the backend
+        $.ajax({
+            type: 'POST',
+            url: '/place-order',
+            data: formData,
+            success: function(response) {
+                // Handle success response from the server
+                console.log(response); // Log the response for debugging
+                
+                // Show SweetAlert2 confirmation message
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Order Placed',
+                    text: 'Your order has been placed successfully!',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Redirect or perform any other action
+                        window.location.href = '/'; // Redirect to the homepage
+                    }
+                });
+            },
+            error: function(xhr, status, error) {
+                // Handle error response from the server
+                console.error(error); // Log the error for debugging
+                var errorMessage = xhr.responseJSON ? xhr.responseJSON.message : 'An error occurred while placing the order. Please try again later.';
+                console.log(errorMessage);
+                // Show an error message to the user using SweetAlert2
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: errorMessage,
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+    });
+});
+
+// Assume total amount is stored in a variable called totalAmount
+
+
+// Function to update the total amount display
+// function updateTotalAmount(amount) {
+//     // Update the total amount display with the new amount
+//     $('#total_amount').text(amount);
+// }
+
+
+document.getElementById('apply_coupon_button').addEventListener('click', function(event) {
+    
+    event.preventDefault(); // Prevent default form submission behavior
+    console.log('1');
+    var couponCode = document.getElementById('coupon_code').value; // Get the entered coupon code
+
+    // Send AJAX request to apply the coupon
+    $.ajax({
+        url: "/applyCoupon",
+        type: 'POST',
+        data: { couponCode: couponCode },
+        success: function(response) {
+            if (response.success) {
+                // Update the order total displayed on the page
+        var orderTotalElement = document.querySelector('.order_total td');
+        if (orderTotalElement) {
+            orderTotalElement.innerHTML = '<strong>₹' + response.cart.totalPrice + '</strong>';
+        }
+                // Display a success message to the user
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Coupon Applied!',
+                    text: 'Discount applied successfully.'
+                })
+                
+            } else {
+                // Display an error message if the coupon code is invalid or coupon is expired
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Coupon Error',
+                    text: response.message // Display the message received from the server
+                });
+            }
+        },
+        error: function(xhr, status, error) {
+            // Handle AJAX errors
+            console.error(xhr.responseText);
+            var response = JSON.parse(xhr.responseText);
+            Swal.fire({
+             icon: 'error',
+            title: 'Server Error',
+            text: response.message 
+            });
+        }
+    });
+});
+
+
+// Add event listener to the remove coupon button
+document.getElementById('remove_coupon_button').addEventListener('click', function(event) {
+    event.preventDefault(); // Prevent default button behavior
+
+    // Send AJAX request to remove the coupon
+    $.ajax({
+        url: "/removeCoupon",
+        type: 'POST',
+        success: function(response) {
+            if (response.success) {
+                // Update the order total displayed on the page
+                var orderTotalElement = document.querySelector('.order_total td strong');
+                if (orderTotalElement) {
+                    orderTotalElement.innerText = '₹' + response.cart.totalPrice;
+                }
+
+                // Display a success message to the user
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Coupon Removed!',
+                    text: 'Coupon removed successfully.'
+                });
+            } else {
+                // Display an error message if the coupon removal was unsuccessful
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Coupon Removal Error',
+                    text: response.message // Display the message received from the server
+                });
+            }
+        },
+        error: function(xhr, status, error) {
+            // Handle AJAX errors
+            console.error(xhr.responseText);
+            // Display an error message
+            Swal.fire({
+                icon: 'error',
+                title: 'Server Error',
+                text: 'An error occurred while processing your request. Please try again later.'
+            });
+        }
+    });
+});
+
+
+
+
+
+    </script>
