@@ -9,7 +9,6 @@ const getCategory = (req, res) => {
       res.render('admin/category', { categories: categories });
     })
     .catch((error) => {
-      // Handle error, for example:
       console.error("Error fetching categories:", error);
       res.status(500).send("Internal Server Error");
     });
@@ -42,17 +41,17 @@ const editCategory = async (req, res) => {
       const id = req.params.id;
       const { categoryName, description } = req.body;
       
-      // Convert category name to lowercase for case-insensitive check
+     
       const nameLowerCase = categoryName.toLowerCase();
       
-      // Find category except for the one being edited
+     
       const existingCategory = await Category.findOne({ _id: { $ne: id }, name: { $regex: new RegExp('^' + nameLowerCase + '$', 'i') } });
 
       if (existingCategory) {
           console.log("Category name already exists.");
-          // Handle the case where the edited category name conflicts with an existing category
+         
       } else {
-          // Update the category
+          
           await Category.findByIdAndUpdate(id, { name: categoryName, description: description });
           res.redirect("/admin/category");
       }

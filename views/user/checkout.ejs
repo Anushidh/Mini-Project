@@ -21,7 +21,7 @@
     <!--Checkout page section-->
     <div class="Checkout_section" id="accordion">
         <div class="container">
-            <div class="row">
+            <!-- <div class="row">
                 <div class="col-12">
                      <div class="user-actions">
                          <h3> 
@@ -72,7 +72,7 @@
                          <button id="remove_coupon_button" type="button" style="background-color: lightcoral; color: black; margin-left: 60px; border: none;">Remove coupon</button>  
                      </div>    
                 </div>
-             </div>
+             </div> -->
             <div class="checkout_form">
                 <form action="/place-order" method="post">
                     <div class="row">
@@ -144,6 +144,14 @@
                                     <input id="payment_cod" name="payment_method" type="radio" value="Cash on Delivery" style="margin-right: 10px;">
                                     <label for="payment_cod">Cash on Delivery</label>
                                 </div>
+                                <div class="panel-default">
+                                    <input id="payment_razorpay" name="payment_method" type="radio" value="razorpay" style="margin-right: 10px;">
+                                    <label for="payment_razorpay">Razorpay</label>
+                                </div>
+                                <div class="panel-default">
+                                    <input id="payment_wallet" name="payment_method" type="radio" value="wallet" style="margin-right: 10px;">
+                                    <label for="payment_wallet">Wallet</label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -168,7 +176,7 @@
     <!--Checkout page section end-->
  
     <%- include("../partials/footer") %>
-
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
 
 
@@ -198,8 +206,13 @@
                     confirmButtonText: 'OK'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Redirect or perform any other action
-                        window.location.href = '/'; // Redirect to the homepage
+                        if (response.paymentMethod === 'razorpay') {
+                            // If payment method is Razorpay, proceed with Razorpay payment
+                            paymentMethodRazorpayPayment(response);
+                        } else {
+                            // Otherwise, redirect to the homepage
+                            window.location.href = '/order-success';
+                        }
                     }
                 });
             },
@@ -221,14 +234,85 @@
     });
 });
 
-// Assume total amount is stored in a variable called totalAmount
+function paymentMethodRazorpayPayment(orderinfo) {
+		console.log("inside ejs razorpayPayment function", orderinfo);
+        console.log(orderinfo.razorpayOrderDetails.amount);
+        console.log(orderinfo.razorpayOrderDetails.id);
+		const options = {
 
+			"key": `rzp_test_XnnB8x997qkm5Z`, // Enter the Key ID generated from the Dashboard
+			"amount": orderinfo.razorpayOrderDetails.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+			"currency": "INR",
+			"name": "Reid",  //your business name
+			"description": "Test Transaction",
+			"image": "/user/assets/images/demos/demo-10/logo-main.png",
+			"order_id": `${orderinfo.razorpayOrderDetails.id}`, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+			"handler": function (response) {
+				// alert(response.razorpay_payment_id);
+				// alert(response.razorpay_order_id);
+				// alert(response.razorpay_signature);
+				console.log('1',response.razorpay_payment_id);
+				console.log('2',response.razorpay_order_id);
+				console.log("response.razorpay_signature", response.razorpay_signature);
 
-// Function to update the total amount display
-// function updateTotalAmount(amount) {
-//     // Update the total amount display with the new amount
-//     $('#total_amount').text(amount);
-// }
+				verifyPaymentSignature(response, orderinfo.orderDetails, orderinfo.razorpayOrderDetails);
+
+			},
+			"prefill": {
+				"name": "anushidh",
+				"email": "anushidh101@gmail.com",
+				"contact": "8075257134"
+			},
+			"notes": {
+				"address": "Razorpay Corporate Office"
+			},
+			"theme": {
+				"color": "#3399cc"
+			}
+		};
+
+		console.log("new Razorpay(options)");
+		const rzp1 = new Razorpay(options);
+		rzp1.open();
+
+	}
+
+    function verifyPaymentSignature(payment, orderDetails, razorpayOrderDetails) {
+    console.log("function verifyPaymentSignature(payment,orderDetails,razorpayOrderDetails)");
+    $.ajax({
+        url: '/verify-payment',
+        method: 'post',
+        data: {
+            payment,
+            orderDetails,
+            razorpayOrderDetails
+        },
+
+        success: (response) => {
+            console.log(response, '22222222222222222222');
+            if (response.status) {
+                Swal.fire({
+                    title: "Good job!",
+                    text: "Payment successful!",
+                    icon: "success",
+                    confirmButtonText: "Ok!",
+                }).then(() => {
+                    location.href = '/order-success';
+                });
+            } else {
+                Swal.fire({
+                    title: "Sorry!",
+                    text: "Payment failed",
+                    icon: "error",
+                    confirmButtonText: "Ok!",
+                }).then(() => {
+                    location.href = '/cart';
+                });
+            }
+        }
+    });
+}
+
 
 
 document.getElementById('apply_coupon_button').addEventListener('click', function(event) {

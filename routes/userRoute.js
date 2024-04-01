@@ -6,6 +6,7 @@ const cartController=require("../controller/cartController");
 const orderController=require("../controller/orderController"); 
 const couponController=require("../controller/couponController"); 
 const addressHelper = require("../helper/addressHelper");
+const walletController=require("../controller/walletController"); 
 const { isLoggedIn } = require("../middleware/authentication");
 
 // User actions
@@ -22,19 +23,20 @@ userRoute.get("/verifyEmail",userController.getVerifyEmail);
 userRoute.post("/VerifyEmail",userController.postVerifyEmail);
 userRoute.post("/verifyForgotPassOtp",userController.verifyForgotPassOtp);
 userRoute.post("/newPassword",userController.postNewPassword);
+userRoute.post('/search-product',userController.searchProduct);
 userRoute.get("/logout",userController.userLogout);
 
 // Products based routes
 userRoute.get("/productDetails/:id", isLoggedIn, userController.getProductDetailsPage);
 userRoute.get("/shop",isLoggedIn, userController.getShopPage);
-userRoute.get("/filter", isLoggedIn, userController.filterProduct);
-
+userRoute.post("/filter-price", isLoggedIn, userController.filterPrice);
 
 // Cart based routes
 userRoute.get('/cart',isLoggedIn, cartController.userCart);
 userRoute.post("/addToCart/:prodId/:quantity/:size",isLoggedIn, cartController.addToCart);
 userRoute.post('/remove-cart-item/:id',isLoggedIn , cartController.removeFromCart);
 userRoute.post('/quantity-change',isLoggedIn, cartController.incDecQuantity);
+userRoute.post('/clear-cart',isLoggedIn, cartController.clearCart);
 
 // Wishlist based routes
 userRoute.get('/wishlist',isLoggedIn, wishlistController.viewWishlist);
@@ -45,6 +47,8 @@ userRoute.post('/removeFromWishlist/:id',isLoggedIn,wishlistController.removeFro
 userRoute.get('/checkoutPage',isLoggedIn,orderController.checkout);
 userRoute.post('/place-order',isLoggedIn,orderController.placeOrder);
 userRoute.get('/order-details/:orderId',isLoggedIn,orderController.orderDetails);
+userRoute.get('/order-success',isLoggedIn,orderController.orderSuccess);
+userRoute.post('/verify-payment',isLoggedIn,orderController.verifyPayment);
 
 // User-Account based routes
 userRoute.get('/user-profile',isLoggedIn,userController.userProfile);
@@ -53,10 +57,13 @@ userRoute.get('/edit-address', isLoggedIn,userController.editAddressPage);
 userRoute.post('/edit-address', isLoggedIn,userController.updateAddress);
 userRoute.post('/change-password', isLoggedIn,userController.updatePassword);
 userRoute.post('/cancel-order', isLoggedIn,userController.cancelOrder);
+userRoute.post('/return-order', isLoggedIn,userController.returnOrder);
 
 //Coupon based routes
-userRoute.post('/applyCoupon', isLoggedIn,couponController.applyCoupon);
-userRoute.post('/removeCoupon', isLoggedIn,couponController.removeCoupon);
+userRoute.post('/applyOrRemoveCoupon', isLoggedIn, couponController.applyOrRemoveCoupon);
+
+//wallet based routes
+userRoute.get('/get-wallet', isLoggedIn, walletController.getWallet);
 
 
 module.exports=userRoute;

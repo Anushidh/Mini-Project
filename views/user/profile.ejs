@@ -53,7 +53,9 @@
                                                 <th>Order</th>
                                                 <th>Date</th>
                                                 <th>Status</th>
+                                                <th>Payment Method</th>
                                                 <th>Total</th>
+                                                <th>Discount</th>
                                                 <th>Actions</th>
                                                 <th></th>	 	 	 	
                                             </tr>
@@ -64,23 +66,33 @@
                                                 <td><%= i + 1 %></td>
                                                 <td><%= formatDate(userOrders[i].orderDate) %></td>
                                                 <td><span class="success"><%= userOrders[i].orderStatus %></span></td>
+                                                <td><%= userOrders[i].paymentMethod %></td>
                                                 <td>₹<%= userOrders[i].totalAmount %></td>
+                                                <td>₹<%= userOrders[i].totalDiscount %></td>
                                                 <td><a href="/order-details/<%= userOrders[i]._id %>" class="view">view</a></td>
                                                 <td>
                                                     <a href="/order-details/<%= userOrders[i]._id %>" class="view"></a>
-                                                    <% if (userOrders[i].orderStatus === 'confirmed' || userOrders[i].orderStatus === 'pending') { %>
-                                                    <button class="cancel-btn" data-order-id="<%= userOrders[i]._id %>">Cancel</button>
-                                                    <% } else { %>
-                                                    <span>Cancelled</span>
+                                                    <% if (userOrders[i].orderStatus === 'cancelled') { %>
+                                                        <span>Cancelled</span>
+                                                    <% } else if (userOrders[i].orderStatus === 'returned') { %>
+                                                        <span>Returned</span>
+                                                    <% } else if (userOrders[i].orderStatus === 'confirmed' || userOrders[i].orderStatus === 'pending') { %>
+                                                        <button class="cancel-btn" data-order-id="<%= userOrders[i]._id %>">Cancel</button>
+                                                    <% } else if (userOrders[i].orderStatus === 'delivered') { %>
+                                                        <button class="return-btn" data-order-id="<%= userOrders[i]._id %>">Return</button>
                                                     <% } %>
                                                 </td>
+                                                
+                                                
                                             </tr>
                                             <% } %>
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
-                            <div class="tab-pane fade" id="downloads">
+                            
+                            
+                            <!-- <div class="tab-pane fade" id="downloads">
                                 <h3>Downloads</h3>
                                 <div class="table-responsive">
                                     <table class="table">
@@ -108,7 +120,7 @@
                                         </tbody>
                                     </table>
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="tab-pane" id="address" style="margin-left: 60px;">
                                 <div style="display: flex; flex-wrap: wrap;">
                                 <div style="display: flex; margin-right: 20px; margin-bottom: 20px;">
@@ -313,6 +325,57 @@ document.getElementById('changePasswordForm').addEventListener('submit', functio
                         Swal.fire(
                             'Error!',
                             'Failed to cancel the order. Please try again later.',
+                            'error'
+                        );
+                    }
+                });
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                // User clicked "No", keep the order
+                Swal.fire(
+                    'Cancelled',
+                    'Your order is safe :)',
+                    'error'
+                );
+            }
+        });
+    });
+});
+
+$(document).ready(function() {
+    $('.return-btn').click(function() {
+        var orderId = $(this).data('order-id');
+        
+        
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Once returned, you will not be able to recover this order!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, return it!',
+            cancelButtonText: 'No, keep it'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // User confirmed the return, make AJAX request
+                $.ajax({
+                    url: '/return-order',
+                    method: 'POST',
+                    data: { orderId: orderId },
+                    success: function(response) {
+                        // Update the button text to "Returned" upon successful return
+                        $('.return-btn[data-order-id="' + orderId + '"]').text('Returned');
+                        // Show success message using SweetAlert2
+                        Swal.fire(
+                            'Returned!',
+                            'Your order has been returned.',
+                            'success'
+                        );
+                    },
+                    error: function(err) {
+                        console.error('Error returning order:', err);
+                        // Show error message using SweetAlert2
+                        Swal.fire(
+                            'Error!',
+                            'Failed to return the order. Please try again later.',
                             'error'
                         );
                     }

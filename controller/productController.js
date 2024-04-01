@@ -84,12 +84,10 @@ const adminProductList = async (req, res) => {
     // console.log('inside list');
      productHelper.getAllProducts()
         .then((response) => {
-            // Pass the fetched products to the view as a variable
             // console.log(response);
             res.render('admin/product', { products: response });
         })
         .catch((error) => {
-            // Handle errors if getAllProducts() fails
             console.error('Error in adminProductList:', error);
             res.status(500).send('Internal Server Error');
         });
@@ -128,13 +126,12 @@ const editProduct = async (req, res) => {
         }
         console.log(req.files)
         
-        // Fetch the existing product
+       
         const existingProduct = await Product.findById(id);
         const productSizes = [
             { size: "Small", quantity: smallQuantity },
             { size: "Medium", quantity: mediumQuantity },
             { size: "Large", quantity: largeQuantity }
-            // Add more sizes if needed
         ];
        
         console.log();

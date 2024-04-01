@@ -37,8 +37,8 @@ adminRoute.get("/products",isAdmin,productController.adminProductList);
 adminRoute.get("/editProduct",isAdmin,productController.getEditProduct);
 adminRoute.post("/editProduct/:id",isAdmin,upload.array("images", 5), productController.editProduct);
 adminRoute.post("/deleteImage",isAdmin,productController.deleteSingleImage);
-adminRoute.get("/blockProduct",isAdmin,productController.getBlockProduct)
-adminRoute.get("/unBlockProduct",isAdmin,productController.getUnblockProduct)
+adminRoute.get("/blockProduct",isAdmin,productController.getBlockProduct);
+adminRoute.get("/unBlockProduct",isAdmin,productController.getUnblockProduct);
 
 // Customer Management
 adminRoute.get("/users",isAdmin,customerController.getCustomersInfo);
@@ -64,6 +64,11 @@ adminRoute.get("/categoryOffer",isAdmin,offerController.allCategoryOffer);
 adminRoute.post("/add-catOffer",isAdmin,offerController.addCategoryOffer);
 adminRoute.post("/edit-catOffer",isAdmin,offerController.editCategoryOffer);
 adminRoute.get("/delete-catOffer/:offerId",isAdmin,offerController.deleteCategoryOffer);
+
+//sales report
+adminRoute.get('/sales-report-page',isAdmin,adminController.salesReportPage);
+adminRoute.post('/sales-report',isAdmin,adminController.salesReport);
+
 
 
 module.exports = adminRoute;

@@ -21,11 +21,11 @@
                                     <p class="mb-1">
                                       <%= orderDetails[0].userDetails[0].name %> <br> <%= orderDetails[0].userDetails[0].email %> <br> <%= orderDetails[0].userDetails[0].phone %>
                                     </p>
-                                    <a href="#">View profile</a>
+                                    <!-- <a href="#">View profile</a> -->
                                 </div>
                             </article>
                         </div> <!-- col// -->
-                        <div class="col-md-4">
+                        <!-- <div class="col-md-4">
                             <article class="icontext align-items-start">
                                 <span class="icon icon-sm rounded-circle bg-primary-light">
                                     <i class="text-primary material-icons md-local_shipping"></i>
@@ -38,7 +38,7 @@
                                     <a href="#">Download info</a>
                                 </div>
                             </article>
-                        </div> <!-- col// -->
+                        </div>  -->
                         <div class="col-md-4">
                             <article class="icontext align-items-start">
                                 <span class="icon icon-sm rounded-circle bg-primary-light">
@@ -47,9 +47,9 @@
                                 <div class="text">
                                     <h6 class="mb-1">Deliver to</h6>
                                     <p class="mb-1">
-                                        City: dfs, Uzbekistan <br>Block A, House 123, Floor 2 <br> Po Box 10000
+                                        City: <%= orderDetails[0].addressDetails[0].city %>, <%= orderDetails[0].addressDetails[0].state %> <br><%= orderDetails[0].addressDetails[0].house %> <br> Po Box <%= orderDetails[0].addressDetails[0].pincode %>
                                     </p>
-                                    <a href="#">View profile</a>
+                                    <!-- <a href="#">View profile</a> -->
                                 </div>
                             </article>
                         </div>
@@ -156,6 +156,7 @@ function toggleOrderStatus(orderId, newStatus) {
     .then(data => {
       // Handle successful update
       console.log('Order status updated:', data);
+      window.location.reload();
     })
     .catch(error => {
       // Handle error

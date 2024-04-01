@@ -10,6 +10,8 @@
               <th style="padding: 8px; text-align: center;">Size</th>
               <th style="padding: 8px; text-align: center;">Quantity</th>
               <th style="padding: 8px; text-align: center;">Total</th>
+              <th style="padding: 8px; text-align: center;">Discount</th>
+              <th style="padding: 8px; text-align: center;">Payment Method</th>
               <th style="padding: 8px; text-align: center;">Status</th>
               <th style="display: none;">Order ID</th>
           </tr>
@@ -26,6 +28,8 @@
               <td style="padding: 8px; text-align: center;"><%= orderDetails[i].orderedItems.size %></td>
               <td style="padding: 8px; text-align: center;"><%= orderDetails[i].orderedItems.quantity %></td>
               <td style="padding: 8px; text-align: center;">₹<%= orderDetails[i].productDetails[0].salePrice * orderDetails[i].orderedItems.quantity %></td>
+              <td style="padding: 8px; text-align: center;">₹<%= orderDetails[i].totalDiscount %></td>
+              <td style="padding: 8px; text-align: center;"><%= orderDetails[i].paymentMethod %></td>
               <td style="padding: 8px; text-align: center;"><%= orderDetails[i].orderStatus %></td>
               <td style="display: none;"><%= orderDetails[i]._id %></td>
           </tr>

@@ -85,17 +85,22 @@
                                 <!-- <a href="#" class="button" id="addToCartButton" onclick="addToCart('<%= data._id %>')">Add to Cart</a> -->
                             </div>
                             <div class="product_stock">
-                                <% let outOfStock = true; %>
+                                <% let outOfStock = false; %>
                                 <% data.productSizes.forEach(size => { %>
-                                    <% if (size.quantity > 0) { %>
+                                    <% console.log('Size:', size.size, 'Quantity:', size.quantity); %>
+                                    <% if (size.quantity <= 0) { %>
+                                        <span class="out_of_stock">Out of Stock: <%= size.size %></span>
+                                        <% outOfStock = true; %>
+                                    <% } else { %>
                                         <span class="stock_amount"><%= size.size %>: <%= size.quantity %> left</span>
-                                        <% outOfStock = false; %>
                                     <% } %>
                                 <% }); %>
-                                <% if (outOfStock) { %>
-                                    <span class="out_of_stock">Out of Stock</span>
+                                <% if (!outOfStock) { %>
+                                    <span class="stock_amount">In Stock</span>
                                 <% } %>
                             </div>
+                            
+                            
                             
                             <div class="product_d_action">
                                 <ul>

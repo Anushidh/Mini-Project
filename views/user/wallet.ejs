@@ -1,0 +1,40 @@
+<%- include("../partials/header") %>
+
+<div class="breadcrumbs_area other_bread">
+  <div class="container">
+      <div class="row">
+          <div class="col-12">
+              <div class="breadcrumb_content">
+                  <ul>
+                      <li><a href="/login">home</a></li>
+                      <li>/</li>
+                      <li>wallet</li>
+                  </ul>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+<div class="wallet_details_area" style="margin-top: 50px;">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 offset-lg-2">
+        <div class="wallet_details" style="background-color: #e3f2fd; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+          <h2 style="margin-bottom: 20px; text-align: center; color: #1565c0;">Wallet Details</h2>
+          <% if (walletDetails) { %>
+            <p style="font-size: 18px; margin-bottom: 10px;"><strong>Wallet Balance:</strong> ₹<%= walletDetails.balance %></p>
+            <!-- Additional wallet information can be added here -->
+          <% } else { %>
+            <p style="font-size: 18px; margin-bottom: 10px;">No wallet balance available.</p>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<%- include("../partials/footer") %>
