@@ -23,41 +23,48 @@
                <div class="container">
                <div class="row">
                 <!--register area start-->
-                <div class="col-lg-6 col-md-6">
-                    <div class="account_form register">
-                        <h2>Register</h2>
-                        <form id="signupForm" action="/signup" method="post" onsubmit="return validateForm()">
-                            <p>   
-                                <label>Name <span>*</span></label>
-                                <input type="text" name="name" id="name">
-                            </p>
-                            <span class="text-danger d-none" style="font-size: 12px; margin-left: 10px;" id="nameError"></span>
-                            <p>   
-                                <label>Email address  <span>*</span></label>
-                                <input type="text" name="email" id="email">
-                             </p>
-                             <span class="text-danger d-none" style="font-size: 12px; margin-left: 10px;" id="emailError"></span>
-                             <p>   
-                                <label>Password <span>*</span></label>
-                                <input type="password" name="password" id="password">
-                             </p>
-                             <span class="text-danger d-none" style="font-size: 12px; margin-left: 10px;" id="passwordError"></span>
-                             <p>   
-                                <label>Confirm Password <span>*</span></label>
-                                <input type="password" name="confirmPassword" id="confirmPassword">
-                            </p>
-                            <span class="text-danger d-none" style="font-size: 12px; margin-left: 10px;" id="confirmPasswordError"></span>
-                             <p>   
-                                <label>Mobile Number <span>*</span></label>
-                                <input type="text" name="phone" id="phone">
-                            </p>
-                            <span class="text-danger d-none" style="font-size: 12px; margin-left: 10px;" id="phoneError"></span>
-                            <div class="login_submit">
-                                <button type="submit">Register</button>
-                            </div>
-                        </form>
-                    </div>    
+                <div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+                    <div style="width: 50%;">
+                        <div class="account_form register" style="background-color: #f9f9f9; padding: 20px; border-radius: 5px; box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);">
+                            <h2>Register</h2>
+                            <form id="signupForm" action="/signup" method="post" onsubmit="return validateForm()">
+                                <p>   
+                                    <label>Name <span>*</span></label>
+                                    <input type="text" name="name" id="name">
+                                </p>
+                                <span class="text-danger d-none" style="font-size: 12px; margin-left: 10px;" id="nameError"></span>
+                                <p>   
+                                    <label>Email address  <span>*</span></label>
+                                    <input type="text" name="email" id="email">
+                                </p>
+                                <span class="text-danger d-none" style="font-size: 12px; margin-left: 10px;" id="emailError"></span>
+                                <p>   
+                                    <label>Password <span>*</span></label>
+                                    <input type="password" name="password" id="password">
+                                </p>
+                                <span class="text-danger d-none" style="font-size: 12px; margin-left: 10px;" id="passwordError"></span>
+                                <p>   
+                                    <label>Confirm Password <span>*</span></label>
+                                    <input type="password" name="confirmPassword" id="confirmPassword">
+                                </p>
+                                <span class="text-danger d-none" style="font-size: 12px; margin-left: 10px;" id="confirmPasswordError"></span>
+                                <p>   
+                                    <label>Mobile Number <span>*</span></label>
+                                    <input type="text" name="phone" id="phone">
+                                </p>
+                                <p>   
+                                    <label>Referral Code <span>*</span></label>
+                                    <input type="text" name="referral" id="referral">
+                                </p>
+                                <span class="text-danger d-none" style="font-size: 12px; margin-left: 10px;" id="phoneError"></span>
+                                <div class="login_submit" style="text-align: center;">
+                                    <button type="submit">Register</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
+                
                 <!--register area end-->
             </div>
         </div>    
@@ -79,7 +86,7 @@
         const nameRegex = /^[a-zA-Z0-9_]+$/;
         const emailRegX = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
         const phoneRegex = /^\d{10}$/;
-        const passRegX = /^.{6,}$/;
+        const passRegX = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{6,}$/;
 
 
         // Name validation

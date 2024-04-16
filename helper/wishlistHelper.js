@@ -178,12 +178,6 @@ const getAllWishlistProducts = async (userId) => {
 };
 
 
-
-
-
-
-
-
 module.exports = {
   addItemToWishlist,
   getAllWishlistProducts,

@@ -29,6 +29,7 @@
     <!-- <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script> -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <!-- Include SweetAlert2 CSS -->
+    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
 </head>
@@ -83,10 +84,10 @@
                                 </li> -->
                             </ul>
                         </div> 
-                        <form id="searchForm" action="#">
+                        <!-- <form id="searchForm" action="#">
                             <input id="searchInput" placeholder="Search entire store here..." type="text">
                             <button type="submit"><i class="ion-ios-search-strong"></i></button>
-                        </form>
+                        </form> -->
                         <div id="suggestionList"></div>
                         
                         <div class="cart_area">
@@ -324,13 +325,13 @@
                       </div>
                   </div>
                   <div class="col-lg-6 col-md-12">
-                    <div class="search_bar">
+                    <!-- <div class="search_bar">
                         <form id="searchForm" action="#">
                             <input id="searchInput" placeholder="Search entire store here..." type="text">
                             <button id="searchButton" type="submit"><i class="ion-ios-search-strong"></i></button>
                         </form>
                         <ul id="suggestionList"></ul>
-                    </div>
+                    </div> -->
                     
                   </div>
                   <div class="col-lg-3 col-md-6 offset-md-6 offset-lg-0">
@@ -344,7 +345,7 @@
 
                           </div>
                           <div class="cart_link">
-                              <a href="#"><i class="fa fa-shopping-basket"></i>2 item(s)</a>
+                              <a href="#"><i class="fa fa-shopping-basket"></i></a>
                               <!--mini cart-->
                                <div class="mini_cart">
                                   <!-- <div class="cart_item top">
@@ -494,43 +495,3 @@
       <!--header bottom end-->
   </header>
   <!--header area end-->
-<script>
-  
-  
-  
-    document.addEventListener('DOMContentLoaded', function() {
-        var searchForm = document.getElementById('searchForm');
-        var searchInput = document.getElementById('searchInput');
-        var searchButton = document.getElementById('searchButton');
-
-        searchButton.addEventListener('click', function(event) {
-            event.preventDefault(); // Prevent default button click behavior
-
-            var productName = searchInput.value.trim(); // Get the value entered in the search input field
-
-            // Make AJAX request to searchProduct route
-            var xhr = new XMLHttpRequest();
-            xhr.open('POST', '/search-product');
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    var response = JSON.parse(xhr.responseText);
-                    var productId = response.productId;
-                    console.log(productId);
-                    // Redirect to the product details page
-                    window.location.href = '/productDetails/' + productId;
-                } else {
-                    console.error('Request failed. Status: ' + xhr.status);
-                }
-            };
-            xhr.send(JSON.stringify({ productName: productName }));
-        });
-    });
-
-
-
-
-
-
-
-</script>

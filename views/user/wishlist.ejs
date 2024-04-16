@@ -87,6 +87,7 @@
      <script>
         
         function productRemove(productId) {
+            console.log('inside productremove');
     // Show a confirmation prompt
     Swal.fire({
         title: "Are you sure?",
@@ -148,6 +149,9 @@ function addToCart(prodId) {
                     icon: 'success',
                     timer: 2000,
                     showConfirmButton: false
+                }).then(() => {
+                    // Reload the page
+                    window.location.reload();
                 });
             } else if (res.status === "Out of stock") {
                 Swal.fire({

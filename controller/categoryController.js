@@ -77,7 +77,7 @@ const softDeleteCategory = async (req, res) => {
 const getListCategory = async (req, res) => {
   try {
       let id = req.query.id
-      console.log("wrking");
+      console.log("getListCategory");
       await Category.updateOne({ _id: id }, { $set: { isBlocked: false } })
       res.redirect("/admin/category")
   } catch (error) {
@@ -89,6 +89,7 @@ const getListCategory = async (req, res) => {
 const getUnlistCategory = async (req, res) => {
   try {
       let id = req.query.id
+      console.log('getUnlistCategory');
       await Category.updateOne({ _id: id }, { $set: { isBlocked: true } })
       res.redirect("/admin/category")
   } catch (error) {

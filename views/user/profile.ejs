@@ -29,7 +29,7 @@
                             <ul role="tablist" class="nav flex-column dashboard-list">
                                 <li><a href="#dashboard" data-bs-toggle="tab" class="nav-link active">Dashboard</a></li>
                                 <li> <a href="#orders" data-bs-toggle="tab" class="nav-link">Orders</a></li>
-                                <li><a href="#downloads" data-bs-toggle="tab" class="nav-link">Downloads</a></li>
+                                <!-- <li><a href="#downloads" data-bs-toggle="tab" class="nav-link">Downloads</a></li> -->
                                 <li><a href="#address" data-bs-toggle="tab" class="nav-link">My Address</a></li>
                                 <li><a href="#account-details" data-bs-toggle="tab" class="nav-link">Add Address</a></li>
                                 <li><a href="#change-password" data-bs-toggle="tab" class="nav-link">Change Password</a></li>
@@ -42,7 +42,7 @@
                         <div class="tab-content dashboard_content">
                             <div class="tab-pane fade show active" id="dashboard">
                                 <h3>Dashboard </h3>
-                                <p>From your account dashboard. you can easily check &amp; view your <a href="#">recent orders</a>, manage your <a href="#">shipping and billing addresses</a> and <a href="#">Edit your password and account details.</a></p>
+                                <p>From your account dashboard. you can easily check &amp; view your <a href="#">recent orders</a>, manage your <a href="#">shipping and billing addresses</a> and <a href="#">Edit your password and account details. Share referral code : <span onclick="referralShare('<%= userDetails.referralCode %>')"><%= userDetails.referralCode %></span>.</a></p>
                             </div>
                             <div class="tab-pane fade" id="orders">
                                 <h3>Orders</h3>
@@ -54,6 +54,7 @@
                                                 <th>Date</th>
                                                 <th>Status</th>
                                                 <th>Payment Method</th>
+                                                <th>Payment Status</th>
                                                 <th>Total</th>
                                                 <th>Discount</th>
                                                 <th>Actions</th>
@@ -67,6 +68,15 @@
                                                 <td><%= formatDate(userOrders[i].orderDate) %></td>
                                                 <td><span class="success"><%= userOrders[i].orderStatus %></span></td>
                                                 <td><%= userOrders[i].paymentMethod %></td>
+                                                <td>
+                                                    <% if (userOrders[i].paymentStatus === 'pending') { %>
+                                                        <!-- Display a button if payment status is pending -->
+                                                        Pending
+                                                    <% } else { %>
+                                                        <!-- Display "Success" text if payment status is not pending -->
+                                                        Success
+                                                    <% } %>
+                                                </td>
                                                 <td>₹<%= userOrders[i].totalAmount %></td>
                                                 <td>₹<%= userOrders[i].totalDiscount %></td>
                                                 <td><a href="/order-details/<%= userOrders[i]._id %>" class="view">view</a></td>
@@ -82,15 +92,12 @@
                                                         <button class="return-btn" data-order-id="<%= userOrders[i]._id %>">Return</button>
                                                     <% } %>
                                                 </td>
-                                                
-                                                
                                             </tr>
                                             <% } %>
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
-                            
                             
                             <!-- <div class="tab-pane fade" id="downloads">
                                 <h3>Downloads</h3>
@@ -111,12 +118,7 @@
                                                 <td><span class="danger">Expired</span></td>
                                                 <td><a href="#" class="view">Click Here To Download Your File</a></td>
                                             </tr>
-                                            <tr>
-                                                <td>Organic - ecommerce html template</td>
-                                                <td>Sep 11, 2022</td>
-                                                <td>Never</td>
-                                                <td><a href="#" class="view">Click Here To Download Your File</a></td>
-                                            </tr>
+                                    
                                         </tbody>
                                     </table>
                                 </div>
@@ -191,8 +193,13 @@
 
 
     <%- include("../partials/footer") %>
-
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
+
+
+
+   
+
 
 
 $(document).ready(function() {
@@ -278,6 +285,7 @@ $(document).ready(function() {
         });
     });
 });
+
 document.getElementById('changePasswordForm').addEventListener('submit', function(event) {
     const newPassword = document.getElementById('newPassword').value;
     const currentPassword = document.getElementById('currentPassword').value;
@@ -392,7 +400,28 @@ $(document).ready(function() {
     });
 });
 
+async function referralShare(userReferralCode) {
+    console.log(userReferralCode);
 
+    if (navigator.share) {
+        
+        const shareData = {
+            title: 'Reid',
+            text: `Use my referral code ${userReferralCode} to sign up and explore `,
+            
+        };
+
+        
+        try {
+            await navigator.share(shareData);
+            console.log('Shared successfully');
+        } catch (error) {
+            console.error('Error sharing:', error);
+        }
+    } else {
+        console.log('Web Share API is not supported in this browser');
+    }
+}
     </script>
 
     

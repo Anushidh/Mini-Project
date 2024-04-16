@@ -5,8 +5,9 @@ const getWallet = async (req,res) => {
   try {
     // console.log('1');
     let userId = req.session.user._id;
+    let wallet = await Wallet.findById(userId);
     let walletAmount = await walletHelper.getWalletAmount(userId);
-    // console.log(walletAmount);
+    console.log(walletAmount);
     res.render('user/wallet', { walletDetails: walletAmount });
   } catch (error) {
     console.log(error);

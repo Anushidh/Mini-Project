@@ -1,0 +1,61 @@
+<%- include("../partials/adminHeader") %>
+
+
+  <div class="content-header">
+    <div>
+      <h2 class="content-title card-title">Stocks</h2>
+
+    </div>
+
+  </div>
+
+
+  <div class="right mt-5">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col"><b>Product name</b></th>
+          <th scope="col"><b>Small</b></th>
+          <th scope="col"><b>Medium</b></th>
+          <th scope="col"><b>Large</b></th>
+          <th scope="col"><b>Total</b></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for(let i = 0; i < products.length; i++) { %>
+          <tr>
+            <td><%= products[i].productName %></td>
+            <% let smallQty = 0, mediumQty = 0, largeQty = 0; %>
+            <% for(let j = 0; j < products[i].productSizes.length; j++) { %>
+              <% if (products[i].productSizes[j].size === 'Small') { %>
+                <% smallQty = products[i].productSizes[j].quantity; %>
+              <% } else if (products[i].productSizes[j].size === 'Medium') { %>
+                <% mediumQty = products[i].productSizes[j].quantity; %>
+              <% } else if (products[i].productSizes[j].size === 'Large') { %>
+                <% largeQty = products[i].productSizes[j].quantity; %>
+              <% } %>
+            <% } %>
+            <td><%= smallQty %></td>
+            <td><%= mediumQty %></td>
+            <td><%= largeQty %></td>
+            <td><%= products[i].totalQuantity %></td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+
+
+  </div> <!-- card-body end// -->
+  </div> <!-- card end// -->
+
+
+
+  <%- include("../partials/adminFooter") %>
+
+    <!-- <script>
+      function getProductQuantity(product, size) {
+        const productSize = product.productSizes.find(ps => ps.size === size);
+        return productSize ? productSize.quantity : 0;
+      }
+    </script> -->

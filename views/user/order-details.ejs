@@ -1,49 +1,272 @@
 <%- include("../partials/header") %>
 
-<div class="table-responsive">
-  <table style="width: 100%; border-collapse: collapse;">
-      <thead>
-          <tr style="border-bottom: 1px solid #ccc;">
-              <th style="padding: 8px; text-align: center;">Image</th>
-              <th style="padding: 8px; text-align: center;">Name</th>
-              <th style="padding: 8px; text-align: center;">Price</th>
-              <th style="padding: 8px; text-align: center;">Size</th>
-              <th style="padding: 8px; text-align: center;">Quantity</th>
-              <th style="padding: 8px; text-align: center;">Total</th>
-              <th style="padding: 8px; text-align: center;">Discount</th>
-              <th style="padding: 8px; text-align: center;">Payment Method</th>
-              <th style="padding: 8px; text-align: center;">Status</th>
-              <th style="display: none;">Order ID</th>
-          </tr>
-      </thead>
-      <tbody>
-        <% for (let i = 0; i < orderDetails.length; i++) { %>
-          <!-- Sample order item -->
-          <tr style="border-bottom: 1px solid #ccc;">
-              <td style="padding: 8px; text-align: center;">
-                  <img src="/uploads/product-images/<%=orderDetails[i].productDetails[0].productImage[0]%>" alt="Product Image" style="width: 50px; height: 50px;">
-              </td>
-              <td style="padding: 8px; text-align: center;"><%= orderDetails[i].productDetails[0].productName %></td>
-              <td style="padding: 8px; text-align: center;">₹<%= orderDetails[i].productDetails[0].salePrice %></td>
-              <td style="padding: 8px; text-align: center;"><%= orderDetails[i].orderedItems.size %></td>
-              <td style="padding: 8px; text-align: center;"><%= orderDetails[i].orderedItems.quantity %></td>
-              <td style="padding: 8px; text-align: center;">₹<%= orderDetails[i].productDetails[0].salePrice * orderDetails[i].orderedItems.quantity %></td>
-              <td style="padding: 8px; text-align: center;">₹<%= orderDetails[i].totalDiscount %></td>
-              <td style="padding: 8px; text-align: center;"><%= orderDetails[i].paymentMethod %></td>
-              <td style="padding: 8px; text-align: center;"><%= orderDetails[i].orderStatus %></td>
-              <td style="display: none;"><%= orderDetails[i]._id %></td>
-          </tr>
-          <!-- Repeat this block for each order item -->
-          <% } %>
-      </tbody>
-  </table>
-</div>
 
-<%- include("../partials/footer") %>
-
-<script>
+    <div style="margin-left: 20px;">
+        <h2 style="margin-bottom: 10px;">Shipping Address</h2>
+        <div style="margin-bottom: 5px;"><strong>Name:</strong>
+            <%= userAddress.name %>
+        </div>
+        <div style="margin-bottom: 5px;"><strong>House:</strong>
+            <%= userAddress.house %>
+        </div>
+        <div style="margin-bottom: 5px;"><strong>City:</strong>
+            <%= userAddress.city %>
+        </div>
+        <div style="margin-bottom: 5px;"><strong>State:</strong>
+            <%= userAddress.state %>
+        </div>
+        <div style="margin-bottom: 5px;"><strong>Pincode:</strong>
+            <%= userAddress.pincode %>
+        </div>
+        <% if (orderDetails.length> 0 && orderDetails[0].orderStatus === 'delivered') { %>
+            <input type="hidden" value="<%= JSON.stringify(orderDetails) %>" id="orderDetailsData">
+            <input type="hidden" value="<%= JSON.stringify(userAddress) %>" id="userAddressData">
+            <a id="downloadInvoiceButton" class="btn btn-primary" style="margin-top: 10px;"
+                onclick="handleDownloadInvoice()">Download Invoice</a>
+            <% } %>
 
 
+    </div>
+
+    <div class="table-responsive">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 1px solid #ccc;">
+                    <th style="padding: 8px; text-align: center;">Image</th>
+                    <th style="padding: 8px; text-align: center;">Name</th>
+                    <th style="padding: 8px; text-align: center;">Price</th>
+                    <th style="padding: 8px; text-align: center;">Size</th>
+                    <th style="padding: 8px; text-align: center;">Quantity</th>
+                    <th style="padding: 8px; text-align: center;">Total</th>
+                    <th style="padding: 8px; text-align: center;">Discount</th>
+                    <th style="padding: 8px; text-align: center;">Payment Method</th>
+                    <th style="padding: 8px; text-align: center;">Status</th>
+                    <th style="padding: 8px; text-align: center;">Payment Status</th>
+                    <th style="display: none;">Order ID</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for (let i=0; i < orderDetails.length; i++) { %>
+                    <!-- Sample order item -->
+                    <tr style="border-bottom: 1px solid #ccc;">
+                        <td style="padding: 8px; text-align: center;">
+                            <img src="/uploads/product-images/<%=orderDetails[i].productDetails[0].productImage[0]%>"
+                                alt="Product Image" style="width: 50px; height: 50px;">
+                        </td>
+                        <td style="padding: 8px; text-align: center;">
+                            <%= orderDetails[i].productDetails[0].productName %>
+                        </td>
+                        <td style="padding: 8px; text-align: center;">₹<%= orderDetails[i].productDetails[0].salePrice
+                                %>
+                        </td>
+                        <td style="padding: 8px; text-align: center;">
+                            <%= orderDetails[i].orderedItems.size %>
+                        </td>
+                        <td style="padding: 8px; text-align: center;">
+                            <%= orderDetails[i].orderedItems.quantity %>
+                        </td>
+                        <td style="padding: 8px; text-align: center;">₹<%= orderDetails[i].productDetails[0].salePrice *
+                                orderDetails[i].orderedItems.quantity %>
+                        </td>
+                        <td style="padding: 8px; text-align: center;">₹<%= orderDetails[i].totalDiscount %>
+                        </td>
+                        <td style="padding: 8px; text-align: center;">
+                            <%= orderDetails[i].paymentMethod %>
+                        </td>
+                        <td style="padding: 8px; text-align: center;">
+                            <%= orderDetails[i].orderStatus %>
+                        </td>
+                        <td style="padding: 8px; text-align: center;">
+                            <% if (orderDetails[i].paymentStatus==='success' ) { %>
+                                Success
+                                <% } else { %>
+                                    <button class="retry-btn" data-order-id="<%= orderDetails[i]._id %>">Retry</button>
+                                    <% } %>
+                        </td>
+                        <td style="display: none;">
+                            <%= orderDetails[i]._id %>
+                        </td>
+                    </tr>
+                    <!-- Repeat this block for each order item -->
+                    <% } %>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/easyinvoice/dist/easyinvoice.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <%- include("../partials/footer") %>
+
+        <script>
+
+              // Handle retry button click for Razorpay payment method
+    $(document).on('click', '.retry-btn', function(event) {
+        event.preventDefault(); // Prevent the default link behavior
+        var orderId = $(this).data('order-id');
+        console.log(orderId);
+        // Send an AJAX request to retry Razorpay payment
+        $.ajax({
+            type: 'POST',
+            url: '/second-try', // Use the same endpoint for retry
+            data: { payment_method: 'razorpay', order_id: orderId }, // Specify Razorpay as the payment method
+            success: function(response) {
+                // If retry is successful, proceed with Razorpay payment
+                paymentMethodRazorpayPayment(response);
+            },
+            error: function(xhr, status, error) {
+                // Handle error response from the server
+                console.error(error); // Log the error for debugging
+                var errorMessage = xhr.responseJSON ? xhr.responseJSON.message : 'An error occurred while retrying the payment. Please try again later.';
+                console.log(errorMessage);
+                // Show an error message to the user using SweetAlert2
+                showErrorAlert(errorMessage);
+            }
+        });
+    });
 
 
-</script>
+            function paymentMethodRazorpayPayment(orderinfo) {
+                console.log("inside ejs razorpayPayment function", orderinfo);
+                console.log(orderinfo.razorpayOrderDetails.amount);
+                console.log(orderinfo.razorpayOrderDetails.id);
+                const options = {
+
+                    "key": `rzp_test_XnnB8x997qkm5Z`, // Enter the Key ID generated from the Dashboard
+                    "amount": orderinfo.razorpayOrderDetails.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                    "currency": "INR",
+                    "name": "Reid",  //your business name
+                    "description": "Test Transaction",
+                    "image": "/user/assets/images/demos/demo-10/logo-main.png",
+                    "order_id": `${orderinfo.razorpayOrderDetails.id}`, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                    "handler": function (response) {
+                        // alert(response.razorpay_payment_id);
+                        // alert(response.razorpay_order_id);
+                        // alert(response.razorpay_signature);
+                        console.log('1', response.razorpay_payment_id);
+                        console.log('2', response.razorpay_order_id);
+                        console.log("response.razorpay_signature", response.razorpay_signature);
+
+                        verifyPaymentSignature(response, orderinfo.order, orderinfo.razorpayOrderDetails);
+
+                    },
+                    "prefill": {
+                        "name": "anushidh",
+                        "email": "anushidh101@gmail.com",
+                        "contact": "8075257134"
+                    },
+                    "notes": {
+                        "address": "Razorpay Corporate Office"
+                    },
+                    "theme": {
+                        "color": "#3399cc"
+                    }
+                };
+
+                console.log("new Razorpay(options)");
+                const rzp1 = new Razorpay(options);
+                rzp1.open();
+
+            }
+
+            function verifyPaymentSignature(payment, orderDetails, razorpayOrderDetails) {
+                console.log("function verifyPaymentSignature(payment,orderDetails,razorpayOrderDetails)");
+                $.ajax({
+                    url: '/verify-payment',
+                    method: 'post',
+                    data: {
+                        payment,
+                        orderDetails,
+                        razorpayOrderDetails
+                    },
+
+                    success: (response) => {
+                        console.log(response, '22222222222222222222');
+                        if (response.status) {
+                            Swal.fire({
+                                title: "Good job!",
+                                text: "Payment successful!",
+                                icon: "success",
+                                confirmButtonText: "Ok!",
+                            }).then(() => {
+                                location.href = '/order-success';
+                            });
+                        } else {
+                            Swal.fire({
+                                title: "Sorry!",
+                                text: "Payment failed",
+                                icon: "error",
+                                confirmButtonText: "Ok!",
+                            }).then(() => {
+                                location.href = '/user-profile';
+                            });
+                        }
+                    }
+                });
+            }
+
+
+            function handleDownloadInvoice() {
+                // Your download invoice logic here
+                console.log('1');// Assuming your "Download Invoice" button has the class "btn-primary"
+                let orderDetails = JSON.parse(document.getElementById('orderDetailsData').value);
+                let userAddress = JSON.parse(document.getElementById('userAddressData').value);
+
+                console.log(orderDetails);
+
+                Swal.fire({
+                    title: 'Do you want to download Invoice?',
+                    showCancelButton: true,
+                    confirmButtonText: 'OK',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        let products = orderDetails.map((order) => ({
+                            quantity: order.orderedItems.quantity,
+                            description: order.productDetails[0].productName,
+                            tax: 0,
+                            price: order.productDetails[0].salePrice
+                        }));
+
+                        const data = {
+                            "apiKey": "free",
+                            "mode": "development",
+                            "documentTitle": "INVOICE Reid",
+                            "currency": "INR",
+                            "taxNotation": "GST",
+                            "marginTop": 25,
+                            "marginRight": 25,
+                            "marginLeft": 25,
+                            "marginBottom": 25,
+                            "logo": "https://public.easyinvoice.cloud/img/logo_en_original.png",
+                            "sender": {
+                                "company": "Reid",
+                                "address": "Maradu,Kochi",
+                                "zip": "1234 AB",
+                                "city": "Kochi",
+                                "country": "India"
+                            },
+                            "client": {
+                                "company": userAddress.name,
+                                "address": userAddress.house,
+                                "zip": "5678 CD",
+                                "city": userAddress.city,
+                                "country": "India" // Assuming the country is India for all addresses
+                            },
+                            "invoiceNumber": "2021.0001",
+                            "invoiceDate": "12-03-2024",
+                            "products": products,
+                            "bottomNotice": "Thank you for your business."
+                        };
+
+                        easyinvoice.createInvoice(data, function (result) {
+                            easyinvoice.download('Reid-invoice.pdf', result.pdf);
+                        });
+                    }
+                });
+            }
+
+
+
+
+
+        </script>

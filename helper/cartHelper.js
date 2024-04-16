@@ -136,7 +136,7 @@ const addToUserCart = async (userId, productId, quantity, size = "Small") => {
       // console.log('countssssssss',count)
       return count;
     } catch (error) {
-      console.log('getcartcout error');
+      console.log('getcartcount error');
       throw error;
     }
   };
@@ -309,6 +309,7 @@ const addToUserCart = async (userId, productId, quantity, size = "Small") => {
 
   const clearTheCart = async (userId) => {
     try {
+      console.log('inside clearthecart');
       const result = await Cart.findOneAndUpdate(
         { user: userId },
         { $set: { items: [] } },

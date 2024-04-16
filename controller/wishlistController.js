@@ -53,7 +53,6 @@ const removeFromWishlist = async (req, res) => {
     let productId = req.body.productId
     await wishlistHelper.removeProductFromWishlist(userId, productId)
     wishlistCount = await wishlistHelper.getWishListCount(userId)
-
     res.status(200).json({ message: 'item removed from the wishlist', wishlistCount })
   } catch (error) {
     console.error(error);

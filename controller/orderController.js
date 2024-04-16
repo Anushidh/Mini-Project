@@ -24,122 +24,257 @@ const checkout = async (req, res) => {
     req.session.oldTotal = totalAmount;
     // let walletBalance = await walletHelper.getWalletAmount(user._id)
     // walletBalance = currencyFormat(walletBalance);
-    if(req.session.updatedTotal) {
+    if (req.session.updatedTotal) {
       totalAmount = req.session.updatedTotal;
-    } 
+    }
     // const coupons = await couponHelper.findAllCoupons();
-    const userAddress = await addressHelper.findAnAddress(user._id);
-    res.render('user/checkout', { loginStatus : req.session.user, user, cartItems,totalAmount : totalAmount, address: userAddress, cartCount,currencyFormat: cartHelper.currencyFormat})
+    const userAddress = await addressHelper.findAllAddress(user._id);
+    // console.log(userAddress);
+    res.render('user/checkout', { loginStatus: req.session.user, user, cartItems, totalAmount: totalAmount, address: userAddress, cartCount, currencyFormat: cartHelper.currencyFormat })
   } catch (error) {
     console.log(error);
     res.status(500).render('user/404');
   }
 }
 
-const placeOrder = async (req, res) => {
+const secondTry = async (req,res) => {
   try {
-    console.log('inside placeorder');
+    console.log(req.body);
+    const orderId = req.body.order_id; 
+    const order = await Order.findById(orderId);
+    console.log(order);
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+    if (req.body.payment_method === 'razorpay') {
+      const razorpayOrderDetails = await razorpay.razorpayOrderCreate(order._id, order.totalAmount);
+      const updatedOrder = await Order.findOneAndUpdate(
+        { _id: order._id },
+        { paymentStatus: 'success' },
+        { new: true }
+      );
+      console.log(updatedOrder);
+      res.json({ paymentMethod: 'razorpay', order, razorpayOrderDetails, razorpaykeyId: process.env.razorpay_key_id });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+const failedRazorpay = async (req,res) => {
+  try {
+    console.log('inside failedRazorpay');
     let userId = req.session.user._id;
     let coupon = req.session.coupon;
-    // console.log(req.body);
-    const address = {
-      name: req.body.name,
-      house: req.body.house,
-      city: req.body.city,
-      state: req.body.state,
-      pincode: req.body.pincode
-  };
-  // console.log(address);
-  //   console.log(req.body.payment_method);
-
+    console.log(req.body);
+    // Get the selected address ID from the request body
+    let selectedAddressId = req.body.selected_address;
+    console.log(selectedAddressId);
+    // Fetch the address details based on the selected address ID
+    const addressData = await Address.findById(selectedAddressId);
+    console.log(addressData);
+    let paymentStatus = 'pending';
     let cartItems = await cartHelper.getAllCartItems(userId);
     console.log(cartItems, 'cartitemsssssssssssssssssss');
-
     if (!cartItems.length) {
       return res.json({ error: true, message: "Please add items to cart before checkout" })
     }
-
-
-    if (address === undefined) {
-      return res.json({ error: true, message: "Please Select any Address before checkout" })
-    }
-
-    if (req.body.payment_method === undefined) {
-      return res.json({ error: true, message: "Please Select any Payment Method before checkout" })
-    }
-    // console.log('1');
-    const totalAmount = await cartHelper.totalAmount(userId);  
-    // console.log(totalAmount);
+    const totalAmount = await cartHelper.totalAmount(userId);
+    console.log(typeof totalAmount);
     let wallet = await Wallet.findOne({ user: userId });
     // console.log(wallet);
     if (!wallet) {
       wallet = new Wallet({ user: userId });
       await wallet.save();
     }
+    const orderDetails = await orderHelper.forOrderPlacing(req.body, totalAmount, cartItems, userId, coupon, addressData);
+    await orderHelper.changeOrderStatus(orderDetails._id, 'confirmed', req.body.payment_method);
+    const updatedOrder = await Order.findOneAndUpdate(
+      { _id: orderDetails._id },
+      { paymentStatus: 'pending' },
+      { new: true }
+    );
+    await cartHelper.clearTheCart(userId);
 
-    if (req.body.payment_method === 'Cash on Delivery') {
-      const placeOrder = await orderHelper.forOrderPlacing(req.body, totalAmount, cartItems, userId, coupon)
-        .then(async (response) => {
-          console.log('inside placeorder');
-          await productHelper.stockDecrease(cartItems);
-          await cartHelper.clearTheCart(userId);
-
-          // cartCount = await cartHelper.getCartCount(userId)
-
-          res.status(202).json({ paymentMethod: 'Cash on Delivery', message: "Purchase Done" })
-        })
-      }  
-      else if(req.body.payment_method === 'razorpay') {
-        await orderHelper.forOrderPlacing(req.body, totalAmount, cartItems, userId, coupon)
-        .then(async (orderDetails) => {
-          await razorpay.razorpayOrderCreate(orderDetails._id, orderDetails.totalAmount)
-            .then(async (razorpayOrderDetails) => {
-              await orderHelper.changeOrderStatus(orderDetails._id, 'confirmed',req.body.payment_method)
-              await productHelper.stockDecrease(cartItems)
-              await cartHelper.clearTheCart(userId)
-              res.json({ paymentMethod: 'razorpay', orderDetails, razorpayOrderDetails, razorpaykeyId: process.env.razorpay_key_id })
-            })
-        })
-    } 
-    else if (req.body.payment_method === 'wallet') {
-      // console.log('2');
-      let isPaymentDone = await walletHelper.payUsingWallet(userId, totalAmount)
-      // console.log(isPaymentDone);
-      if (isPaymentDone) {
-        await orderHelper.forOrderPlacing(req.body, totalAmount, cartItems, userId, coupon)
-          .then(async (orderDetails) => {
-            await orderHelper.changeOrderStatus(orderDetails._id, 'confirmed',req.body.payment_method)
-            await productHelper.stockDecrease(cartItems)
-            await cartHelper.clearTheCart(userId)
-            // console.log('3');
-            res.status(202).json({ paymentMethod: 'wallet', message: "Purchase Done" })
-          })
-      } else {
-        res.status(200).json({ paymentMethod: 'wallet', message: "Balance Insufficient in Wallet" })
-      }
-    }
-      
   } catch (error) {
-   
+    console.log(error);
     res.status(500).render('user/404');
   }
 }
+
+// const placeOrderRazorpay = async (req,res) => {
+//   try {
+//     console.log('placeorderrazorpay');
+//     let userId = req.session.user._id;
+//     let coupon = req.session.coupon;
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).render('user/404');
+//   }
+// }
+
+const placeOrder = async (req, res) => {
+  try {
+    console.log('inside placeorder');
+    let userId = req.session.user._id;
+    let coupon = req.session.coupon;
+    console.log(req.body);
+    // Get the selected address ID from the request body
+    let selectedAddressId = req.body.selected_address;
+    console.log(selectedAddressId);
+    // Fetch the address details based on the selected address ID
+    const addressData = await Address.findById(selectedAddressId);
+    console.log(addressData);
+    let paymentStatus = 'pending';
+    let cartItems = await cartHelper.getAllCartItems(userId);
+    console.log(cartItems, 'cartitemsssssssssssssssssss');
+    if (!cartItems.length) {
+      return res.json({ error: true, message: "Please add items to cart before checkout" })
+    }
+    // if (address === undefined) {
+    //   return res.json({ error: true, message: "Please Select any Address before checkout" })
+    // }
+    if (req.body.payment_method === undefined) {
+      return res.json({ error: true, message: "Please Select any Payment Method before checkout" })
+    }
+    // console.log('1');
+    const totalAmount = await cartHelper.totalAmount(userId);
+    // console.log(typeof totalAmount);
+    let wallet = await Wallet.findOne({ user: userId });
+    // console.log(wallet);
+    if (!wallet) {
+      wallet = new Wallet({ user: userId });
+      await wallet.save();
+    }
+    if (req.body.payment_method === 'Cash on Delivery') {
+      try {
+        if (totalAmount <= 1000) {
+          const placeOrder = await orderHelper.forOrderPlacing(req.body, totalAmount, cartItems, userId, coupon, addressData);
+
+          // Update payment status to 'success'
+          await Order.findOneAndUpdate(
+            { _id: placeOrder._id }, // Use order ID instead of user ID
+            { paymentStatus: 'success' },
+            { new: true }
+          );
+          
+          // Decrease product stock and clear cart
+          await productHelper.stockDecrease(cartItems);
+          await cartHelper.clearTheCart(userId);
+
+          res.status(202).json({ paymentMethod: 'Cash on Delivery', message: "Purchase Done", totalAmount: totalAmount });
+        } else {
+          console.log('cod error');
+          return res.json({ error: true, paymentMethod: 'Cash on Delivery', message: "Orders with Cash on Delivery are only allowed for total amount greater than 1000", totalAmount: totalAmount });
+        }
+      } catch (error) {
+        console.error('Error processing Cash on Delivery payment:', error);
+        res.status(500).json({ error: 'Failed to process payment' });
+      }
+    }
+
+    else if (req.body.payment_method === 'razorpay') {
+      try {
+        const orderDetails = await orderHelper.forOrderPlacing(req.body, totalAmount, cartItems, userId, coupon, addressData);
+        // const razorpayOrderDetails = await razorpay.razorpayOrderCreate(orderDetails._id, orderDetails.totalAmount);
+
+        // Update order status to 'confirmed'
+        await orderHelper.changeOrderStatus(orderDetails._id, 'confirmed', req.body.payment_method);
+
+        // Update payment status to 'success'
+        
+        const updatedOrder = await Order.findOneAndUpdate(
+          { _id: orderDetails._id },
+          { paymentStatus: 'success' },
+          { new: true }
+        );
+
+        // Decrease product stock and clear cart
+        await productHelper.stockDecrease(cartItems);
+        await cartHelper.clearTheCart(userId);
+
+        res.json({ paymentMethod: 'razorpay', orderDetails, });
+      } catch (error) {
+        console.error('Error processing Razorpay payment:', error);
+        res.status(500).json({ error: 'Failed to process payment' });
+      }
+    }
+    else if (req.body.payment_method === 'wallet') {
+      try {
+        let isPaymentDone = await walletHelper.payUsingWallet(userId, totalAmount);
+
+        if (isPaymentDone) {
+          const orderDetails = await orderHelper.forOrderPlacing(req.body, totalAmount, cartItems, userId, coupon, addressData);
+
+          // Update order status to 'confirmed'
+          await orderHelper.changeOrderStatus(orderDetails._id, 'confirmed', req.body.payment_method);
+
+          // Update payment status to 'success'
+          const updatedOrder = await Order.findOneAndUpdate(
+            { _id: orderDetails._id},
+            { paymentStatus: 'success' },
+            { new: true }
+          );
+
+          // Decrease product stock and clear cart
+          await productHelper.stockDecrease(cartItems);
+          await cartHelper.clearTheCart(userId);
+
+          res.status(202).json({ paymentMethod: 'wallet', message: "Purchase Done" });
+        } else {
+          res.status(200).json({ paymentMethod: 'wallet', message: "Balance Insufficient in Wallet" });
+        }
+      } catch (error) {
+        console.error('Error processing wallet payment:', error);
+        res.status(500).json({ error: 'Failed to process payment' });
+      }
+    }
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).render('user/404');
+  }
+}
+
+const paymentSuccess = (req, res) => {
+  try {
+    console.log(req.body);
+    const { paymentid, signature, orderId } = req.body;
+    const { createHmac } = require("node:crypto");
+
+    const hash = createHmac("sha256", process.env.KEY_SECRET)
+      .update(orderId + "|" + paymentid)
+      .digest("hex");
+
+    if (hash === signature) {
+      console.log("payment success");
+      res.status(200).json({ success: true, message: "Payment successful" });
+    } else {
+      console.log("error");
+      res.json({ success: false, message: "Invalid payment details" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
 
 const orderDetails = async (req, res) => {
   try {
     const orderId = req.params.orderId;
     // console.log(orderId);
-
+    let userId = req.session.user._id;
     const orderDetails = await Order.aggregate([
       {
         $match: { _id: new mongoose.Types.ObjectId(orderId) }
       },
       {
-        $unwind: "$orderedItems" 
+        $unwind: "$orderedItems"
       },
       {
         $lookup: {
-          from: "products", 
+          from: "products",
           localField: "orderedItems.product",
           foreignField: "_id",
           as: "productDetails"
@@ -147,17 +282,18 @@ const orderDetails = async (req, res) => {
       },
       {
         $project: {
-          orderedItems: 1, 
-          productDetails: 1, 
+          orderedItems: 1,
+          productDetails: 1,
           orderStatus: 1,
           paymentMethod: 1,
           totalDiscount: 1,
+          paymentStatus: 1,
         }
       }
     ]);
-
+    let userAddress = await addressHelper.findAnAddress(userId);
     // console.log(orderDetails);
-    res.render('user/order-details', { orderDetails }); 
+    res.render('user/order-details', { orderDetails, userAddress });
   } catch (error) {
     console.error('Error in orderDetails:', error);
     res.status(500).send('Internal Server Error');
@@ -220,11 +356,11 @@ const getOrderDetailsAdmin = async (req, res) => {
         $match: { _id: new mongoose.Types.ObjectId(orderId) }
       },
       {
-        $unwind: "$orderedItems" 
+        $unwind: "$orderedItems"
       },
       {
         $lookup: {
-          from: "products", 
+          from: "products",
           localField: "orderedItems.product",
           foreignField: "_id",
           as: "productDetails"
@@ -240,16 +376,16 @@ const getOrderDetailsAdmin = async (req, res) => {
       },
       {
         $lookup: {
-          from: "addresses", 
-          localField: "userDetails._id", 
+          from: "addresses",
+          localField: "userDetails._id",
           foreignField: "userId",
           as: "addressDetails"
         }
       },
       {
         $project: {
-          orderedItems: 1, 
-          productDetails: 1, 
+          orderedItems: 1,
+          productDetails: 1,
           userDetails: 1,
           addressDetails: 1,
           orderStatus: 1,
@@ -306,13 +442,13 @@ const verifyPayment = async (req, res) => {
       console.log(error);
       res.status(500).render('user/404');
     })
-} 
+}
 
 const orderSuccess = (req, res) => {
   try {
-    res.render('user/success', { loginStatus : req.session.user })
+    res.render('user/success', { loginStatus: req.session.user })
   } catch (error) {
-  
+
     res.status(500).render('user/404');
   }
 }
@@ -326,6 +462,9 @@ module.exports = {
   updateOrderStatus,
   orderSuccess,
   verifyPayment,
+  secondTry,
+  paymentSuccess,
+  failedRazorpay,
 }
 
 

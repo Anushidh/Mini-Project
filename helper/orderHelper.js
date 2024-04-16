@@ -10,10 +10,10 @@ function orderDate(){
   return date;
 }
 
-const forOrderPlacing = async (order, totalAmount, cartItems, userId1, coupon) => {
+const forOrderPlacing = async (order, totalAmount, cartItems, userId1, coupon, addressData) => {
   try {
-    // console.log('inside fororderplacing');
-    // console.log(order);
+    console.log('inside fororderplacing');
+    console.log(order);
     let couponUsed = await Coupon.findOne({ couponCode: coupon });
 
       let status = order.payment_method == 'Cash on Delivery' ? 'confirmed' : 'pending';
@@ -24,10 +24,11 @@ const forOrderPlacing = async (order, totalAmount, cartItems, userId1, coupon) =
       // console.log(userId);
       let paymentMethod = order.payment_method;
       console.log(paymentMethod);
-      let address = await addressHelper.findAnAddress(order.address);
+      let address = addressData;
       // console.log(address);
       let itemsOrdered = cartItems;
       // console.log(itemsOrdered);
+      let couponAmount = couponUsed ? couponUsed.discount : 0;
     // console.log('2');
       let completedOrders = new Order({
           user: userId,
@@ -38,7 +39,7 @@ const forOrderPlacing = async (order, totalAmount, cartItems, userId1, coupon) =
           orderStatus: status,
           orderedItems: itemsOrdered,
           coupon: coupon,
-          couponAmount: couponUsed.discount,
+          couponAmount: couponAmount,
       });
 
       await completedOrders.save();

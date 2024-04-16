@@ -19,6 +19,8 @@ adminRoute.use("/public/uploads", express.static("/public/uploads"));
 //Admin Actions
 adminRoute.get("/",adminController.adminLogin);
 adminRoute.post("/",adminController.adminLoginPost);
+adminRoute.get("/dashboard",adminController.dashboard);
+adminRoute.post("/showChart",adminController.showChart);
 adminRoute.get("/logout",adminController.adminLogout);
 
 //Category Management
@@ -39,6 +41,9 @@ adminRoute.post("/editProduct/:id",isAdmin,upload.array("images", 5), productCon
 adminRoute.post("/deleteImage",isAdmin,productController.deleteSingleImage);
 adminRoute.get("/blockProduct",isAdmin,productController.getBlockProduct);
 adminRoute.get("/unBlockProduct",isAdmin,productController.getUnblockProduct);
+
+//stock Management
+adminRoute.get("/stocks",isAdmin,productController.stocks);
 
 // Customer Management
 adminRoute.get("/users",isAdmin,customerController.getCustomersInfo);

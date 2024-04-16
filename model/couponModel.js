@@ -1,8 +1,6 @@
 const mongoose = require('mongoose')
 
 const couponSchema = mongoose.Schema({
-
-
     couponName :{
         type: String,
         require : true

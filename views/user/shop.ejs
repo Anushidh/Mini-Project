@@ -1,5 +1,15 @@
 <%- include("../partials/header") %>
 
+    <!-- Centered search bar -->
+    <div style="display: flex; justify-content: center;">
+        <div class="search_bar">
+            <form id="searchForm" action="/search-product" method="POST">
+                <input type="text" name="query" placeholder="Search products..." />
+                <button type="submit"><i class="fa fa-search"></i></button>
+            </form>
+        </div>
+    </div>
+
     <!--breadcrumbs area start-->
     <div class="breadcrumbs_area">
         <div class="container">
@@ -49,54 +59,51 @@
                                     <a href="/shop?sort=releaseDate">Price: Release Date</a>
                                 </div>
                             </div>
-                            
-                            
+
+
                             <style>
                                 /* Style the dropdown button */
-.dropbtn {
-  background-color: #fff;
-  color: #333;
-  padding: 10px;
-  font-size: 16px;
-  border: none;
-  cursor: pointer;
-}
+                                .dropbtn {
+                                    background-color: #fff;
+                                    color: #333;
+                                    padding: 10px;
+                                    font-size: 16px;
+                                    border: none;
+                                    cursor: pointer;
+                                }
 
-/* Style the dropdown content (hidden by default) */
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #fff;
-  min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1;
-}
+                                /* Style the dropdown content (hidden by default) */
+                                .dropdown-content {
+                                    display: none;
+                                    position: absolute;
+                                    background-color: #fff;
+                                    min-width: 160px;
+                                    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+                                    z-index: 1;
+                                }
 
-/* Style the links inside the dropdown */
-.dropdown-content a {
-  color: #333;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-}
+                                /* Style the links inside the dropdown */
+                                .dropdown-content a {
+                                    color: #333;
+                                    padding: 12px 16px;
+                                    text-decoration: none;
+                                    display: block;
+                                }
 
-/* Change color of dropdown links on hover */
-.dropdown-content a:hover {
-  background-color: #f1f1f1;
-}
+                                /* Change color of dropdown links on hover */
+                                .dropdown-content a:hover {
+                                    background-color: #f1f1f1;
+                                }
 
-/* Show the dropdown content when the dropdown button is hovered over */
-.dropdown:hover .dropdown-content {
-  display: block;
-}
-
+                                /* Show the dropdown content when the dropdown button is hovered over */
+                                .dropdown:hover .dropdown-content {
+                                    display: block;
+                                }
                             </style>
-                            
-                         
-                            
-                            <!-- <div class="page_amount">
-                                <p>Showing 1–9 of 21 results</p>
-                            </div> -->
+
+
+
+
                         </div>
                         <!--shop toolbar end-->
 
@@ -105,38 +112,41 @@
                                 <div class="col-lg-4 col-md-4 col-12 ">
                                     <div class="single_product">
                                         <div class="product_thumb">
-                                            <a class="primary_img" href="/productDetails/<%= product[i]._id %>"><img
-                                                    src="/uploads/product-images/<%= product[i].productImage[0] %>"
-                                                    alt=""></a>
-                                            <a class="secondary_img" href="/productDetails/<%= product[i]._id %>"><img
-                                                    src="/uploads/product-images/<%= product[i].productImage[1] %>"
-                                                    alt=""></a>
-                                            <div class="product_action">
-                                                <div class="hover_action">
-                                                    <a href="#"><i class="fa fa-plus"></i></a>
-                                                    <div class="action_button">
-                                                        <ul>
-                                                            <li><a title="add to cart" href="/cart"><i
-                                                                        class="fa fa-shopping-basket"
-                                                                        aria-hidden="true"></i></a></li>
-                                                            <li><a href="/wishlist" title="add to wishlist"><i
-                                                                        class="fa fa-heart-o"
-                                                                        aria-hidden="true"></i></a></li>
-                                                        </ul>
+                                            <% console.log('product.productImage:', product.productImage); %>
+                                                <a class="primary_img" href="/productDetails/<%= product[i]._id %>"><img
+                                                        src="/uploads/product-images/<%= product[i].productImage[0] %>"
+                                                        alt=""></a>
+                                                <a class="secondary_img"
+                                                    href="/productDetails/<%= product[i]._id %>"><img
+                                                        src="/uploads/product-images/<%= product[i].productImage[1] %>"
+                                                        alt=""></a>
+                                                <div class="product_action">
+                                                    <div class="hover_action">
+                                                        <a href="#"><i class="fa fa-plus"></i></a>
+                                                        <div class="action_button">
+                                                            <ul>
+                                                                <li><a title="add to cart" href="/cart"><i
+                                                                            class="fa fa-shopping-basket"
+                                                                            aria-hidden="true"></i></a></li>
+                                                                <li><a href="/wishlist" title="add to wishlist"><i
+                                                                            class="fa fa-heart-o"
+                                                                            aria-hidden="true"></i></a></li>
+                                                            </ul>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="quick_button">
-                                                <a href="#" data-bs-toggle="modal" data-bs-target="#modal_box"
-                                                    title="quick_view">+ quick view</a>
-                                            </div>
+                                                <div class="quick_button">
+                                                    <a href="#" data-bs-toggle="modal" data-bs-target="#modal_box"
+                                                        title="quick_view">+ quick view</a>
+                                                </div>
 
-                                            <% let priceDifference=product[i].regularPrice - product[i].salePrice; %>
-                                                <% if (priceDifference> 0) { %>
-                                                    <div class="product_sale">
-                                                        <span>₹<%= priceDifference %> off</span>
-                                                    </div>
-                                                    <% } %>
+                                                <% let priceDifference=product[i].regularPrice - product[i].salePrice;
+                                                    %>
+                                                    <% if (priceDifference> 0) { %>
+                                                        <div class="product_sale">
+                                                            <span>₹<%= priceDifference %> off</span>
+                                                        </div>
+                                                        <% } %>
                                         </div>
 
                                         <div class="product_content grid_content">
@@ -145,8 +155,9 @@
                                                 </a></h3>
                                             <span class="current_price">₹<%= product[i].salePrice.toFixed(2) %></span>
                                             <span class="old_price">₹<%= product[i].regularPrice.toFixed(2) %></span>
-                                            <span class="stock_status" style="margin-left: 10px; color: <%= product[i].totalQuantity > 0 ? 'green' : 'red' %>;">
-                                                <%= product[i].totalQuantity > 0 ? 'In Stock' : 'Out of Stock' %>
+                                            <span class="stock_status"
+                                                style="margin-left: 10px; color: <%= product[i].totalQuantity > 0 ? 'green' : 'red' %>;">
+                                                <%= product[i].totalQuantity> 0 ? 'In Stock' : 'Out of Stock' %>
                                             </span>
                                         </div>
 
@@ -166,9 +177,9 @@
                                             </div>
                                             <div class="product_price">
                                                 <span class="current_price">₹<%= product[i].salePrice.toFixed(2) %>
-                                                        </span>
+                                                </span>
                                                 <span class="old_price">₹<%= product[i].regularPrice.toFixed(2) %>
-                                                        </span>
+                                                </span>
                                             </div>
                                             <div class="product_desc">
                                                 <p>
@@ -214,71 +225,43 @@
                         <div class="sidebar_widget">
                             <div class="widget_list widget_filter">
                                 <h2>Filter by price</h2>
-                                <form id="priceFilterForm">
+                                <form id="priceFilterForm" action="/filter-price" method="POST">
+                                    <!-- Hidden input fields to store minPrice and maxPrice values -->
+                                    <input type="hidden" name="minPrice" id="minPriceInput" value="">
+                                    <input type="hidden" name="maxPrice" id="maxPriceInput" value="">
+
+                                    <!-- Slider range for selecting price -->
                                     <div id="slider-range"></div>
+
+                                    <!-- Display selected price range -->
+                                    <input type="text" name="amount" id="amount" readonly>
+
+                                    <!-- Submit button -->
                                     <button type="submit">Filter</button>
-                                    <input type="text" name="text" id="amount" readonly />
                                 </form>
                             </div>
-                            
+
+
                             <div class="widget_list widget_categories">
                                 <h2>Product categories</h2>
                                 <ul>
-                                    <li><a href="/filter?category=65d49268fc9e287ab389c85e">T-shirts <span>2</span></a> </li>
-                                    <li><a href="/filter?category=65d49281fc9e287ab389c864">Shirts <span>2</span></a> </li>
-                                    <li><a href="/filter?category=65d4929bfc9e287ab389c86a">Sweatshirt <span>2</span></a> </li>
-                                    <li><a href="/filter?category=65d9ce2aba3278170c0c87fe"> Jeans <span>2</span></a> </li>
+                                    <li><a href="/filter?category=65d49268fc9e287ab389c85e">T-shirts <span>2</span></a>
+                                    </li>
+                                    <li><a href="/filter?category=65d49281fc9e287ab389c864">Shirts <span>2</span></a>
+                                    </li>
+                                    <li><a href="/filter?category=65d4929bfc9e287ab389c86a">Sweatshirt
+                                            <span>2</span></a> </li>
+                                    <li><a href="/filter?category=65d9ce2aba3278170c0c87fe"> Jeans <span>2</span></a>
+                                    </li>
                                 </ul>
                             </div>
 
-                            <!-- <div class="widget_list widget_categories">
-                                <h2>Manufacturer</h2>
-                                <ul>
-                                    <li><a href="#">Calvin Klein <span>6</span></a> </li>
-                                    <li><a href="#"> Chanel <span>10</span></a> </li>
-                                    <li><a href="#">Christian Dior <span>4</span></a> </li>
-                                    <li><a href="#"> ferragamo <span>4</span></a> </li>
-                                    <li><a href="#">hermes <span>10</span></a> </li>
-                                    <li><a href="#">louis vuitton <span>8</span></a> </li>
-                                    <li><a href="#">Tommy Hilfiger <span>7</span></a> </li>
-                                    <li><a href="#">Versace <span>6</span></a> </li>
 
-                                </ul>
-                            </div> -->
-                            <!-- <div class="widget_list widget_categories">
-                                <h2>Select By Color</h2>
-                                <ul>
-                                    <li><a href="#">Black <span>6</span></a> </li>
-                                    <li><a href="#"> Blue <span>10</span></a> </li>
-                                    <li><a href="#">Brown <span>4</span></a> </li>
-                                    <li><a href="#"> Green <span>4</span></a> </li>
-                                    <li><a href="#">Pink <span>7</span></a> </li>
-                                    <li><a href="#">White<span>8</span></a> </li>
-                                    <li><a href="#">Yellow <span>5</span></a> </li>
-
-                                </ul>
-                            </div> -->
-                            <!-- <div class="widget_list tag-cloud">
-                                <h2>Popular Tags</h2>
-                                <div class="tag_widget">
-                                    <ul>
-                                        <li><a href="#">Creams</a></li>
-                                        <li><a href="#">Eyebrow Pencil</a></li>
-                                        <li><a href="#">Eyeliner</a></li>
-                                        <li><a href="#">Eye Shadow</a></li>
-                                        <li><a href="#">Lotions</a></li>
-                                        <li><a href="#">Mascara</a></li>
-                                        <li><a href="#">Oils</a></li>
-                                        <li><a href="#">Powders</a></li>
-                                        <li><a href="#">Shampoos</a></li>
-                                    </ul>
-                                </div>
-                            </div> -->
 
                         </div>
                         <!--sidebar widget end-->
                     </div>
-                
+
                 </div>
             </div>
 
@@ -420,54 +403,162 @@
         </div>
     </div>
     <!-- modal area start-->
-
+   
 
     <%- include("../partials/footer") %>
 
-    <script>
- 
- $(function() {
-    var minPrice = 300;  // Example: Minimum price of $10
-    var maxPrice = 900; // Example: Maximum price of $100
-    
-    $("#slider-range").slider({
-        range: true,
-        min: minPrice,
-        max: maxPrice,
-        values: [minPrice, maxPrice],
-        slide: function(event, ui) {
-            $("#amount").val("₹" + ui.values[0] + " - ₹" + ui.values[1]);
-        }
-    });
-    
-    $("#amount").val("₹" + $("#slider-range").slider("values", 0) +
-        " - ₹" + $("#slider-range").slider("values", 1));
-});
+        <script>
+
+            const searchForm = document.getElementById('searchForm');
+
+            searchForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const query = searchForm.elements.query.value;
+                console.log(query);
+                try {
+                    const response = await fetch(`/search-product?query=${encodeURIComponent(query)}`);
+
+                    if (response.ok) {
+                        const products = await response.json();
+                        console.log(products);
+                        updateProductList(products);
+                    } else {
+                        console.error('Error searching for products:', response.status);
+                    }
+                } catch (error) {
+                    console.error('Error searching for products:', error);
+                }
+            });
+
+            function updateProductList(products) {
+                // Clear the existing product list
+                const productWrapper = document.getElementById('productWrapper');
+                productWrapper.innerHTML = '';
+
+                // Render the new product list
+                for (let i = 0; i < products.length; i++) {
+                    const product = products[i];
+
+                    // Create the product element and append it to the productWrapper
+                    const productElement = document.createElement('div');
+                    productElement.classList.add('col-lg-4', 'col-md-4', 'col-12');
+                    productElement.innerHTML = `
+      <div class="single_product">
+        <div class="product_thumb">
+          <a class="primary_img" href="/productDetails/${product.id}">
+            ${product.productImage && product.productImage.length > 0
+                            ? `<img src="/uploads/product-images/${product.productImage[0]}" alt="">`
+                            : `<img src="/images/placeholder.jpg" alt="Placeholder Image">`
+                        }
+          </a>
+          <a class="secondary_img" href="/productDetails/${product.id}">
+            ${product.productImage && product.productImage.length > 1
+                            ? `<img src="/uploads/product-images/${product.productImage[1]}" alt="">`
+                            : product.productImage && product.productImage.length > 0
+                                ? `<img src="/uploads/product-images/${product.productImage[0]}" alt="">`
+                                : `<img src="/images/placeholder.jpg" alt="Placeholder Image">`
+                        }
+          </a>
+          <div class="product_action">
+            <div class="hover_action">
+              <a href="#"><i class="fa fa-plus"></i></a>
+              <div class="action_button">
+                <ul>
+                  <li>
+                    <a title="add to cart" href="/cart">
+                      <i class="fa fa-shopping-basket" aria-hidden="true"></i>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/wishlist" title="add to wishlist">
+                      <i class="fa fa-heart-o" aria-hidden="true"></i>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="quick_button">
+            <a href="#" data-bs-toggle="modal" data-bs-target="#modal_box" title="quick_view">+ quick view</a>
+          </div>
+
+          ${product.regularPrice > product.salePrice
+                            ? `<div class="product_sale"><span>₹${product.regularPrice - product.salePrice} off</span></div>`
+                            : ''
+                        }
+        </div>
+
+        <div class="product_content grid_content">
+          <h3><a href="/productDetails/${product.id}">${product.productName}</a></h3>
+          ${product.salePrice !== undefined && product.salePrice !== null
+                            ? `<span class="current_price">₹${product.salePrice.toFixed(2)}</span>`
+                            : `<span class="current_price">₹0.00</span>`
+                        }
+          ${product.regularPrice !== undefined && product.regularPrice !== null
+                            ? `<span class="old_price">₹${product.regularPrice.toFixed(2)}</span>`
+                            : `<span class="old_price">₹0.00</span>`
+                        }
+          <span class="stock_status" style="margin-left: 10px; color: ${product.totalQuantity > 0 ? 'green' : 'red'};">
+            ${product.totalQuantity > 0 ? 'In Stock' : 'Out of Stock'}
+          </span>
+        </div>
+
+        <div class="product_content list_content">
+          <h3><a href="/productDetails/${product.id}">${product.productName}</a></h3>
+          <div class="product_ratting">
+            <ul>
+              <li><a href="#"><i class="fa fa-star"></i></a></li>
+              <li><a href="#"><i class="fa fa-star"></i></a></li>
+              <li><a href="#"><i class="fa fa-star"></i></a></li>
+              <li><a href="#"><i class="fa fa-star"></i></a></li>
+              <li><a href="#"><i class="fa fa-star"></i></a></li>
+            </ul>
+          </div>
+          <div class="product_price">
+            ${product.salePrice !== undefined && product.salePrice !== null
+                            ? `<span class="current_price">₹${product.salePrice.toFixed(2)}</span>`
+                            : `<span class="current_price">₹0.00</span>`
+                        }
+            ${product.regularPrice !== undefined && product.regularPrice !== null
+                            ? `<span class="old_price">₹${product.regularPrice.toFixed(2)}</span>`
+                            : `<span class="old_price">₹0.00</span>`
+                        }
+          </div>
+          <div class="product_desc">
+            <p>${product.productDescription}</p>
+          </div>
+        </div>
+      </div>
+    `;
+
+                    productWrapper.appendChild(productElement);
+                }
+            }
 
 
 
-// $(function() {
-//     $("#priceFilterForm").submit(function(event) {
-//         event.preventDefault(); 
-//         var minPrice = $("#slider-range").slider("values", 0);
-//         var maxPrice = $("#slider-range").slider("values", 1);
-//         console.log(minPrice + " " + maxPrice);
-//         $.ajax({
-//             url: '/filter-price', 
-//             method: 'POST',
-//             data: {
-//                 minPrice: minPrice,
-//                 maxPrice: maxPrice
-//             },
-//             success: function(response) {
-//                 console.log(response); 
-//             },
-//             error: function(xhr, status, error) {
-//                 console.error('Error:', error); 
-//             }
-//         });
-//     });
-// });
 
 
-    </script>
+            $(function () {
+                $("#slider-range").slider({
+                    range: true,
+                    min: 0,
+                    max: 900,
+                    values: [0, 900],
+                    slide: function (event, ui) {
+                        $("#amount").val("₹" + ui.values[0] + " - ₹" + ui.values[1]);
+                        $("#minPriceInput").val(ui.values[0]);
+                        $("#maxPriceInput").val(ui.values[1]);
+                    }
+                });
+                $("#amount").val("₹" + $("#slider-range").slider("values", 0) +
+                    " - ₹" + $("#slider-range").slider("values", 1));
+            });
+
+
+
+
+
+
+
+        </script>

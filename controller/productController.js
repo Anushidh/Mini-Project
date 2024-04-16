@@ -5,6 +5,18 @@ const fs = require("fs");
 const path = require("path");
 const { log } = require("console");
 
+const stocks = async (req, res) => {
+    try {
+        const products = await productHelper.getAllProducts();
+        res.render('admin/stock', { products });
+    } catch (error) {
+        // Handle errors
+        console.error('Error fetching products:', error);
+        res.status(500).send('Internal Server Error');
+    }
+}
+
+
 const getProductAddPage = async (req, res) => {
     try {
         const category = await Category.find({ isBlocked: false });
@@ -15,11 +27,11 @@ const getProductAddPage = async (req, res) => {
         res.render('user/404');
     }
 }
- 
+
 const addProducts = async (req, res) => {
     try {
         const { productName, productDescription, category, regularPrice, salePrice, small_quantity, medium_quantity, large_quantity } = req.body;
-        
+
         // Backend validation
         if (!productName || !productDescription || !category || !regularPrice || !salePrice || !small_quantity || !medium_quantity || !large_quantity) {
             return res.status(400).json({ error: "Missing required fields" });
@@ -38,7 +50,7 @@ const addProducts = async (req, res) => {
         const totalQuantity = smallQuantity + mediumQuantity + largeQuantity;
 
         // Check if a product with the same name or image already exists
-        const productExists = await Product.findOne({ $or: [{ productName }, { productImage: { $in: req.files.map(file => file.filename) }}]});
+        const productExists = await Product.findOne({ $or: [{ productName }, { productImage: { $in: req.files.map(file => file.filename) } }] });
         if (productExists) {
             if (productExists.productName === productName && productExists.productImage.includes(req.files[0].filename)) {
                 return res.status(400).json({ error: "Product with the same name and image already exists" });
@@ -58,7 +70,7 @@ const addProducts = async (req, res) => {
                 images.push(req.files[i].filename);
             }
         }
-       
+
         const newProduct = new Product({
             productName,
             productDescription,
@@ -70,7 +82,7 @@ const addProducts = async (req, res) => {
             productImage: images
         });
         await newProduct.save();
-        
+
         res.redirect("/admin/products")
         // res.json("success")
     } catch (error) {
@@ -82,7 +94,7 @@ const addProducts = async (req, res) => {
 
 const adminProductList = async (req, res) => {
     // console.log('inside list');
-     productHelper.getAllProducts()
+    productHelper.getAllProducts()
         .then((response) => {
             // console.log(response);
             res.render('admin/product', { products: response });
@@ -125,15 +137,15 @@ const editProduct = async (req, res) => {
             }
         }
         console.log(req.files)
-        
-       
+
+
         const existingProduct = await Product.findById(id);
         const productSizes = [
             { size: "Small", quantity: smallQuantity },
             { size: "Medium", quantity: mediumQuantity },
             { size: "Large", quantity: largeQuantity }
         ];
-       
+
         console.log();
         // Check if any new images were uploaded
         if (req.files.length > 0) {
@@ -231,12 +243,12 @@ const deleteSingleImage = async (req, res) => {
         if (fs.existsSync(imagePath)) {
             await fs.unlinkSync(imagePath);
             console.log(`Image ${image} deleted successfully`);
-            res.json({success : true})
+            res.json({ success: true })
         } else {
             console.log(`Image ${image} not found`);
             res.status(404).json({ success: false, message: 'Image not found' });
         }
-        
+
         // res.redirect(`/admin/editProduct?id=${product._id}`)
 
     } catch (error) {
@@ -254,4 +266,5 @@ module.exports = {
     getBlockProduct,
     getUnblockProduct,
     deleteSingleImage,
+    stocks,
 }

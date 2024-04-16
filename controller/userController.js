@@ -16,7 +16,7 @@ const addressHelper = require("../helper/addressHelper");
 const { v4: uuidv4 } = require("uuid");
 const Order = require('../model/orderModel');
 const walletHelper = require('../helper/walletHelper');
-const walletController=require("../controller/walletController"); 
+const walletController = require("../controller/walletController");
 const Wallet = require('../model/walletModel');
 // const { render } = require('../routes/userRoute');
 
@@ -39,13 +39,14 @@ const getHome = async (req, res) => {
 const userProfile = async (req, res) => {
   try {
     let userId = req.session.user._id;
+    let userDetails = await User.findById(userId)
     let userAddress = await addressHelper.findAnAddress(userId);
     let userOrders = await Order.find({ user: userId });
     cartCount = await cartHelper.getCartCount(userId);
     // wishListCount = await wishlistHelper.getWishListCount(userId)
     // let walletDetails = await walletHelper.getWalletAmount(userId)
     let allAddress = await addressHelper.findAllAddress(userId);
-    res.render('user/profile', { loginStatus: req.session.user, allAddress: allAddress, cartCount, userAddress: userAddress, userOrders: userOrders, formatDate: userHelper.formatDate });
+    res.render('user/profile', { loginStatus: req.session.user, allAddress: allAddress, cartCount, userAddress: userAddress, userOrders: userOrders, formatDate: userHelper.formatDate, userDetails: userDetails });
   } catch (error) {
     console.error(error);
     // res.status(500).render('user/404');
@@ -111,10 +112,65 @@ const editAddressPage = async (req, res) => {
 
 }
 
+const searchProduct = async (req, res) => {
+  try {
+    const { query } = req.query;
+    console.log(query);
+    let products;
+    if (req.session.category) {
+      console.log('1');
+      products = await Product.find({
+        isBlocked: false,
+        productName: { $regex: new RegExp(query, 'i') },
+        category: req.session.category, // This will only be included if a categoryId is available
+      });
+    }
+    else if (req.session.sort) {
+      console.log('2');
+      if (req.session.sort === "highToLow") {
+        products = await Product.find({
+          productName: { $regex: new RegExp(query, 'i') },
+          isBlocked: false,
+        }).sort({ salePrice: -1 });
+      }
+      else if (req.session.sort === "lowToHigh") {
+        products = await Product.find({
+          productName: { $regex: new RegExp(query, 'i') },
+          isBlocked: false,
+        }).sort({ salePrice: 1 });
+      }
+      else if (req.session.sort === "releaseDate") {
+        products = await Product.find({
+          productName: { $regex: new RegExp(query, 'i') },
+          isBlocked: false,
+        }).sort({ createdAt: 1 });
+      }
+
+    }
+    else {
+      products = await Product.find({
+        productName: { $regex: new RegExp(query, 'i') },
+        isBlocked: false,
+      });
+    }
+
+    console.log(products);
+    const productOffers = await productOffer.find({ "productOffer.offerStatus": true }).populate('productOffer.product');
+    const categoryOffers = await categoryOffer.find({ "categoryOffer.offerStatus": true }).populate('categoryOffer.category');
+    const categories = await Category.find({ isBlocked: false });
+    res.json(products,
+      productOffers,
+      categoryOffers,
+      categories,);
+  } catch (error) {
+    console.error('Error searching for products:', error);
+    res.status(500).json({ error: 'Error searching for products' });
+  }
+}
 
 const getProductDetailsPage = async (req, res) => {
   try {
-    // console.log('1');
+    console.log('1');
     const user = req.session.user
     // console.log("wrking");
     const id = req.params.id
@@ -138,6 +194,7 @@ const getProductDetailsPage = async (req, res) => {
 const getShopPage = async (req, res) => {
   try {
     const sort = req.query.sort;
+    req.session.sort = sort;
     // console.log(sort);
     const user = req.session.id;
     let currentProduct;
@@ -181,50 +238,71 @@ const getShopPage = async (req, res) => {
   }
 };
 
-const filterPrice = async (req,res) => {
+const filterPrice = async (req, res) => {
   try {
     console.log('1');
+    const user = req.session.id;
     const { minPrice, maxPrice } = req.body;
+    console.log(minPrice + " " + maxPrice);
     const filteredProducts = await Product.find({
-        salePrice: { $gte: minPrice, $lte: maxPrice }
+      salePrice: { $gte: minPrice, $lte: maxPrice }
     });
-    
-    res.json({ success: true, product: filteredProducts });
-} catch (error) {
+    console.log(filteredProducts);
+    const count = filteredProducts.length;
+    const categories = await Category.find({ isBlocked: false });
+    const itemsPerPage = 8;
+    const currentPage = parseInt(req.query.page) || 1;
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+    const productsOnPage = filteredProducts.slice(startIndex, endIndex);
+    res.render("user/shop", {
+      user: user,
+      product: productsOnPage,
+      category: categories,
+      count: count,
+      totalPages: totalPages,
+      currentPage: currentPage,
+    });
+  } catch (error) {
     console.error('Error filtering products:', error);
     res.status(500).json({ success: false, message: 'Internal server error' });
+  }
 }
-}
-// const filterProduct = async (req, res) => {
-//   try {
-//     const categoryId = req.query.category;
-//     // console.log(categoryId);
-//     const user = req.session.id;
-//     const products = await Product.find({ category: categoryId, isBlocked: false });
 
-//     const count = products.length;
-//     const categories = await Category.find({ isBlocked: false });
 
-//     const itemsPerPage = 8;
-//     const currentPage = parseInt(req.query.page) || 1;
-//     const startIndex = (currentPage - 1) * itemsPerPage;
-//     const endIndex = startIndex + itemsPerPage;
-//     const totalPages = Math.ceil(products.length / itemsPerPage);
-//     const productsOnPage = products.slice(startIndex, endIndex);
+const filterProduct = async (req, res) => {
+  try {
+    const categoryId = req.query.category;
+    console.log(categoryId);
+    req.session.category = categoryId;
+    // console.log(categoryId);
+    const user = req.session.id;
+    const products = await Product.find({ category: categoryId, isBlocked: false });
 
-//     res.render("user/shop", {
-//       user: user,
-//       product: productsOnPage,
-//       category: categories,
-//       count: count,
-//       totalPages: totalPages,
-//       currentPage: currentPage,
-//     });
-//   } catch (error) {
-//     console.log(error.message);
-//     res.status(500).send("Internal Server Error");
-//   }
-// };
+    const count = products.length;
+    const categories = await Category.find({ isBlocked: false });
+
+    const itemsPerPage = 8;
+    const currentPage = parseInt(req.query.page) || 1;
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const totalPages = Math.ceil(products.length / itemsPerPage);
+    const productsOnPage = products.slice(startIndex, endIndex);
+
+    res.render("user/shop", {
+      user: user,
+      product: productsOnPage,
+      category: categories,
+      count: count,
+      totalPages: totalPages,
+      currentPage: currentPage,
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send("Internal Server Error");
+  }
+};
 
 
 
@@ -255,8 +333,9 @@ const getOtp = async (req, res) => {
 
 
 const userSignup = async (req, res) => {
-  const { username, email, phone, password } = req.body;
+  const { username, email, phone, password, referral } = req.body;
   // let email = req.body.email;
+  req.session.referral = referral;
   const findUser = await User.findOne({ email });
   if (!findUser) {
     var otp = await otpHelper.generateOtp();
@@ -300,17 +379,56 @@ const otpVerify = async (req, res) => {
   if (otp === req.session.userOtp) {
     const user = req.session.userData
     const passwordHash = await passwordHelper.securePassword(user.password)
-    const referalCode = uuidv4()
-    console.log("the referralCode  =>" + referalCode);
+    const referralCode = await generateRandomString();
+    console.log("the referralCode  =>" + referralCode);
+    let newUserWallet;
+
+    if (req.session.referral) {
+      const existingUser = await User.findOne({ referralCode: req.session.referral });
+      console.log(existingUser);
+      if (existingUser) {
+        // Referrer found, add 50rs to their wallet balance
+        const wallet = await Wallet.findOne({ user: existingUser._id });
+        if (wallet) {
+          wallet.walletBalance += 50;
+          await wallet.save();
+        } else {
+          // If the wallet doesn't exist for the user, create a new one
+          const newWallet = new Wallet({
+            user: existingUser._id,
+            walletBalance: 50
+          });
+          await newWallet.save();
+        }
+      }
+    }
 
     const saveUserData = new User({
       name: user.name,
       email: user.email,
       phone: user.phone,
       password: passwordHash,
-      referalCode: referalCode
+      referralCode: referralCode
     })
     await saveUserData.save()
+    // Create a new wallet for the new user and add 50rs to it
+    const existingUser = await User.findOne({ referralCode: req.session.referral });
+    if (existingUser) {
+      const newUserWallet = new Wallet({
+        user: saveUserData._id, // Now we have the user's ID after saving the user data
+        walletBalance: 50
+      });
+      await newUserWallet.save();
+    }
+    else {
+      const newUserWallet = new Wallet({
+        user: saveUserData._id, // Now we have the user's ID after saving the user data
+        walletBalance: 0
+      });
+      await newUserWallet.save();
+    }
+
+
     req.session.user = saveUserData._id
     res.redirect('/login')
   }
@@ -320,6 +438,15 @@ const otpVerify = async (req, res) => {
   }
 }
 
+function generateRandomString() {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < 15; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    result += characters.charAt(randomIndex);
+  }
+  return result;
+}
 
 const resendOtp = async (req, res) => {
   try {
@@ -588,18 +715,20 @@ const cancelOrder = async (req, res) => {
       return res.status(404).json({ error: 'Order not found' });
     }
     console.log(order);
-     let totalAmount = order.totalAmount;
-     
-     console.log(totalAmount);
+    let totalAmount = order.totalAmount;
+
+    console.log(totalAmount);
     if (order.orderStatus === 'confirmed' || order.orderStatus === 'pending') {
-      const wallet = await Wallet.findOne({ user: req.session.user._id });
-      console.log(wallet);
-      if (!wallet) {
-        return res.status(404).json({ error: 'Wallet not found' });
+      if (order.paymentMethod === 'razorpay') {
+        const wallet = await Wallet.findOne({ user: req.session.user._id });
+        console.log(wallet);
+        if (!wallet) {
+          return res.status(404).json({ error: 'Wallet not found' });
+        }
+        wallet.walletBalance += totalAmount;
+        await wallet.save();
+        console.log(wallet);
       }
-      wallet.walletBalance += totalAmount;
-      await wallet.save();
-      console.log(wallet);
       order.orderStatus = 'cancelled';
       await order.save();
       console.log(order);
@@ -607,25 +736,26 @@ const cancelOrder = async (req, res) => {
         const product = await Product.findById(item.product);
         if (!product) {
           console.error(`Product not found for item: ${item}`);
-          continue; 
+          continue;
         }
         if (!product.productSizes || !Array.isArray(product.productSizes)) {
           console.error(`Product sizes not defined or not an array for product: ${product}`);
-          continue; 
+          continue;
         }
         const sizeIndex = product.productSizes.findIndex(size => size.size === item.size);
         if (sizeIndex !== -1) {
-          
+
           product.productSizes[sizeIndex].quantity += item.quantity;
+          product.totalQuantity += item.quantity;
           await product.save();
         } else {
           console.error(`Size ${item.size} not found for product: ${product}`);
         }
       }
-     
+
       return res.status(200).json({ message: 'Order cancelled successfully' });
     } else {
-      
+
       return res.status(400).json({ error: 'Order cannot be cancelled' });
     }
   } catch (error) {
@@ -641,7 +771,19 @@ const returnOrder = async (req, res) => {
     if (!order) {
       return res.status(404).json({ error: 'Order not found' });
     }
+    let totalAmount = order.totalAmount;
+    console.log(totalAmount);
     if (order.orderStatus === 'delivered') {
+      if (order.paymentMethod === 'razorpay') {
+        const wallet = await Wallet.findOne({ user: req.session.user._id });
+        console.log(wallet);
+        if (!wallet) {
+          return res.status(404).json({ error: 'Wallet not found' });
+        }
+        wallet.walletBalance += totalAmount;
+        await wallet.save();
+        console.log(wallet);
+      }
       order.orderStatus = 'returned';
       await order.save();
       for (const item of order.orderedItems) {
@@ -657,6 +799,7 @@ const returnOrder = async (req, res) => {
         const sizeIndex = product.productSizes.findIndex(size => size.size === item.size);
         if (sizeIndex !== -1) {
           product.productSizes[sizeIndex].quantity += item.quantity;
+          product.totalQuantity += item.quantity;
           await product.save();
         } else {
           console.error(`Size ${item.size} not found for product: ${product}`);
@@ -673,22 +816,7 @@ const returnOrder = async (req, res) => {
 };
 
 
-const searchProduct = async (req, res) => {
-  try {
-    const { productName } = req.body;
-    console.log(productName);
-    const regex = new RegExp(productName, 'i');
-    const product = await Product.findOne({ productName: { $regex: regex } });
 
-    if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
-    }
-
-    res.status(200).json({ productId: product._id });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
 
 
 module.exports = {
@@ -716,6 +844,7 @@ module.exports = {
   filterPrice,
   searchProduct,
   returnOrder,
+  filterProduct,
 }
 
 

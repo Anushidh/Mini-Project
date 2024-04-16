@@ -1,133 +1,177 @@
 <%- include("../partials/adminHeader") %>
 
 
-<style>
-    .col-md-3 {
-        padding: 20px;
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        margin: 10px;
-    }
+    <style>
+        .col-md-3 {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            margin: 10px;
+        }
 
-    .form-label {
-        margin-bottom: 8px;
-    }
+        .form-label {
+            margin-bottom: 8px;
+        }
 
-    .form-control {
-        width: 100%;
-        padding: 8px;
-        margin-bottom: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        box-sizing: border-box;
-    }
+        .form-control {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
 
-    .d-grid {
-        margin-top: 20px;
-    }
+        .d-grid {
+            margin-top: 20px;
+        }
 
-    .btn-primary {
-        background-color: #007bff;
-        color: #fff;
-        border: 1px solid #007bff;
-        border-radius: 5px;
-        padding: 10px 20px;
-        cursor: pointer;
-    }
+        .btn-primary {
+            background-color: #007bff;
+            color: #fff;
+            border: 1px solid #007bff;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
 
-    .btn-primary:hover {
-        background-color: #0056b3;
-        border-color: #0056b3;
-    }
-</style>
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+    </style>
 
 
 
-<section class="content-main">
-    <div class="content-header">
-        <div>
-            <h2 class="content-title card-title">Category </h2>
-            <p>Add, edit or delete a category</p>
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Category </h2>
+                <p>Add, edit or delete a category</p>
+            </div>
+            <div>
+                <input type="text" placeholder="Search cat" class="form-control bg-white">
+            </div>
         </div>
-        <div>
-            <input type="text" placeholder="Search cat" class="form-control bg-white">
-        </div>
-    </div>
-    <div class="card">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-3">
-                    <form method="post" action="/admin/category">
-                        <div class="mb-4">
-                            <label for="product_name" class="form-label">Name</label>
-                            <input type="text" name="categoryName" placeholder="Type here" class="form-control" id="product_name" required/>
-                        </div>
-                       
-                      
-                        <div class="mb-4">
-                            <label class="form-label">Description</label>
-                            <textarea placeholder="Type here" name="categoryDescription" class="form-control" required></textarea>
-                        </div>
-                        <div class="d-grid">
-                            <button class="btn btn-primary" type="submit">Create category</button>
-                        </div>
-                    </form>
-                </div>
-                <div class="col-md-7 ml-105">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th class="text-center">
-                                    </th>
-                                    <th>Name</th>
-                                    <th>Description</th>
-                                    <th>Status</th>
-                                    <th>List/Unlist</th>
-                                    <th class="text-start">Edit</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% for (let i = 0; i < categories.length; i++) { %>
-                                    <tr>
-                                        <td>
-                                            <!-- Content for the first column, if needed -->
-                                        </td>
-                                        <td class="text-start"><%= categories[i].name %></td>
-                                        <td class="text-start"><%= categories[i].description %></td>
-                                        <td class="text-start">
-                                            <% if (categories[i].isBlocked === false) { %>
-                                                <span class="badge rounded-pill alert-success" style="width: 60px;">Listed</span>
-                                            <% } else { %>
-                                                <span class="badge rounded-pill alert-danger" style="width: 60px;">Unlisted</span>
-                                            <% } %>
-                                        </td>                                        
-                                        <td class="text-start">
-                                            <% if (categories[i].isBlocked === false) { %>
-                                                <button class="btn btn-danger" style="width: 70px;">
-                                                    <a href="/admin/listCategory?id=<%= categories[i]._id %>" class="text-white">Unlist</a>
-                                                </button>
-                                            <% } else { %>
-                                                <button class="btn btn-success" style="width: 70px;">
-                                                    <a href="/admin/unListCategory?id=<%= categories[i]._id %>" class="text-white">List</a>
-                                                </button>
-                                            <% } %>
-                                        </td>
-                                        <td class="text-start">
-                                            <button class="btn btn-info">
-                                                <a href="/admin/edit-category/<%= categories[i]._id %>" class="text-white">Edit</a>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                <% } %>
-                            </tbody>
-                        </table>
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+
                         
-                    </div>
-                </div> <!-- .col// -->
-            </div> <!-- .row // -->
-        </div> <!-- card body .// -->
-    </div> <!-- card .// -->
-</section> <!-- content-main end// -->
+                        <form method="post" action="/admin/category" onsubmit="return validateForm()">
+                            <div class="mb-4">
+                                <label for="product_name" class="form-label">Name</label>
+                                <input type="text" name="categoryName" placeholder="Type here" class="form-control"
+                                    id="product_name" required />
+                                <div id="nameError" class="text-danger"></div>
+                            </div>
 
-<%- include("../partials/adminFooter") %>
+
+                            <div class="mb-4">
+                                <label class="form-label">Description</label>
+                                <textarea placeholder="Type here" name="categoryDescription" class="form-control"
+                                    id="category_description" required></textarea>
+                                <div id="descriptionError" class="text-danger"></div>
+                            </div>
+                            <div class="d-grid">
+                                <button class="btn btn-primary" type="submit">Create category</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-7 ml-105">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">
+                                        </th>
+                                        <th>Name</th>
+                                        <th>Description</th>
+                                        <th>Status</th>
+                                        <th>List/Unlist</th>
+                                        <th class="text-start">Edit</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% for (let i=0; i < categories.length; i++) { %>
+                                        <tr>
+                                            <td>
+                                                <!-- Content for the first column, if needed -->
+                                            </td>
+                                            <td class="text-start">
+                                                <%= categories[i].name %>
+                                            </td>
+                                            <td class="text-start">
+                                                <%= categories[i].description %>
+                                            </td>
+                                            <td class="text-start">
+                                                <% if (categories[i].isBlocked===false) { %>
+                                                    <span class="badge rounded-pill alert-success"
+                                                        style="width: 60px;">Listed</span>
+                                                    <% } else { %>
+                                                        <span class="badge rounded-pill alert-danger"
+                                                            style="width: 60px;">Unlisted</span>
+                                                        <% } %>
+                                            </td>
+                                            <td class="text-start">
+                                                <% if (categories[i].isBlocked===false) { %>
+                                                    <button class="btn btn-danger" style="width: 70px;">
+                                                        <a href="/admin/unListCategory?id=<%= categories[i]._id %>"
+                                                            class="text-white">Unlist</a>
+                                                    </button>
+                                                    <% } else { %>
+                                                        <button class="btn btn-success" style="width: 70px;">
+                                                            <a href="/admin/listCategory?id=<%= categories[i]._id %>"
+                                                                class="text-white">List</a>
+                                                        </button>
+                                                        <% } %>
+                                            </td>
+                                            <td class="text-start">
+                                                <button class="btn btn-info">
+                                                    <a href="/admin/edit-category/<%= categories[i]._id %>"
+                                                        class="text-white">Edit</a>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <% } %>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div> <!-- .col// -->
+                </div> <!-- .row // -->
+            </div> <!-- card body .// -->
+        </div> <!-- card .// -->
+    </section> <!-- content-main end// -->
+
+    <%- include("../partials/adminFooter") %>
+
+        <script>
+            function validateForm() {
+                console.log('1');
+                var name = document.getElementById("product_name").value.trim();
+                var description = document.getElementById("category_description").value.trim();
+                var nameError = document.getElementById("nameError");
+                var descriptionError = document.getElementById("descriptionError");
+                var regex = /^[a-zA-Z]{3,}$/;
+
+                // Reset error messages
+                nameError.innerHTML = "";
+                descriptionError.innerHTML = "";
+
+                // Validate Name
+                if (!name.match(regex) || name.startsWith(" ")) {
+                    nameError.innerHTML = "Name must start with at least 3 alphabets, not start with a space, and contain no numbers.";
+                    return false;
+                }
+
+                // Validate Description
+                if (description.length < 3) {
+                    descriptionError.innerHTML = "Description must contain at least 3 characters.";
+                    return false;
+                }
+
+                return true; // Form submission allowed if all validations pass
+            }
+        </script>

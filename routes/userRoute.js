@@ -6,6 +6,7 @@ const cartController=require("../controller/cartController");
 const orderController=require("../controller/orderController"); 
 const couponController=require("../controller/couponController"); 
 const addressHelper = require("../helper/addressHelper");
+const razorpay = require("../middleware/razorpay");
 const walletController=require("../controller/walletController"); 
 const { isLoggedIn } = require("../middleware/authentication");
 
@@ -23,14 +24,15 @@ userRoute.get("/verifyEmail",userController.getVerifyEmail);
 userRoute.post("/VerifyEmail",userController.postVerifyEmail);
 userRoute.post("/verifyForgotPassOtp",userController.verifyForgotPassOtp);
 userRoute.post("/newPassword",userController.postNewPassword);
-userRoute.post('/search-product',userController.searchProduct);
+// userRoute.post('/search-product/:query',userController.searchProduct);
 userRoute.get("/logout",userController.userLogout);
 
 // Products based routes
 userRoute.get("/productDetails/:id", isLoggedIn, userController.getProductDetailsPage);
+userRoute.get("/search-product", isLoggedIn, userController.searchProduct);
 userRoute.get("/shop",isLoggedIn, userController.getShopPage);
 userRoute.post("/filter-price", isLoggedIn, userController.filterPrice);
-
+userRoute.get("/filter", isLoggedIn, userController.filterProduct);
 // Cart based routes
 userRoute.get('/cart',isLoggedIn, cartController.userCart);
 userRoute.post("/addToCart/:prodId/:quantity/:size",isLoggedIn, cartController.addToCart);
@@ -46,6 +48,11 @@ userRoute.post('/removeFromWishlist/:id',isLoggedIn,wishlistController.removeFro
 // purchase based routes
 userRoute.get('/checkoutPage',isLoggedIn,orderController.checkout);
 userRoute.post('/place-order',isLoggedIn,orderController.placeOrder);
+// userRoute.post('/place-orderRazorpay',isLoggedIn,orderController.placeOrderRazorpay);
+userRoute.post("/createOrder", isLoggedIn, razorpay.createOrder);
+userRoute.post('/paymentSuccess', isLoggedIn, orderController.paymentSuccess);
+userRoute.post('/failedRazorpay', isLoggedIn, orderController.failedRazorpay);
+userRoute.post('/second-try',isLoggedIn,orderController.secondTry);
 userRoute.get('/order-details/:orderId',isLoggedIn,orderController.orderDetails);
 userRoute.get('/order-success',isLoggedIn,orderController.orderSuccess);
 userRoute.post('/verify-payment',isLoggedIn,orderController.verifyPayment);
@@ -60,7 +67,9 @@ userRoute.post('/cancel-order', isLoggedIn,userController.cancelOrder);
 userRoute.post('/return-order', isLoggedIn,userController.returnOrder);
 
 //Coupon based routes
-userRoute.post('/applyOrRemoveCoupon', isLoggedIn, couponController.applyOrRemoveCoupon);
+// userRoute.post('/applyOrRemoveCoupon', isLoggedIn, couponController.applyOrRemoveCoupon);
+userRoute.post('/applyCoupon', isLoggedIn, couponController.applyCoupon);
+userRoute.post('/removeCoupon', isLoggedIn, couponController.removeCoupon);
 
 //wallet based routes
 userRoute.get('/get-wallet', isLoggedIn, walletController.getWallet);

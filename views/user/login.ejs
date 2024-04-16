@@ -27,14 +27,16 @@
         <div class="col-lg-6 col-md-6">
           <div class="account_form">
             <h2>login</h2>
-            <form method="post">
+            <form id="loginForm" method="post" onsubmit="return validateForm()">
               <p>   
                 <label>Email <span>*</span></label>
-                <input type="text" required="" name="email">
+                <input type="text" required="" name="email" id="email">
+                <span id="email-error" class="error"></span>
               </p>
               <p>   
                 <label>Password <span>*</span></label>
-                <input type="password" required="" name="password">
+                <input type="password" required="" name="password" id="password">
+                <span id="password-error" class="error"></span>
               </p>   
               <div class="login_submit">
                 <a href="/verifyEmail">Lost your password?</a>
@@ -54,3 +56,48 @@
 
 
 <%- include("../partials/footer") %>
+
+
+<script>
+  function validateForm() {
+    console.log('1');
+    const email = document.getElementById("email");
+    const password = document.getElementById("password");
+    // const emailRegX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // const passRegX = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{6,}$/;
+    // Updated email regular expression
+    const emailRegX = /^\S+@\S+\.\S+$/;
+
+    // Updated password regular expression
+    const passRegX = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{6,}$/;
+
+    // Email validation
+    if (email.value === "" || email.value === null) {
+            document.getElementById("email-error").classList.remove('d-none');
+            document.getElementById("email-error").innerHTML = "Email must be filled!";
+            return false;
+        } else if (!email.value.match(emailRegX)) {
+            document.getElementById("email-error").classList.remove('d-none');
+            document.getElementById("email-error").innerHTML = "Invalid Email Address";
+            return false;
+        } else {
+            document.getElementById("email-error").innerHTML = "";
+            document.getElementById("email-error").classList.add('d-none');
+        }
+
+        // Password validation
+        if (password.value === "" || password.value === null) {
+            document.getElementById("password-error").classList.remove('d-none');
+            document.getElementById("password-error").innerHTML = "Password must be filled!";
+            return false;
+        } else if (!password.value.match(passRegX)) {
+            document.getElementById("password-error").classList.remove('d-none');
+            document.getElementById("password-error").innerHTML = "it doesn't meet the specified password requirements";
+            return false;
+        } else {
+            document.getElementById("password-error").classList.add('d-none');
+        }
+        console.log('end');
+        return true;
+  }
+</script>

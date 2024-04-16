@@ -2,9 +2,11 @@ const cartHelper = require("../helper/cartHelper");
 const User= require("../model/userModel");
 const Product = require("../model/productModel");
 const Cart = require("../model/cartModel");
+const Order = require("../model/orderModel");
 const express = require("express");
 const ObjectId = require("mongoose").Types.ObjectId
 const Coupon = require('../model/couponModel');
+const Wishlist = require('../model/wishlistModel');
 
 const addToCart = async (req, res) => {
     try {
@@ -14,6 +16,18 @@ const addToCart = async (req, res) => {
         console.log(req.params);
         let user = req.session.user;
         // console.log(user);
+        const isInWishlist = await Wishlist.findOne({
+          user: user._id,
+          'products.productItemId': prodId,
+          'products.size': size
+      });
+      if (isInWishlist) {
+        // Remove product from wishlist
+        await Wishlist.findOneAndUpdate(
+            { user: user._id },
+            { $pull: { products: { productItemId: prodId, size: size } } }
+        );
+    }
         let response = await cartHelper.addToUserCart(user._id, prodId,addedQuantity, size);
         // console.log('1');
         if (response) {
@@ -29,16 +43,19 @@ const addToCart = async (req, res) => {
 
 const userCart = async (req, res) => {
   try {
+    let couponApplied;
+    couponApplied = req.session.coupon;
     let user = req.session.user;
     let totalandSubTotal = 0;
     let allCartItems = await cartHelper.getAllCartItems(user._id);
     cartCount = await cartHelper.getCartCount(user._id);
-    // wishListCount = await wishlistHelper.getWishListCount(user._id)
+    
     let availableCoupons = await Coupon.find({
       expiryDate: { $gt: new Date() },
       usedBy: { $ne: user._id },
     });
-    console.log(availableCoupons);
+    
+
     if(req.session.updatedTotal) {
       totalandSubTotal = req.session.updatedTotal;
     } 
@@ -46,8 +63,7 @@ const userCart = async (req, res) => {
       totalandSubTotal = await cartHelper.totalSubtotal(user._id, allCartItems);
       totalandSubTotal = cartHelper.currencyFormat(totalandSubTotal);
     }
-    
-    res.render('user/cart', { loginStatus : req.session.user, allCartItems, cartCount, totalAmount: totalandSubTotal, currencyFormat: cartHelper.currencyFormat, availableCoupons });
+    res.render('user/cart', { loginStatus : req.session.user, allCartItems, cartCount, totalAmount: totalandSubTotal, currencyFormat: cartHelper.currencyFormat, availableCoupons, couponApplied });
   } catch (error) {
    console.log(error);
     res.status(500).render('user/404');
@@ -67,8 +83,6 @@ const removeFromCart = (req, res) => {
     res.status(500).render('user/404');
   }
 }
-
-
 
 
 const incDecQuantity = async (req, res) => {
@@ -123,6 +137,21 @@ const clearCart = async (req, res) => {
       return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
+
+async function isCouponApplied(couponId, userId) {
+  try {
+      const coupon = await Coupon.findById(couponId);
+      if (!coupon) {
+          return false;
+      }
+      const isApplied = coupon.usedBy.some(usedUserId => String(usedUserId) === String(userId));
+      return isApplied;
+  } catch (error) {
+      console.error('Error checking if coupon is applied:', error);
+      return false;
+  }
+}
+
 
 module.exports = {
   addToCart,

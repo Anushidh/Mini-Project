@@ -26,7 +26,7 @@ const addCouponToDb = async (couponData) => {
       existingCoupon = await Coupon.findOne({ couponCode });
     } while (existingCoupon);
   
-    console.log(`Unique coupon code generated: ${couponCode}`);
+    // console.log(`Unique coupon code generated: ${couponCode}`);
   
     if (couponData.discountAmount > 50) {
       throw new Error('Discount amount cannot exceed 50');
@@ -40,7 +40,7 @@ const addCouponToDb = async (couponData) => {
       createdOn: couponData.startDate
     });
   
-    console.log(coupon1.couponCode);
+    // console.log(coupon1.couponCode);
     await coupon1.save();
     return coupon1._id;
   } catch (error) {

@@ -7,10 +7,11 @@ const flash = require('express-flash');
 const cookieParser = require('cookie-parser')
 const path = require("path")
 const bodyParser = require("body-parser")
-const session = require("express-session")
-const nocache = require("nocache")
-const mongoose = require("mongoose")
-const userRoute = require("./routes/userRoute")
+const session = require("express-session");
+const easyinvoice = require('easyinvoice');
+const nocache = require("nocache");
+const mongoose = require("mongoose");
+const userRoute = require("./routes/userRoute");
 const adminRoute = require("./routes/adminRoute");
 
 const app = express()
