@@ -280,6 +280,10 @@
 
                     // Send an AJAX request to the backend
                     if (isCodSelected || isWalletSelected) {
+                        if(isCodSelected && totalAmount < 1000) {
+                            alert('Orders below 1000 are not allowed for COD');
+                            return;
+                        }
                         $.ajax({
                             type: 'POST',
                             url: '/place-order',
@@ -287,7 +291,7 @@
                             success: function (response) {
                                 // Handle success response from the server
                                 console.log(response);
-
+                                
                                 // Check if the order was successfully placed
                                 if (response.paymentMethod === 'wallet' || response.paymentMethod === 'Cash on Delivery') {
                                     // Show a success message using SweetAlert2

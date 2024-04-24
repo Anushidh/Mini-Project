@@ -1,8 +1,9 @@
 const Product = require('../model/productModel')
 const Category = require('../model/categoryModel');
 
-const getAllProducts = async () => {
+const getAllProducts = async (page = 1, limit = 10) => {
   try {
+    const startIndex = (page - 1) * limit;
     const result = await Product.aggregate([
       {
         $lookup: {
@@ -11,8 +12,17 @@ const getAllProducts = async () => {
           foreignField: '_id',
           as: 'category'
         }
+      },
+      {
+        $skip: startIndex,
+      },
+      {
+        $limit: limit,
       }
     ]);
+    const totalProducts = await Product.countDocuments();
+    const totalPages = Math.ceil(totalProducts / limit);
+    return { products: result, totalPages, currentPage: page };
     return result;
   } catch (error) {
     console.error(error);

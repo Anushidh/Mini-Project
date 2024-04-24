@@ -81,9 +81,10 @@ const findAllAddress = async (userId) => {
   }
 };
 
-const findAnAddress = async (userId) => {
+const findAnAddress = async (Id) => {
   try {
-      const result = await Address.findOne({ userId: userId });
+      const result = await Address.findOne({ _id: Id });
+      console.log(result);
       return result;
   } catch (error) {
       throw error;

@@ -252,12 +252,13 @@
                          <tr>
                              <td class="text-center">`+ (i + 1) + `</td>
                              <td class="text-center"><b>`+ sales[i]._id + `</b></td>
-                             <td class="text-center">`+ sales[i].user + `</td>
+                             <td class="text-center">`+ sales[i].userDetails[0].name + `</td>
                              <td class="text-center">`+ sales[i].orderDate + `</td>
                              <td class="text-center">`+ sales[i].paymentMethod + `</td>
                              <td class="text-center"><span class="badge rounded-pill alert-warning">`+ sales[i].orderStatus + `</span></td>
                              <td class="text-center">`+ sales[i].totalAmount + `</td>
                              <td class="text-center">`+ sales[i].totalDiscount + `</td>
+                             <td class="text-center">`+ sales[i].couponAmount + `</td>
                          </tr>
                      `);
                  }
@@ -313,7 +314,9 @@
                      { wch: 15 },  // Width for column "Order Date"
                      { wch: 20 },  // Width for column "Payment Method"
                      { wch: 15 },  // Width for column "Order Status"
-                     { wch: 15 }   // Width for column "Total Amount"
+                     { wch: 15 },   // Width for column "Total Amount"
+                     { wch: 15 },   // Width for column "totalDiscount"
+                     { wch: 15 }   // Width for column "couponAmount"
                  ];
          
                  // Set column widths

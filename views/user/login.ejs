@@ -1,65 +1,122 @@
-<%- include("../partials/header") %>
+<!doctype html>
+<html class="no-js" lang="en">
 
 
+<!-- Mirrored from htmldemo.net/reid/reid/login.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 17 Feb 2024 13:44:34 GMT -->
 
-<!--breadcrumbs area start-->
-<div class="breadcrumbs_area other_bread">
-  <div class="container">   
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Reid - login</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Favicon -->
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/img/favicon.ico">
+
+  <!-- CSS 
+    ========================= -->
+
+
+  <!-- Plugins CSS -->
+  <link rel="stylesheet" href="/assets/css/plugins.css">
+
+  <!-- Main Style CSS -->
+  <link rel="stylesheet" href="/assets/css/style.css">
+
+  <!-- Include SweetAlert CSS -->
+  <!-- <link rel="stylesheet" href="https://unpkg.com/sweetalert/dist/sweetalert.css"> -->
+
+  <!-- Include SweetAlert JS -->
+  <!-- <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script> -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <!-- Include SweetAlert2 CSS -->
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+</head>
+
+<body>
+
+
+  <!--breadcrumbs area start-->
+  <div class="breadcrumbs_area other_bread">
+    <div class="container">
       <div class="row">
-          <div class="col-12">
-              <div class="breadcrumb_content">
-                  <ul>
-                      <li><a href="/">home</a></li>
-                      <li>/</li>
-                      <li>login</li>
-                  </ul>
-              </div>
+        <div class="col-12">
+          <div class="breadcrumb_content">
+            <ul>
+              <li><a href="/">home</a></li>
+              <li>/</li>
+              <li>login</li>
+            </ul>
           </div>
+        </div>
       </div>
-  </div>         
-</div>
-<!--breadcrumbs area end-->
+    </div>
+  </div>
+  <!--breadcrumbs area end-->
 
 
-<div class="customer_login" style="display: flex; justify-content: center; align-items: center; height: 50vh;">
+  <div class="customer_login"
+    style="display: flex; justify-content: center; align-items: center; height: 50vh; margin-top: 70px;">
     <div class="container">
       <div class="row justify-content-center align-items-center">
         <div class="col-lg-6 col-md-6">
           <div class="account_form">
             <h2>login</h2>
-            <form id="loginForm" method="post" onsubmit="return validateForm()">
-              <p>   
+            <form id="loginForm" method="post" style="border: 2px solid #000; border-radius: 5px;">
+              <p>
                 <label>Email <span>*</span></label>
-                <input type="text" required="" name="email" id="email">
+                <input type="text" required="" name="email" id="email" style="border-color: #000;">
                 <span id="email-error" class="error"></span>
               </p>
-              <p>   
+              <p>
                 <label>Password <span>*</span></label>
-                <input type="password" required="" name="password" id="password">
+                <input type="password" required="" name="password" id="password" style="border-color: #000;">
                 <span id="password-error" class="error"></span>
-              </p>   
+              </p>
               <div class="login_submit">
                 <a href="/verifyEmail">Lost your password?</a>
-                <label for="remember">
-                  <input id="remember" type="checkbox">
-                  Remember me
-                </label>
                 <button type="submit">login</button>
               </div>
             </form>
-          </div>    
+            <div style="margin-top: 10px; text-align: center; font-size: 14px; color: #666;">
+              Don't have an account? <a href="/signup" style="color: #007bff; text-decoration: none;">Sign up</a>
+            </div>
+          </div>
         </div>
       </div>
-    </div>    
+    </div>
   </div>
-  
 
 
-<%- include("../partials/footer") %>
+  <!-- JS
+============================================ -->
+
+  <!-- Plugins JS -->
+  <script src="/assets/js/plugins.js"></script>
+
+  <!-- Main JS -->
+  <script src="/assets/js/main.js"></script>
+
+  <!-- Include SweetAlert2 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+
+</body>
+
+
+<!-- Mirrored from htmldemo.net/reid/reid/login.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 17 Feb 2024 13:44:34 GMT -->
+
+</html>
 
 
 <script>
-  function validateForm() {
+
+
+  document.getElementById("loginForm").addEventListener("submit", function (event) {
+    event.preventDefault(); // Prevent the form from submitting normally
     console.log('1');
     const email = document.getElementById("email");
     const password = document.getElementById("password");
@@ -73,31 +130,80 @@
 
     // Email validation
     if (email.value === "" || email.value === null) {
-            document.getElementById("email-error").classList.remove('d-none');
-            document.getElementById("email-error").innerHTML = "Email must be filled!";
-            return false;
-        } else if (!email.value.match(emailRegX)) {
-            document.getElementById("email-error").classList.remove('d-none');
-            document.getElementById("email-error").innerHTML = "Invalid Email Address";
-            return false;
-        } else {
-            document.getElementById("email-error").innerHTML = "";
-            document.getElementById("email-error").classList.add('d-none');
-        }
+      document.getElementById("email-error").classList.remove('d-none');
+      document.getElementById("email-error").innerHTML = "Email must be filled!";
+      return false;
+    } else if (!email.value.match(emailRegX)) {
+      document.getElementById("email-error").classList.remove('d-none');
+      document.getElementById("email-error").innerHTML = "Invalid Email Address";
+      return false;
+    } else {
+      document.getElementById("email-error").innerHTML = "";
+      document.getElementById("email-error").classList.add('d-none');
+    }
 
-        // Password validation
-        if (password.value === "" || password.value === null) {
-            document.getElementById("password-error").classList.remove('d-none');
-            document.getElementById("password-error").innerHTML = "Password must be filled!";
-            return false;
-        } else if (!password.value.match(passRegX)) {
-            document.getElementById("password-error").classList.remove('d-none');
-            document.getElementById("password-error").innerHTML = "it doesn't meet the specified password requirements";
-            return false;
+    // Password validation
+    if (password.value === "" || password.value === null) {
+      document.getElementById("password-error").classList.remove('d-none');
+      document.getElementById("password-error").innerHTML = "Password must be filled!";
+      return false;
+    } else if (!password.value.match(passRegX)) {
+      document.getElementById("password-error").classList.remove('d-none');
+      document.getElementById("password-error").innerHTML = "it doesn't meet the specified password requirements";
+      return false;
+    } else {
+      document.getElementById("password-error").classList.add('d-none');
+    }
+    console.log('end');
+
+    const formData = {
+      email: email.value,
+      password: password.value
+    };
+
+    // Send AJAX request
+    fetch("/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(formData)
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Redirect to home page or display success message
+          window.location.href = "/";
         } else {
-            document.getElementById("password-error").classList.add('d-none');
+          // Display error message using Toastify
+          Toastify({
+            text: data.message,
+            duration: 3000,
+            close: true,
+            gravity: "top", // `top` or `bottom`
+            position: "center", // `left`, `center` or `right`
+            style: {
+              background: "linear-gradient(to right, #ff6b6b, #ff4b4b)",
+            }
+          }).showToast();
         }
-        console.log('end');
-        return true;
-  }
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        // Display a generic error message using Toastify
+        Toastify({
+          text: "An error occurred. Please try again later.",
+          duration: 3000,
+          close: true,
+          gravity: "top",
+          position: "center",
+          style: {
+            background: "linear-gradient(to right, #ff6b6b, #ff4b4b)",
+          }
+        }).showToast();
+      });
+
+  });
+
+
 </script>

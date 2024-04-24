@@ -17,6 +17,7 @@ const razorpay = require('../middleware/razorpay');
 const checkout = async (req, res) => {
   try {
     const user = req.session.user;
+    const loggedIn = user;
     cartCount = await cartHelper.getCartCount(user._id);
     // wishListCount = await wishlistHelper.getWishListCount(user._id)
     let cartItems = await cartHelper.getAllCartItems(user._id);
@@ -30,17 +31,17 @@ const checkout = async (req, res) => {
     // const coupons = await couponHelper.findAllCoupons();
     const userAddress = await addressHelper.findAllAddress(user._id);
     // console.log(userAddress);
-    res.render('user/checkout', { loginStatus: req.session.user, user, cartItems, totalAmount: totalAmount, address: userAddress, cartCount, currencyFormat: cartHelper.currencyFormat })
+    res.render('user/checkout', { loggedIn, loginStatus: req.session.user, user, cartItems, totalAmount: totalAmount, address: userAddress, cartCount, currencyFormat: cartHelper.currencyFormat })
   } catch (error) {
     console.log(error);
-    res.status(500).render('user/404');
+    res.status(500).render('user/404',{ loggedIn });
   }
 }
 
-const secondTry = async (req,res) => {
+const secondTry = async (req, res) => {
   try {
     console.log(req.body);
-    const orderId = req.body.order_id; 
+    const orderId = req.body.order_id;
     const order = await Order.findById(orderId);
     console.log(order);
     if (!order) {
@@ -61,7 +62,7 @@ const secondTry = async (req,res) => {
   }
 }
 
-const failedRazorpay = async (req,res) => {
+const failedRazorpay = async (req, res) => {
   try {
     console.log('inside failedRazorpay');
     let userId = req.session.user._id;
@@ -98,7 +99,7 @@ const failedRazorpay = async (req,res) => {
 
   } catch (error) {
     console.log(error);
-    res.status(500).render('user/404');
+    res.status(500).render('user/404',{ loggedIn });
   }
 }
 
@@ -148,7 +149,7 @@ const placeOrder = async (req, res) => {
     }
     if (req.body.payment_method === 'Cash on Delivery') {
       try {
-        if (totalAmount <= 1000) {
+        if (totalAmount >= 1000) {
           const placeOrder = await orderHelper.forOrderPlacing(req.body, totalAmount, cartItems, userId, coupon, addressData);
 
           // Update payment status to 'success'
@@ -157,7 +158,7 @@ const placeOrder = async (req, res) => {
             { paymentStatus: 'success' },
             { new: true }
           );
-          
+
           // Decrease product stock and clear cart
           await productHelper.stockDecrease(cartItems);
           await cartHelper.clearTheCart(userId);
@@ -182,7 +183,7 @@ const placeOrder = async (req, res) => {
         await orderHelper.changeOrderStatus(orderDetails._id, 'confirmed', req.body.payment_method);
 
         // Update payment status to 'success'
-        
+
         const updatedOrder = await Order.findOneAndUpdate(
           { _id: orderDetails._id },
           { paymentStatus: 'success' },
@@ -211,7 +212,7 @@ const placeOrder = async (req, res) => {
 
           // Update payment status to 'success'
           const updatedOrder = await Order.findOneAndUpdate(
-            { _id: orderDetails._id},
+            { _id: orderDetails._id },
             { paymentStatus: 'success' },
             { new: true }
           );
@@ -232,7 +233,7 @@ const placeOrder = async (req, res) => {
 
   } catch (error) {
     console.log(error);
-    res.status(500).render('user/404');
+    res.status(500).render('user/404',{ loggedIn });
   }
 }
 
@@ -265,6 +266,11 @@ const orderDetails = async (req, res) => {
     const orderId = req.params.orderId;
     // console.log(orderId);
     let userId = req.session.user._id;
+    const loggedIn = userId;
+    const order = await Order.findById(orderId);
+    const addressId = order.address;
+    const userAddress = await Address.findById(addressId);
+    console.log(userAddress);
     const orderDetails = await Order.aggregate([
       {
         $match: { _id: new mongoose.Types.ObjectId(orderId) }
@@ -291,9 +297,8 @@ const orderDetails = async (req, res) => {
         }
       }
     ]);
-    let userAddress = await addressHelper.findAnAddress(userId);
-    // console.log(orderDetails);
-    res.render('user/order-details', { orderDetails, userAddress });
+    console.log(userAddress);
+    res.render('user/order-details', { orderDetails, userAddress, loggedIn });
   } catch (error) {
     console.error('Error in orderDetails:', error);
     res.status(500).send('Internal Server Error');
@@ -303,8 +308,8 @@ const orderDetails = async (req, res) => {
 
 const getOrderList = async (req, res) => {
   try {
-    // console.log('1');
-    // Fetch all order details using aggregation
+    const currentPage = parseInt(req.query.page) || 1; // Get the current page number from the query parameter
+    const pageSize = 7; // Set the desired page size to 9
     const allOrderDetails = await Order.aggregate([
       {
         $lookup: {
@@ -332,13 +337,20 @@ const getOrderList = async (req, res) => {
           orderDate: 1,
           paymentMethod: 1
         }
-      }
+      },
+      { $skip: (currentPage - 1) * pageSize },
+      { $limit: pageSize }
     ]);
     // console.log(allOrderDetails[0].userDetails);
     // console.log(allOrderDetails);
-
+    const totalOrders = await Order.countDocuments();
+    const totalPages = Math.ceil(totalOrders / pageSize);
     // Send the order details as the response
-    res.render('admin/order-list', { allOrderDetails });
+    res.render('admin/order-list', {
+      allOrderDetails,
+      currentPage,
+      totalPages
+    });
   } catch (error) {
     console.error('Error fetching order details:', error);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -426,6 +438,7 @@ const updateOrderStatus = async (req, res) => {
 const verifyPayment = async (req, res) => {
   console.log('verify payment');
   const userId = req.session.user._id;
+  const loggedIn = userId;
   await razorpay.verifyPaymentSignature(req.body)
     .then(async (response) => {
       if (response.signatureIsValid) {
@@ -440,16 +453,18 @@ const verifyPayment = async (req, res) => {
     })
     .catch((error) => {
       console.log(error);
-      res.status(500).render('user/404');
+      res.status(500).render('user/404',{ loggedIn });
     })
 }
 
 const orderSuccess = (req, res) => {
   try {
-    res.render('user/success', { loginStatus: req.session.user })
+    const user = req.session.user;
+    const loggedIn = user;
+    res.render('user/success', { loginStatus: req.session.user, loggedIn })
   } catch (error) {
 
-    res.status(500).render('user/404');
+    res.status(500).render('user/404',{ loggedIn });
   }
 }
 

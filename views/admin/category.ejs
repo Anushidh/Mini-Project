@@ -49,25 +49,23 @@
                 <h2 class="content-title card-title">Category </h2>
                 <p>Add, edit or delete a category</p>
             </div>
-            <div>
+            <!-- <div>
                 <input type="text" placeholder="Search cat" class="form-control bg-white">
-            </div>
+            </div> -->
         </div>
         <div class="card">
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-3">
 
-                        
-                        <form method="post" action="/admin/category" onsubmit="return validateForm()">
+
+                        <form>
                             <div class="mb-4">
                                 <label for="product_name" class="form-label">Name</label>
                                 <input type="text" name="categoryName" placeholder="Type here" class="form-control"
                                     id="product_name" required />
                                 <div id="nameError" class="text-danger"></div>
                             </div>
-
-
                             <div class="mb-4">
                                 <label class="form-label">Description</label>
                                 <textarea placeholder="Type here" name="categoryDescription" class="form-control"
@@ -84,8 +82,7 @@
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th class="text-center">
-                                        </th>
+                                        <th class="text-center"></th>
                                         <th>Name</th>
                                         <th>Description</th>
                                         <th>Status</th>
@@ -94,47 +91,51 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <% for (let i=0; i < categories.length; i++) { %>
-                                        <tr>
-                                            <td>
-                                                <!-- Content for the first column, if needed -->
-                                            </td>
-                                            <td class="text-start">
-                                                <%= categories[i].name %>
-                                            </td>
-                                            <td class="text-start">
-                                                <%= categories[i].description %>
-                                            </td>
-                                            <td class="text-start">
-                                                <% if (categories[i].isBlocked===false) { %>
-                                                    <span class="badge rounded-pill alert-success"
-                                                        style="width: 60px;">Listed</span>
-                                                    <% } else { %>
-                                                        <span class="badge rounded-pill alert-danger"
-                                                            style="width: 60px;">Unlisted</span>
-                                                        <% } %>
-                                            </td>
-                                            <td class="text-start">
-                                                <% if (categories[i].isBlocked===false) { %>
-                                                    <button class="btn btn-danger" style="width: 70px;">
-                                                        <a href="/admin/unListCategory?id=<%= categories[i]._id %>"
-                                                            class="text-white">Unlist</a>
-                                                    </button>
-                                                    <% } else { %>
-                                                        <button class="btn btn-success" style="width: 70px;">
-                                                            <a href="/admin/listCategory?id=<%= categories[i]._id %>"
-                                                                class="text-white">List</a>
+                                    <% if (categories.length> 0) { %>
+                                        <% for (let i=0; i < categories.length; i++) { %>
+                                            <tr>
+                                                <td><!-- Content for the first column, if needed --></td>
+                                                <td class="text-start">
+                                                    <%= categories[i].name %>
+                                                </td>
+                                                <td class="text-start">
+                                                    <%= categories[i].description %>
+                                                </td>
+                                                <td class="text-start">
+                                                    <% if (categories[i].isBlocked===false) { %>
+                                                        <span class="badge rounded-pill alert-success"
+                                                            style="width: 60px;">Listed</span>
+                                                        <% } else { %>
+                                                            <span class="badge rounded-pill alert-danger"
+                                                                style="width: 60px;">Unlisted</span>
+                                                            <% } %>
+                                                </td>
+                                                <td class="text-start">
+                                                    <% if (categories[i].isBlocked===false) { %>
+                                                        <button class="btn btn-danger" style="width: 70px;">
+                                                            <a href="/admin/unListCategory?id=<%= categories[i]._id %>"
+                                                                class="text-white">Unlist</a>
                                                         </button>
-                                                        <% } %>
-                                            </td>
-                                            <td class="text-start">
-                                                <button class="btn btn-info">
-                                                    <a href="/admin/edit-category/<%= categories[i]._id %>"
-                                                        class="text-white">Edit</a>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <% } %>
+                                                        <% } else { %>
+                                                            <button class="btn btn-success" style="width: 70px;">
+                                                                <a href="/admin/listCategory?id=<%= categories[i]._id %>"
+                                                                    class="text-white">List</a>
+                                                            </button>
+                                                            <% } %>
+                                                </td>
+                                                <td class="text-start">
+                                                    <button class="btn btn-info">
+                                                        <a href="/admin/edit-category/<%= categories[i]._id %>"
+                                                            class="text-white">Edit</a>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <% } %>
+                                                <% } else { %>
+                                                    <tr>
+                                                        <td colspan="6" class="text-center">No categories found.</td>
+                                                    </tr>
+                                                    <% } %>
                                 </tbody>
                             </table>
 
@@ -145,33 +146,129 @@
         </div> <!-- card .// -->
     </section> <!-- content-main end// -->
 
-    <%- include("../partials/adminFooter") %>
+    <!-- Render the pagination links -->
+    <% if (totalPages> 1) { %>
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <% if (currentPage> 1) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="/admin/category/<%= currentPage - 1 %>">Previous</a>
+                    </li>
+                    <% } %>
+                        <% for (let page=1; page <=totalPages; page++) { %>
+                            <% if (page===currentPage) { %>
+                                <li class="page-item active"><span class="page-link">
+                                        <%= page %>
+                                    </span></li>
+                                <% } else { %>
+                                    <li class="page-item"><a class="page-link" href="/admin/category/<%= page %>">
+                                            <%= page %>
+                                        </a></li>
+                                    <% } %>
+                                        <% } %>
+                                            <% if (currentPage < totalPages) { %>
+                                                <li class="page-item">
+                                                    <a class="page-link"
+                                                        href="/admin/category/<%= currentPage + 1 %>">Next</a>
+                                                </li>
+                                                <% } %>
+            </ul>
+        </nav>
+        <% } %>
 
-        <script>
-            function validateForm() {
-                console.log('1');
-                var name = document.getElementById("product_name").value.trim();
-                var description = document.getElementById("category_description").value.trim();
-                var nameError = document.getElementById("nameError");
-                var descriptionError = document.getElementById("descriptionError");
-                var regex = /^[a-zA-Z]{3,}$/;
+            <%- include("../partials/adminFooter") %>
 
-                // Reset error messages
-                nameError.innerHTML = "";
-                descriptionError.innerHTML = "";
+                <script>
+                    function validateForm() {
+                        console.log('1');
+                        var name = document.getElementById("product_name").value.trim();
+                        var description = document.getElementById("category_description").value.trim();
+                        var nameError = document.getElementById("nameError");
+                        var descriptionError = document.getElementById("descriptionError");
+                        var regex = /^[a-zA-Z]{3,}$/;
 
-                // Validate Name
-                if (!name.match(regex) || name.startsWith(" ")) {
-                    nameError.innerHTML = "Name must start with at least 3 alphabets, not start with a space, and contain no numbers.";
-                    return false;
-                }
+                        // Reset error messages
+                        nameError.innerHTML = "";
+                        descriptionError.innerHTML = "";
 
-                // Validate Description
-                if (description.length < 3) {
-                    descriptionError.innerHTML = "Description must contain at least 3 characters.";
-                    return false;
-                }
+                        // Validate Name
+                        if (!name.match(regex) || name.startsWith(" ")) {
+                            nameError.innerHTML = "Name must start with at least 3 alphabets, not start with a space, and contain no numbers.";
+                            return false;
+                        }
 
-                return true; // Form submission allowed if all validations pass
-            }
-        </script>
+                        // Validate Description
+                        if (description.length < 3) {
+                            descriptionError.innerHTML = "Description must contain at least 3 characters.";
+                            return false;
+                        }
+
+                        console.log('2');
+                        return true; // Form submission allowed if all validations pass
+                    }
+
+                    document.querySelector('form').addEventListener('submit', function (event) {
+                        event.preventDefault();
+                        if (validateForm()) {
+                            const name = document.getElementById('product_name').value.trim();
+                            const description = document.getElementById('category_description').value.trim();
+
+                            const formData = {
+                                categoryName: name,
+                                categoryDescription: description
+                            };
+                            console.log(formData);
+                            fetch('/admin/category', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(formData)
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.status) {
+                                        Toastify({
+                                            text: 'Category created successfully',
+                                            duration: 3000,
+                                            gravity: 'top',
+                                            position: 'center',
+                                            style: {
+                                                background: 'green',
+                                                color: 'white'
+                                            }
+                                        }).showToast();
+
+                                        // Redirect to /admin/category after a short delay
+                                        setTimeout(() => {
+                                            window.location.href = '/admin/category';
+                                        }, 2000);
+                                    } else {
+                                        Toastify({
+                                            text: 'Category already exists',
+                                            duration: 3000,
+                                            gravity: 'top',
+                                            position: 'center',
+                                            style: {
+                                                background: 'red',
+                                                color: 'white'
+                                            }
+                                        }).showToast();
+                                    }
+                                })
+                                .catch(error => {
+                                    Toastify({
+                                        text: 'An error occurred while creating the category',
+                                        duration: 3000,
+                                        gravity: 'top',
+                                        position: 'center',
+                                        style: {
+                                            background: 'red',
+                                            color: 'white'
+                                        }
+                                    }).showToast();
+                                    console.error('Error:', error);
+                                });
+                        }
+                    });
+                </script>

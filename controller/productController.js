@@ -7,7 +7,7 @@ const { log } = require("console");
 
 const stocks = async (req, res) => {
     try {
-        const products = await productHelper.getAllProducts();
+        const products = await Product.find({});
         res.render('admin/stock', { products });
     } catch (error) {
         // Handle errors
@@ -24,12 +24,13 @@ const getProductAddPage = async (req, res) => {
         res.render("admin/product-add", { cat: category });
     } catch (error) {
         console.log(error.message);
-        res.render('user/404');
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 }
 
 const addProducts = async (req, res) => {
     try {
+        console.log(req.body);
         const { productName, productDescription, category, regularPrice, salePrice, small_quantity, medium_quantity, large_quantity } = req.body;
 
         // Backend validation
@@ -70,7 +71,7 @@ const addProducts = async (req, res) => {
                 images.push(req.files[i].filename);
             }
         }
-
+        console.log(images);
         const newProduct = new Product({
             productName,
             productDescription,
@@ -81,29 +82,57 @@ const addProducts = async (req, res) => {
             totalQuantity,
             productImage: images
         });
+        console.log(newProduct);
         await newProduct.save();
 
-        res.redirect("/admin/products")
-        // res.json("success")
+        // Send a success response
+        res.status(200).json({ success: "Product added successfully" });
     } catch (error) {
         console.log(error.message);
-        res.render('user/404');
+        // Send an error response
+        res.status(500).json({ error: "Internal server error" });
     }
 }
 
 
 const adminProductList = async (req, res) => {
-    // console.log('inside list');
-    productHelper.getAllProducts()
-        .then((response) => {
-            // console.log(response);
-            res.render('admin/product', { products: response });
-        })
-        .catch((error) => {
-            console.error('Error in adminProductList:', error);
-            res.status(500).send('Internal Server Error');
+    try {
+        const page = req.query.page ? parseInt(req.query.page) : 1;
+        const limit = 5; // Set the desired limit here
+
+        const { products, totalPages, currentPage } = await productHelper.getAllProducts(page, limit);
+
+        res.render('admin/product', {
+            products,
+            totalPages,
+            currentPage,
+            pagination: {
+                page,
+                limit,
+            },
         });
+    } catch (error) {
+        console.error('Error in adminProductList:', error);
+        res.status(500).send('Internal Server Error');
+    }
 };
+
+const adminSearchProduct = async (req, res) => {
+    try {
+        console.log('inside search');
+        const searchTerm = req.query.search || '';
+        console.log(searchTerm);
+        const product = await Product.find({
+            productName: { $regex: searchTerm, $options: 'i' }
+        });
+        console.log(product);
+        res.json({ product });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+
 
 const getEditProduct = async (req, res) => {
     try {
@@ -115,7 +144,7 @@ const getEditProduct = async (req, res) => {
         res.render("admin/edit-product", { product: findProduct, cat: category })
     } catch (error) {
         console.log(error.message);
-        res.render('user/404')
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 }
 
@@ -136,7 +165,7 @@ const editProduct = async (req, res) => {
                 images.push(req.files[i].filename);
             }
         }
-        console.log(req.files)
+        // console.log(req.files)
 
 
         const existingProduct = await Product.findById(id);
@@ -164,7 +193,7 @@ const editProduct = async (req, res) => {
                     $push: { productImage: { $each: newImages } } // Add new images to the existing images
                 }, { new: true });
                 console.log("Product updated");
-                return res.redirect("/admin/products");
+                return res.status(200).json({ success: 'Product updated successfully!' });
             } else {
                 console.log("Same images were present");
                 // No new images were uploaded, so update the product without changing the images
@@ -178,7 +207,7 @@ const editProduct = async (req, res) => {
                     totalQuantity: totalQuantity,
                 }, { new: true });
                 console.log("Product updated");
-                return res.redirect("/admin/products");
+                return res.status(200).json({ success: 'Product updated successfully!' });
             }
         } else {
             console.log("No images were present");
@@ -194,11 +223,11 @@ const editProduct = async (req, res) => {
             }, { new: true });
             console.log(updatedProduct);
             console.log("Product updated");
-            return res.redirect("/admin/products");
+            return res.status(200).json({ success: 'Product updated successfully!' });
         }
     } catch (error) {
         console.log(error.message);
-        res.render('user/404');
+        return res.status(500).json({ error: 'An error occurred while updating the product.' });
     }
 }
 
@@ -212,7 +241,7 @@ const getBlockProduct = async (req, res) => {
         res.redirect("/admin/products")
     } catch (error) {
         console.log(error.message);
-        res.render('user/404');
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 }
 
@@ -225,7 +254,7 @@ const getUnblockProduct = async (req, res) => {
         res.redirect("/admin/products")
     } catch (error) {
         console.log(error.message);
-        res.render('user/404');
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 }
 
@@ -267,4 +296,5 @@ module.exports = {
     getUnblockProduct,
     deleteSingleImage,
     stocks,
+    adminSearchProduct,
 }

@@ -227,31 +227,33 @@ const addToUserCart = async (userId, productId, quantity, size = "Small") => {
 
   const incDecProductQuantity = async (userId, productId, quantity, selectedSize, maxQuantityAllowed) => {
     try {
-      console.log('inside incdecproductquantity');
+      // console.log('inside incdecproductquantity');
       const cart = await Cart.findOne({ user: userId });
       const item = cart.items.find(item => item.productId.toString() === productId && item.size === selectedSize);
-      console.log(item);
+      // console.log(item);
       let itemQuantity = item.quantity;
       if (!item) {
-        throw new Error('Product not found in cart');
+        console.log('Product not found in cart');
+        return { message: 'Product not found in cart' };
       }
       const product = await Product.findById(productId);
       const sizeInfo = product.productSizes.find(size => size.size === selectedSize);
-      console.log(sizeInfo);
+      // console.log(sizeInfo);
       if (!sizeInfo) {
-        throw new Error('Size information not found for the product');
+        console.log('Size information not found for the product');
+        return { message: 'Size information not found for the product' };
       }
       let newQuantity = parseInt(quantity);
-      console.log(newQuantity);
+      // console.log(newQuantity);
       item.quantity = newQuantity;
       if(item.quantity > sizeInfo.quantity) {
         item.quantity = itemQuantity;
-        throw new error('stock exceeded');
+        return { message: 'Stock exceeded' };
       }
       await cart.save();
       return newQuantity;
     } catch (error) {
-      throw error; 
+      console.log(error);
     }
   };
 

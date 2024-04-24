@@ -25,11 +25,18 @@ const addCategoryToDb = (body) => {
   });
 };
 
-const getAllCategory = () => {
+const getAllCategory = (currentPage, pageSize) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const result = await Category.find();
-      resolve(result);
+      const skip = (currentPage - 1) * pageSize;
+      const categories = await Category.find()
+        .skip(skip)
+        .limit(pageSize);
+
+      const totalCategories = await Category.countDocuments();
+      const totalPages = Math.ceil(totalCategories / pageSize);
+
+      resolve({ categories, totalPages });
     } catch (error) {
       reject(error);
     }

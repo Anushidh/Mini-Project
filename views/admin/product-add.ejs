@@ -1,13 +1,14 @@
 <%- include("../partials/adminHeader") %>
 
 
-<style>
-    .error-message {
-        color: red;
-        margin-top: 5px;
-        font-size: 14px; /* Adjust font size as needed */
-    }
-</style>
+    <style>
+        .error-message {
+            color: red;
+            margin-top: 5px;
+            font-size: 14px;
+            /* Adjust font size as needed */
+        }
+    </style>
 
     <section class="content-main">
         <div class="row">
@@ -40,7 +41,7 @@
                                         <label class="form-label">Regular price</label>
                                         <input placeholder="₹" name="regularPrice" type="text"
                                             class="form-control border">
-                                            <div id="regularPrice-error" class="error-message"></div>
+                                        <div id="regularPrice-error" class="error-message"></div>
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
@@ -56,73 +57,75 @@
                                 <div class="col-lg-4">
                                     <div class="mb-4">
                                         <label class="form-label">Small</label>
-                                        <input placeholder="" name="small_quantity" type="text" class="form-control border">
+                                        <input placeholder="" name="small_quantity" type="text"
+                                            class="form-control border">
                                         <div id="small-quantity-error" class="error-message"></div> <!-- Updated ID -->
                                     </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-4">
+                                        <label class="form-label">Medium</label>
+                                        <input placeholder="" name="medium_quantity" type="text"
+                                            class="form-control border">
+                                        <div id="medium-quantity-error" class="error-message"></div> <!-- Updated ID -->
                                     </div>
-                                    <div class="col-lg-4">
-                                        <div class="mb-4">
-                                            <label class="form-label">Medium</label>
-                                            <input placeholder="" name="medium_quantity" type="text" class="form-control border">
-                                            <div id="medium-quantity-error" class="error-message"></div> <!-- Updated ID -->
-                                        </div>
-                                        </div>
-                                        <div class="col-lg-4">
-                                            <div class="mb-4">
-                                               <label class="form-label">Large</label>
-                                               <input placeholder="" name="large_quantity" type="text" class="form-control border">
-                                               <div id="large-quantity-error" class="error-message"></div> <!-- Updated ID -->
-                                           </div>
-                                      </div> 
                                 </div>
-                               
+                                <div class="col-lg-4">
+                                    <div class="mb-4">
+                                        <label class="form-label">Large</label>
+                                        <input placeholder="" name="large_quantity" type="text"
+                                            class="form-control border">
+                                        <div id="large-quantity-error" class="error-message"></div> <!-- Updated ID -->
+                                    </div>
                                 </div>
-                                
                             </div>
 
-                            
-                            <div class="card mb-4">
-                                <div class="card-body">
-                                    <div class="row gx-2">
-                                        <div class="col-sm-6 mb-3">
-                                            <label class="form-label">Category</label>
-                                            <select class="form-select border" style="width: 150px;" name="category">
-                                                <% for (let i=0; i < cat.length; i++) { %>
-                                                    <option value="<%= cat[i]._id %>">
-                                                        <%= cat[i].name %>
-                                                    </option>
-                                                    <% } %>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
+                    </div>
+
+                </div>
+
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row gx-2">
+                            <div class="col-sm-6 mb-3">
+                                <label class="form-label">Category</label>
+                                <select class="form-select border" style="width: 150px;" name="category">
+                                    <% for (let i=0; i < cat.length; i++) { %>
+                                        <option value="<%= cat[i]._id %>">
+                                            <%= cat[i].name %>
+                                        </option>
+                                        <% } %>
+                                </select>
                             </div>
-                            <div class="mb-4">
-                           
-                            <div class="card mb-2">
-                                <div class="card-header">
-                                    <h4>Choose images</h4>
-                                </div>
-                                <div class="border row">
-                                    <div id="addedImagesContainer" class="thumbnails-container"></div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="input-upload">
-                                        <img src="admin-assets/imgs/theme/upload.svg" alt="">
-                                        <input class="form-control border" name="images" id="imageInput" type="file"
-                                            multiple>
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                <button class="btn btn-md rounded font-sm hover-up" type="button"
-                                    onclick="validateAndSubmit()">Publish</button>
-                            </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
+                <div class="mb-4">
+
+                    <div class="card mb-2">
+                        <div class="card-header">
+                            <h4>Choose images</h4>
+                        </div>
+                        <div class="border row">
+                            <div id="addedImagesContainer" class="thumbnails-container"></div>
+                        </div>
+                        <div class="card-body">
+                            <div class="input-upload">
+                                <img src="admin-assets/imgs/theme/upload.svg" alt="">
+                                <input class="form-control border" name="images" id="imageInput" type="file" multiple>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-md rounded font-sm hover-up" type="button"
+                            onclick="validateAndSubmit()">Publish</button>
+                    </div>
+                    </form>
+                </div>
             </div>
-        
+        </div>
+
     </section>
 
     <!-- Add an empty container div for displaying image thumbnails -->
@@ -139,104 +142,115 @@
     </style>
 
     <script>
-       // Array to store selected images
-const selectedImages = [];
+        // Array to store selected images
+        const selectedImages = [];
 
-// Function to handle file input change
-document.getElementById("imageInput").addEventListener("change", handleFileSelect);
+        // Function to handle file input change
+        document.getElementById("imageInput").addEventListener("change", handleFileSelect);
 
-function handleFileSelect(event) {
-    // Clear previous content
-    addedImagesContainer.innerHTML = "";
+        function handleFileSelect(event) {
+            const newFiles = Array.from(event.target.files); // Create a copy of the FileList object
 
-    const files = event.target.files;
+            // Clear previous content
+            addedImagesContainer.innerHTML = "";
 
-    for (let i = 0; i < files.length; i++) {
-        const file = files[i];
+            const allValidFiles = [];
 
-        // Image validation checks
-        isValidImage(file);
-    }
-}
+            // Process previously selected images
+            selectedImages.forEach(file => {
+                if (isValidImage(file)) {
+                    allValidFiles.push(file);
+                    const thumbnail = createThumbnail(file);
+                    addedImagesContainer.appendChild(thumbnail);
+                }
+            });
 
-// Function to validate image files
-function isValidImage(file) {
-    // Define allowed image file types
-    const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+            // Process newly selected files
+            newFiles.forEach(file => {
+                if (isValidImage(file)) {
+                    if (!allValidFiles.includes(file)) {
+                        allValidFiles.push(file);
+                        const thumbnail = createThumbnail(file);
+                        addedImagesContainer.appendChild(thumbnail);
+                    }
+                }
+            });
 
-    // Check if the file type is allowed
-    if (!allowedTypes.includes(file.type)) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Invalid file type',
-            text: 'Please upload images of type JPEG, PNG, or GIF.',
-        });
-        return false;
-    }
-
-    // Define maximum allowed file size in bytes (1 MB in this example)
-    const maxSizeBytes = 1024 * 1024; // 1 MB
-
-    // Check if the file size exceeds the maximum allowed size
-    if (file.size > maxSizeBytes) {
-        Swal.fire({
-            icon: 'error',
-            title: 'File size exceeds the maximum allowed size',
-            text: 'Please upload images that are smaller than 1 MB.',
-        });
-        return false;
-    }
-
-    // If all validation checks pass, add the file to the selected images array
-    selectedImages.push(file);
-
-    // Create thumbnail element
-    const thumbnail = document.createElement("div");
-    thumbnail.classList.add("thumbnail");
-
-    // Create image element
-    const img = document.createElement("img");
-    img.src = URL.createObjectURL(file);
-    img.alt = "thumbnail";
-
-    // Set a fixed width for the image
-    img.style.width = "50px"; // Adjust the width as needed
-    img.style.height = "auto";
-
-    // Create remove icon
-    const removeIcon = document.createElement("span");
-    removeIcon.classList.add("remove-icon");
-    removeIcon.innerHTML = "&times;"; // Multiplication symbol as a cross
-
-    // Event listener to remove the image on icon click
-    removeIcon.addEventListener("click", function () {
-        // Remove the file from the selected images array
-        const index = selectedImages.indexOf(file);
-        if (index !== -1) {
-            selectedImages.splice(index, 1);
+            // Update the selectedImages array with the allValidFiles array
+            selectedImages.length = 0;
+            selectedImages.push(...allValidFiles);
         }
 
-        // Remove the thumbnail from the container
-        thumbnail.remove();
-    });
+        // Function to validate image files
+        function isValidImage(file) {
+            // Define allowed image file types
+            const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
 
-    // Append elements to thumbnail
-    thumbnail.appendChild(img);
-    thumbnail.appendChild(removeIcon);
+            // Check if the file type is allowed
+            if (!allowedTypes.includes(file.type)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid file type',
+                    text: 'Please upload images of type JPEG, PNG, or GIF.',
+                });
+                return false;
+            }
 
-    // Append thumbnail to the container
-    addedImagesContainer.appendChild(thumbnail);
+            // Define maximum allowed file size in bytes (1 MB in this example)
+            const maxSizeBytes = 1024 * 1024; // 1 MB
 
-    // Return true to indicate that the image is valid
-    return true;
-}
+            // Check if the file size exceeds the maximum allowed size
+            if (file.size > maxSizeBytes) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'File size exceeds the maximum allowed size',
+                    text: 'Please upload images that are smaller than 1 MB.',
+                });
+                return false;
+            }
+
+            // If all validation checks pass, return true
+            return true;
+        }
+
+        // Function to create a thumbnail element for a file
+        function createThumbnail(file) {
+            const thumbnail = document.createElement("div");
+            thumbnail.classList.add("thumbnail");
+
+            const img = document.createElement("img");
+            img.src = URL.createObjectURL(file);
+            img.alt = "thumbnail";
+            img.style.width = "50px"; // Adjust the width as needed
+            img.style.height = "auto";
+
+            const removeIcon = document.createElement("span");
+            removeIcon.classList.add("remove-icon");
+            removeIcon.innerHTML = "&times;"; // Multiplication symbol as a cross
+
+            // Event listener to remove the image on icon click
+            removeIcon.addEventListener("click", function () {
+                // Remove the file from the selected images array
+                const index = selectedImages.indexOf(file);
+                if (index !== -1) {
+                    selectedImages.splice(index, 1);
+                }
+                // Remove the thumbnail from the container
+                thumbnail.remove();
+            });
+
+            thumbnail.appendChild(img);
+            thumbnail.appendChild(removeIcon);
+
+            return thumbnail;
+        }
 
 
 
         function validateAndSubmit() {
             if (validateForm()) {
                 // If validation passes, submit the form
-                document.forms[0].submit(); // Assuming this is the first (and only) form on your page
+                sendProductData();
             }
         }
 
@@ -253,10 +267,14 @@ function isValidImage(file) {
             var smallQuantity = document.getElementsByName("small_quantity")[0].value;
             var mediumQuantity = document.getElementsByName("medium_quantity")[0].value;
             var largeQuantity = document.getElementsByName("large_quantity")[0].value;
+            const specialCharsRegex = /[!@#$%^&*(),.?":{}|<>]/;
 
             // Check if inputs are not empty
             if (productName === "") {
                 displayErrorMessage("productName-error", "Product Name is required");
+                isValid = false;
+            } else if (specialCharsRegex.test(productName)) {
+                displayErrorMessage("productName-error", "Product Name should not contain special characters");
                 isValid = false;
             }
 
@@ -284,18 +302,18 @@ function isValidImage(file) {
             // }
 
             if (!/^[1-9]\d*$/.test(smallQuantity)) {
-            displayErrorMessage("small-quantity-error", "Small quantity must be a positive integer");
-            isValid = false;
+                displayErrorMessage("small-quantity-error", "Small quantity must be a positive integer");
+                isValid = false;
             }
 
             if (!/^[1-9]\d*$/.test(mediumQuantity)) {
-            displayErrorMessage("medium-quantity-error", "Medium quantity must be a positive integer");
-            isValid = false;
+                displayErrorMessage("medium-quantity-error", "Medium quantity must be a positive integer");
+                isValid = false;
             }
 
             if (!/^[1-9]\d*$/.test(largeQuantity)) {
-            displayErrorMessage("large-quantity-error", "Large quantity must be a positive integer");
-            isValid = false;
+                displayErrorMessage("large-quantity-error", "Large quantity must be a positive integer");
+                isValid = false;
             }
 
             return isValid;
@@ -314,6 +332,75 @@ function isValidImage(file) {
                 element.style.display = "none";
             });
         }
+
+        function sendProductData() {
+            const formData = new FormData();
+
+            // Append form fields to the formData object
+            formData.append('productName', document.getElementById('product_name').value);
+            formData.append('productDescription', document.querySelector('textarea[name="productDescription"]').value);
+            formData.append('category', document.querySelector('select[name="category"]').value);
+            formData.append('regularPrice', document.querySelector('input[name="regularPrice"]').value);
+            formData.append('salePrice', document.querySelector('input[name="salePrice"]').value);
+            formData.append('small_quantity', document.querySelector('input[name="small_quantity"]').value);
+            formData.append('medium_quantity', document.querySelector('input[name="medium_quantity"]').value);
+            formData.append('large_quantity', document.querySelector('input[name="large_quantity"]').value);
+
+            console.log(selectedImages);
+            // Append the selected images to the formData object
+            selectedImages.forEach((file, index) => {
+                formData.append('images', file, `image-${index}.${file.name.split('.').pop()}`);
+            });
+
+            fetch('/admin/addProducts', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json()) // Parse the response as JSON
+                .then(data => {
+                    if (data.success) {
+                        Toastify({
+                            text: data.success,
+                            duration: 3000,
+                            gravity: "top",
+                            position: "center",
+                            style: {
+                                background: "green",
+                                color: "white"
+                            }
+                        }).showToast();
+                        // Redirect to /admin/products after a short delay
+                        setTimeout(() => {
+                            window.location.href = '/admin/products';
+                        }, 2000); // Delay of 2 seconds (2000 milliseconds)
+
+                    } else if (data.error) {
+                        Toastify({
+                            text: data.error,
+                            duration: 3000,
+                            gravity: "top",
+                            position: "center",
+                            style: {
+                                background: "red",
+                                color: "white"
+                            }
+                        }).showToast();
+                    }
+                })
+                .catch(error => {
+                    Toastify({
+                        text: "Error: " + error.message,
+                        duration: 3000,
+                        gravity: "top",
+                        position: "center",
+                        style: {
+                            background: "red",
+                            color: "white"
+                        }
+                    }).showToast();
+                });
+        }
+
     </script>
 
     <%- include("../partials/adminFooter") %>

@@ -10,13 +10,14 @@ const addToWishlist = async (req, res) => {
     // console.log('1');
     let productId = req.params.prodId;
     let user = req.session.user._id
+    const loggedIn = user;
     let size = req.params.size;
     // console.log(productId + " " + user + " " + size);
     let result = await wishlistHelper.addItemToWishlist(productId, user, size)
     // console.log(result);
     res.json({ message: `item added to wishlist ` })
   } catch (error) {
-    res.status(500).render('user/404');
+    res.status(500).render('user/404',{loggedIn});
   }
 }
 
@@ -27,6 +28,8 @@ const viewWishlist = async (req, res) => {
     // console.log(wishlist);
     cartCount = await cartHelper.getCartCount(userId)
     wishListCount = await wishlistHelper.getWishListCount(userId)
+    const user = req.session.user;
+    const loggedIn = user;
     // let stock = await productHelper.stockStatus(wishlist[i].product._id,wishlist[i].size)
     // console.log(stock);
     let stocks = [];
@@ -39,10 +42,10 @@ const viewWishlist = async (req, res) => {
       wishlist[i].isInCart = isInCart
     }
     // console.log(stocks);
-    res.render('user/wishlist', { loginStatus : req.session.user, wishlist: wishlist, cartCount, wishListCount,stocks })
+    res.render('user/wishlist', { loggedIn, loginStatus : req.session.user, wishlist: wishlist, cartCount, wishListCount,stocks })
   } catch (error) {
     console.error(error);
-    res.status(500).render('user/404');
+    res.status(500).render('user/404',{loggedIn});
   }
 }
 
@@ -50,13 +53,14 @@ const removeFromWishlist = async (req, res) => {
   try {
     console.log('removefromwishlist');
     let userId = req.session.user._id
+    const loggedIn = userId;
     let productId = req.body.productId
     await wishlistHelper.removeProductFromWishlist(userId, productId)
     wishlistCount = await wishlistHelper.getWishListCount(userId)
     res.status(200).json({ message: 'item removed from the wishlist', wishlistCount })
   } catch (error) {
     console.error(error);
-    res.status(500).render('user/404');
+    res.status(500).render('user/404',{loggedIn});
   }
 }
 

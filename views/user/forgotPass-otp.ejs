@@ -1,52 +1,290 @@
-<%- include("../partials/header") %>
-
-<div class="breadcrumbs_area other_bread">
-  <div class="container">   
-      <div class="row">
-          <div class="col-12">
-              <div class="breadcrumb_content">
-                  <ul>
-                      <li><a href="home.ejs">home</a></li>
-                      <li>/</li>
-                      <li>Verify OTP</li>
-                  </ul>
-              </div>
-          </div>
-      </div>
-  </div>         
-</div>
-<!--breadcrumbs area end-->
+<!doctype html>
+<html class="no-js" lang="en">
 
 
-<!-- customer login start -->
-<div class="customer_login">
-  <div class="container">
-      <div class="row">
-         <!--login area start-->
-          <div class="col-lg-6 col-md-6">
-              <div class="account_form">
-                  <h2>Verify OTP</h2>
-                  <form action="/verifyForgotPassOtp" method="post">
-                       <p>   
-                          <label>Enter OTP <span>*</span></label>
-                          <input type="text" required="" name="otp">
-                       </p>   
-                      <div class="login_submit">
-                         <a href="/resendOtp">Resend OTP</a>
-                          <label for="remember">
-                              <input id="remember" type="checkbox">
-                              Remember me
-                          </label>
-                          <button type="submit" name="newotp">Verify</button>
-                          
-                      </div>
+<!-- Mirrored from htmldemo.net/reid/reid/login.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 17 Feb 2024 13:44:34 GMT -->
 
-                  </form>
-               </div>    
-          </div>
-          <!--login area start-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Reid - login</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/assets/img/favicon.ico">
+
+    <!-- CSS 
+    ========================= -->
+
+
+    <!-- Plugins CSS -->
+    <link rel="stylesheet" href="/assets/css/plugins.css">
+
+    <!-- Main Style CSS -->
+    <link rel="stylesheet" href="/assets/css/style.css">
+
+    <!-- Include SweetAlert CSS -->
+    <!-- <link rel="stylesheet" href="https://unpkg.com/sweetalert/dist/sweetalert.css"> -->
+
+    <!-- Include SweetAlert JS -->
+    <!-- <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- Include SweetAlert2 CSS -->
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+</head>
+
+<body>
+    <div class="breadcrumbs_area other_bread">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="breadcrumb_content">
+                        <ul>
+                            <li><a href="/">home</a></li>
+                            <li>/</li>
+                            <li>Verify OTP</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>    
-  </div>
+    </div>
+    <!--breadcrumbs area end-->
 
-<%- include("../partials/footer") %>
+
+    <!-- customer login start -->
+    <div class="customer_login" style="position: relative; top: 100px; left: 230px;">
+        <div class="container">
+            <div class="row">
+                <!--login area start-->
+                <div class="col-lg-6 col-md-6">
+                    <div class="account_form">
+                        <h2>Verify OTP</h2>
+                        <form id="otpForm" action="/verifyForgotPassOtp" method="post"
+                            style="border: 2px solid black; width: 100%; padding: 5px;">
+                            <p>
+                                <label>Enter OTP <span>*</span></label>
+                                <input type="text" name="otp" id="otpInput"
+                                    style="border: 2px solid black; width: 100%; padding: 5px;">
+                            </p>
+                            <div class="login_submit">
+                                <span id="timer"></span> <!-- Timer display -->
+                                <a href="#" id="resendOtp">Resend OTP</a>
+                                <!-- <label for="remember">
+                                    <input id="remember" type="checkbox">
+                                    Remember me
+                                </label> -->
+                                <button type="submit" name="newotp">Verify</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!--login area start-->
+            </div>
+        </div>
+    </div>
+
+    <script src="/assets/js/plugins.js"></script>
+
+    <!-- Main JS -->
+    <script src="/assets/js/main.js"></script>
+
+    <!-- Include SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+</body>
+
+</html>
+
+<script>
+    let intervalId; // Global variable to hold the interval ID
+
+    function startTimer(duration, display, action) {
+        let timer = duration, minutes, seconds;
+        intervalId = setInterval(function () {
+            minutes = parseInt(timer / 60, 10);
+            seconds = parseInt(timer % 60, 10);
+
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            display.textContent = minutes + ":" + seconds;
+
+            if (--timer < 0) {
+                clearInterval(intervalId);
+                display.style.display = "none"; // Hide the timer display
+
+                // Show the Swal.fire alert for timer expiration
+                if (action === 'otpVerification') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Timer Expired',
+                        text: 'The timer has expired for OTP verification. Please try again.',
+                    });
+                } else if (action === 'resendOTP') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Timer Expired',
+                        text: 'The timer has expired for resending OTP. Please try again.',
+                    });
+                }
+            }
+        }, 1000);
+
+        return intervalId; // Return the interval ID for later use
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        let duration = 60;
+        let display = document.querySelector('#timer');
+        let intervalId; // Declare intervalId outside of the event listeners
+
+        // Function to start the timer
+        function startTimerAndDisplay(duration, display) {
+            display.style.display = "block"; // Show the timer display
+            clearInterval(intervalId); // Clear any existing timer
+            intervalId = startTimer(duration, display); // Start the timer
+        }
+
+        // Start the timer for OTP verification
+        startTimerAndDisplay(duration, display);
+
+        // Attach an event listener to the OTP verification form
+        let otpForm = document.querySelector('#otpForm');
+        otpForm.addEventListener('submit', function (event) {
+            clearInterval(intervalId); // Stop the timer when the form is submitted
+        });
+
+        // Attach an event listener to the "Resend OTP" link
+        let resendOtpLink = document.querySelector('#resendOtp');
+        resendOtpLink.addEventListener('click', function (event) {
+            event.preventDefault(); // Prevent the default link behavior
+            // Start the timer for resend OTP
+            startTimerAndDisplay(duration, display);
+            // Add logic here to trigger the resend OTP functionality
+            // For example, you can make an AJAX request to the server to resend OTP
+        });
+    });
+
+    const otpForm = document.getElementById('otpForm');
+
+    otpForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const otpInput = document.getElementById('otpInput');
+        const otp = otpInput.value.trim();
+
+        try {
+            const response = await fetch('/verifyForgotPassOtp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ otp })
+            });
+
+            const data = await response.json();
+
+            if (data.status) {
+                Toastify({
+                    text: "OTP verified successfully",
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "center",
+                    style: {
+                        background: "linear-gradient(to right, #6bff6b, #4bff4b)",
+                    },
+                }).showToast();
+                // Redirect to /login after a delay
+                setTimeout(() => {
+                    window.location.href = "/newPassword";
+                }, 3000);
+            } else {
+                Toastify({
+                    text: data.message || "Invalid OTP",
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "center",
+                    style: {
+                        background: "linear-gradient(to right, #ff6b6b, #ff4b4b)",
+                    },
+                }).showToast();
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            Toastify({
+                text: "An error occurred. Please try again later.",
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "center",
+                style: {
+                    background: "linear-gradient(to right, #ff6b6b, #ff4b4b)",
+                },
+            }).showToast();
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded",  function () {
+        // Attach an event listener to the "Resend OTP" link
+        let resendOtpLink = document.getElementById('resendOtp');
+        resendOtpLink.addEventListener('click', async function (event) {
+            event.preventDefault(); // Prevent the default action of the link
+
+            try {
+            const response = await fetch('/resendOtpAgain', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            });
+
+            const data = await response.json();
+
+            if (data.status) {
+                Toastify({
+                    text: "OTP resent successfully",
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "center",
+                    style: {
+                        background: "linear-gradient(to right, #6bff6b, #4bff4b)",
+                    },
+                }).showToast();
+            } else {
+                Toastify({
+                    text: data.message || "Failed to resend OTP",
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "center",
+                    style: {
+                        background: "linear-gradient(to right, #ff6b6b, #ff4b4b)",
+                    },
+                }).showToast();
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            Toastify({
+                text: "An error occurred. Please try again later.",
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "center",
+                style: {
+                    background: "linear-gradient(to right, #ff6b6b, #ff4b4b)",
+                },
+            }).showToast();
+        }
+    });
+});
+
+
+
+</script>

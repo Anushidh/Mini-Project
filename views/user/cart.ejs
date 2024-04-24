@@ -56,13 +56,13 @@
                                                 <td class="product_size">
                                                     <%= allCartItems[i].size %>
                                                 </td>
-                                                
+
                                                 <td class="product_quantity">
                                                     <input id="quantity<%= allCartItems[i].product._id %>" min="1"
                                                         max="5" value="<%= allCartItems[i].quantity %>" type="number"
                                                         onchange="updateQuantityAndMax('<%= allCartItems[i].item._id %>', '<%= allCartItems[i]._id %>', this.value, '<%= allCartItems[i].size %>', '<%= allCartItems[i].product.salePrice %>')">
-                                                </td> 
-                                                
+                                                </td>
+
                                                 <td class="product_total"
                                                     id="product_total_<%= allCartItems[i].product._id %>">
                                                     <%= allCartItems[i].product.salePrice * allCartItems[i].quantity %>
@@ -113,10 +113,10 @@
                                     </div>
                                     <button id="couponButton" type="button" style="margin-top: 10px;">
                                         <% if (couponApplied) { %> <!-- Check if appliedCouponCode is truthy -->
-                                        Remove Coupon <!-- If coupon applied, show Remove Coupon button -->
-                                        <% } else { %>
-                                        Apply Coupon <!-- If no coupon applied, show Apply Coupon button -->
-                                        <% } %>
+                                            Remove Coupon <!-- If coupon applied, show Remove Coupon button -->
+                                            <% } else { %>
+                                                Apply Coupon <!-- If no coupon applied, show Apply Coupon button -->
+                                                <% } %>
                                     </button>
                                     <div id="couponMessage"></div>
                                 </div>
@@ -164,162 +164,154 @@
 
         <script>
 
-// document.addEventListener("DOMContentLoaded", function () {
-//     // Add event listener to the Apply/Remove Coupon button
-//     document.getElementById("couponButton").addEventListener("click", function () {
-//         // Get the selected coupon code from the dropdown menu
-//         var couponCode = document.getElementById("couponSelect").value;
-//         var button = document.getElementById("couponButton");
-//         // Send an AJAX request to apply/remove the coupon
-//         var xhr = new XMLHttpRequest();
-//         xhr.open("POST", "/applyOrRemoveCoupon", true);
-//         xhr.setRequestHeader("Content-Type", "application/json");
-//         xhr.onreadystatechange = function () {
-//             if (xhr.readyState === XMLHttpRequest.DONE) {
-//                 if (xhr.status === 200) {
-//                     // Coupon applied/removed successfully
-//                     var response = JSON.parse(xhr.responseText);
-//                     swal.fire({
-//                         icon: 'success',
-//                         title: 'Success',
-//                         text: response.message,
-//                         showConfirmButton: false,
-//                         timer: 1500
-//                     });
-//                     // Toggle button label
-//                     if (button.textContent.trim() === "Apply Coupon") {
-//                         button.textContent = "Remove Coupon";
-//                     } else {
-//                         button.textContent = "Apply Coupon";
-//                     }
-//                 } else {
-//                     // Error applying/removing coupon
-//                     var errorMessage = JSON.parse(xhr.responseText).message;
-//                     swal.fire({
-//                         icon: 'error',
-//                         title: 'Error',
-//                         text: errorMessage
-//                     });
-//                 }
-//             }
-//         };
-//         xhr.send(JSON.stringify({ couponCode: couponCode }));
-//     });
-// });
+            // document.addEventListener("DOMContentLoaded", function () {
+            //     // Add event listener to the Apply/Remove Coupon button
+            //     document.getElementById("couponButton").addEventListener("click", function () {
+            //         // Get the selected coupon code from the dropdown menu
+            //         var couponCode = document.getElementById("couponSelect").value;
+            //         var button = document.getElementById("couponButton");
+            //         // Send an AJAX request to apply/remove the coupon
+            //         var xhr = new XMLHttpRequest();
+            //         xhr.open("POST", "/applyOrRemoveCoupon", true);
+            //         xhr.setRequestHeader("Content-Type", "application/json");
+            //         xhr.onreadystatechange = function () {
+            //             if (xhr.readyState === XMLHttpRequest.DONE) {
+            //                 if (xhr.status === 200) {
+            //                     // Coupon applied/removed successfully
+            //                     var response = JSON.parse(xhr.responseText);
+            //                     swal.fire({
+            //                         icon: 'success',
+            //                         title: 'Success',
+            //                         text: response.message,
+            //                         showConfirmButton: false,
+            //                         timer: 1500
+            //                     });
+            //                     // Toggle button label
+            //                     if (button.textContent.trim() === "Apply Coupon") {
+            //                         button.textContent = "Remove Coupon";
+            //                     } else {
+            //                         button.textContent = "Apply Coupon";
+            //                     }
+            //                 } else {
+            //                     // Error applying/removing coupon
+            //                     var errorMessage = JSON.parse(xhr.responseText).message;
+            //                     swal.fire({
+            //                         icon: 'error',
+            //                         title: 'Error',
+            //                         text: errorMessage
+            //                     });
+            //                 }
+            //             }
+            //         };
+            //         xhr.send(JSON.stringify({ couponCode: couponCode }));
+            //     });
+            // });
 
-document.addEventListener("DOMContentLoaded", function () {
-    // Add event listener to the Apply/Remove Coupon button
-    document.getElementById("couponButton").addEventListener("click", function () {
-        var couponCode = document.getElementById("couponSelect").value;
-        var button = document.getElementById("couponButton");
-        var buttonLabel = button.textContent.trim();
-        
-        if (buttonLabel === "Apply Coupon") {
-            // Send request to apply coupon
-            applyCoupon(couponCode);
-        } else {
-            // Send request to remove coupon
-            removeCoupon();
-        }
-    });
-});
+            document.addEventListener("DOMContentLoaded", function () {
+                // Add event listener to the Apply/Remove Coupon button
+                document.getElementById("couponButton").addEventListener("click", function () {
+                    var couponCode = document.getElementById("couponSelect").value;
+                    var button = document.getElementById("couponButton");
+                    var buttonLabel = button.textContent.trim();
 
-
-async function applyCoupon(couponCode) {
-    try {
-        const response = await fetch("/applyCoupon", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ couponCode: couponCode })
-        });
-        if (response.ok) {
-            const data = await response.json();
-            Swal.fire({
-                icon: 'success',
-                title: 'Coupon Applied',
-                text: data.message,
-                showConfirmButton: false,
-                timer: 1500
+                    if (buttonLabel === "Apply Coupon") {
+                        // Send request to apply coupon
+                        applyCoupon(couponCode);
+                    } else {
+                        // Send request to remove coupon
+                        removeCoupon();
+                    }
+                });
             });
-            // Update total amount displayed in the HTML
-            document.getElementById("totalAmount").innerHTML = `
+
+
+            async function applyCoupon(couponCode) {
+                try {
+                    const response = await fetch("/applyCoupon", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ couponCode: couponCode })
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Coupon Applied',
+                            text: data.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        // Update total amount displayed in the HTML
+                        document.getElementById("totalAmount").innerHTML = `
                 <p>Total</p>
                 <p class="cart_amount">${data.cart.totalPrice}</p>
             `;
-            // Toggle button text between Apply Coupon and Remove Coupon
-            const button = document.getElementById("couponButton");
-            button.textContent = "Remove Coupon";
-        } else {
-            const errorMessage = await response.text();
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: errorMessage
-            });
-        }
-    } catch (error) {
-        console.error('Error applying coupon:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'An error occurred while applying the coupon'
-        });
-    }
-}
-
-
-
-
-
-
-
-async function removeCoupon() {
-    try {
-        const response = await fetch("/removeCoupon", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
+                        // Toggle button text between Apply Coupon and Remove Coupon
+                        const button = document.getElementById("couponButton");
+                        button.textContent = "Remove Coupon";
+                    } else {
+                        const errorMessage = await response.text();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: errorMessage
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error applying coupon:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while applying the coupon'
+                    });
+                }
             }
-        });
-        if (response.ok) {
-            const data = await response.json();
-            Swal.fire({
-                icon: 'success',
-                title: 'Coupon Removed',
-                text: data.message,
-                showConfirmButton: false,
-                timer: 1500
-            });
-            // Update total amount displayed in the HTML
-            document.getElementById("totalAmount").innerHTML = `
+
+
+            async function removeCoupon() {
+                try {
+                    const response = await fetch("/removeCoupon", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        }
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Coupon Removed',
+                            text: data.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        // Update total amount displayed in the HTML
+                        document.getElementById("totalAmount").innerHTML = `
                 <p>Total</p>
                 <p class="cart_amount">${data.cart.totalPrice}</p>
             `;
-            // Toggle button text back to Apply Coupon
-            const button = document.getElementById("couponButton");
-            button.textContent = "Apply Coupon";
-        } else {
-            const errorMessage = await response.text();
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: errorMessage
-            });
-        }
-    } catch (error) {
-        console.error('Error removing coupon:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'An error occurred while removing the coupon'
-        });
-    }
-}
-
-
-
+                        // Toggle button text back to Apply Coupon
+                        const button = document.getElementById("couponButton");
+                        button.textContent = "Apply Coupon";
+                    } else {
+                        const errorMessage = await response.text();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: errorMessage
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error removing coupon:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while removing the coupon'
+                    });
+                }
+            }
 
 
             function updateQuantityAndMax(itemId, cartId, newQuantity, selectedSize, price) {
@@ -328,36 +320,64 @@ async function removeCoupon() {
                 console.log(newQuantity);
                 console.log(selectedSize);
                 console.log(price);
-                $.ajax({
-                    url: '/quantity-change',
-                    type: 'POST',
-                    data: {
-                        productId: itemId,
-                        cartId: cartId,
-                        quantity: newQuantity,
-                        selectedSize: selectedSize
-                    },
-                    success: function (response) {
-                        if (response) {
-                            document.getElementById('quantity' + itemId).value = response.message.quantity;
-                            document.getElementById('totalAmount').innerHTML = response.message.totalAmount;
-                            var newTotal = response.message.quantity * price;
-                            // Construct the ID of the total <td> element
-                            var totalTdId = 'product_total_' + itemId;
 
-                            // Target the total <td> element by its ID and update its content with the new total
+                fetch('/quantity-change', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ productId: itemId, cartId: cartId, quantity: newQuantity, selectedSize: selectedSize }),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById('quantity' + itemId).value = data.message.quantity;
+                            document.getElementById('totalAmount').innerHTML = data.message.totalAmount;
+                            var newTotal = data.message.quantity * price;
+                            var totalTdId = 'product_total_' + itemId;
                             var totalTdElement = document.getElementById(totalTdId);
                             if (totalTdElement) {
                                 totalTdElement.innerHTML = newTotal;
                             }
-
-
+                            // Show success message
+                            Toastify({
+                                text: "Quantity updated successfully",
+                                duration: 3000,
+                                gravity: "top",
+                                position: "center",
+                                style: {
+                                    background: "green",
+                                },
+                            }).showToast();
+                        } else {
+                            // Show error message
+                            Toastify({
+                                text: data.message,
+                                duration: 3000,
+                                gravity: "top",
+                                position: "center",
+                                style: {
+                                    background: "red",
+                                },
+                            }).showToast();
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
                         }
-                    },
-                    error: function (error) {
+                    })
+                    .catch(error => {
                         console.error('Error updating quantity:', error);
-                    }
-                });
+                        // Show error message
+                        Toastify({
+                            text: "An error occurred while updating the quantity",
+                            duration: 3000,
+                            gravity: "top",
+                            position: "center",
+                            style: {
+                                background: "red",
+                            },
+                        }).showToast();
+                    });
             }
 
             function productRemove(productId, cartId, size) {

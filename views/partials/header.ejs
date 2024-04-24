@@ -6,7 +6,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Reid - login</title>
+    <title>Reid</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Favicon -->
@@ -31,7 +31,7 @@
     <!-- Include SweetAlert2 CSS -->
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 </head>
 
 <body>
@@ -39,9 +39,7 @@
   
 
      <!--Offcanvas menu area start-->
-    <div class="off_canvars_overlay">
-                
-    </div>
+    
     <div class="offcanvas_menu">
         <div class="container">
             <div class="row">
@@ -70,35 +68,13 @@
                                         <!-- <li><a href="compare.html">Compare Products  </a></li> -->
                                     </ul>
                                 </li> 
-                                <!-- <li class="language"><a href="#"><img src="/assets/img/logo/language.png" alt=""> English <i class="ion-chevron-down"></i></a>
-                                    <ul class="dropdown_language">
-                                        <li><a href="#"><img src="/assets/img/logo/cigar.jpg" alt=""> French</a></li>
-                                        <li><a href="#"><img src="/assets/img/logo/language2.png" alt="">German</a></li>
-                                    </ul>
-                                </li> -->
-                                <!-- <li class="currency"><a href="#">USD <i class="ion-chevron-down"></i></a>
-                                    <ul class="dropdown_currency">
-                                        <li><a href="#">EUR</a></li>
-                                        <li><a href="#">BRL</a></li>
-                                    </ul>
-                                </li> -->
                             </ul>
                         </div> 
-                        <!-- <form id="searchForm" action="#">
-                            <input id="searchInput" placeholder="Search entire store here..." type="text">
-                            <button type="submit"><i class="ion-ios-search-strong"></i></button>
-                        </form> -->
+                       
                         <div id="suggestionList"></div>
                         
                         <div class="cart_area">
-                            <div class="middel_links">
-                               <ul>
-                                   <li><a href="/login">Login</a></li>
-                                   <li>/</li>
-                                   <li><a href="/signup">Register</a></li>
-                               </ul>
-
-                            </div>
+                           
                             <div class="cart_link">
                                 <!-- <a href="#"><i class="fa fa-shopping-basket"></i>2 item(s)</a> -->
                                 <!--mini cart-->
@@ -291,7 +267,7 @@
                                       <li><a href="/wishlist">My Wish List </a></li>
                                       <li><a href="/user-profile">My Account </a></li>
                                       <li><a href="/login">Sign In</a></li>
-                                      <li><a href="compare.html">Compare Products  </a></li>
+                                      <!-- <li><a href="compare.html">Compare Products  </a></li> -->
                                   </ul>
                               </li> 
                               <li class="language"><a href="#"><img src="/assets/img/logo/language.png" alt=""> English <i class="ion-chevron-down"></i></a>
@@ -336,14 +312,16 @@
                   </div>
                   <div class="col-lg-3 col-md-6 offset-md-6 offset-lg-0">
                       <div class="cart_area">
-                          <div class="middel_links">
-                             <ul>
-                                 <li><a href="/login">Login</a></li>
-                                 <li>/</li>
-                                 <li><a href="/signup">Register</a></li>
-                             </ul>
-
-                          </div>
+                        <div class="middel_links">
+                            <ul>
+                                <% if (loggedIn) { %>
+                                    <li><a href="/logout">Logout</a></li>
+                                <% } else { %>
+                                    <li><a href="/login">Login</a></li>
+                                <% } %>
+                            </ul>
+                        </div>
+                        
                           <div class="cart_link">
                               <a href="#"><i class="fa fa-shopping-basket"></i></a>
                               <!--mini cart-->
@@ -456,15 +434,15 @@
                                                   <li class="banner_menu"><a href="#"><img src="/assets/img/bg/banner1.jpg" alt=""></a></li>
                                               </ul> -->
                                           </li>
-                                          <li><a href="blog.html">blog <i></i></a>
+                                          <!-- <li><a href="blog.html">blog <i></i></a> -->
                                               <!-- <ul class="sub_menu pages"> -->
                                                   <!-- <li><a href="blog-details.html">blog details</a></li>
                                                   <li><a href="blog-sidebar.html">blog  Sidebar</a></li>
                                                   <li><a href="blog-fullwidth.html">blog fullwidth</a></li> -->
                                               <!-- </ul> -->
-                                          </li>
-                                          <li class="active"><a href="#">pages <i></i></a>
-                                              <ul class="sub_menu pages">
+                                          <!-- </li> -->
+                                          <!-- <li class="active"><a href="#">pages <i></i></a>
+                                              <ul class="sub_menu pages"> -->
                                                   <!-- <li><a href="about.html">About Us</a></li>
                                                   <li><a href="services.html">services</a></li>
                                                   <li><a href="faq.html">Frequently Questions</a></li>
@@ -475,10 +453,10 @@
                                                   <li><a href="compare.html">compare</a></li>
                                                   <li><a href="privacy-policy.html">privacy policy</a></li>
                                                   <li><a href="coming-soon.html">coming soon</a></li> -->
-                                              </ul>
+                                              <!-- </ul>
                                           </li>
                                           <li><a href="about.html">About us</a></li>
-                                          <li><a href="contact.html">Contact Us</a></li>
+                                          <li><a href="contact.html">Contact Us</a></li> -->
                                       </ul>  
                                   </nav> 
                               </div>

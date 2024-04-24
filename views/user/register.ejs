@@ -1,62 +1,104 @@
-<%- include("../partials/header") %>
-    
-    <!--breadcrumbs area start-->
-<div class="breadcrumbs_area other_bread">
-  <div class="container">   
-      <div class="row">
-          <div class="col-12">
-              <div class="breadcrumb_content">
-                  <ul>
-                      <li><a href="/">home</a></li>
-                      <li>/</li>
-                      <li>Register</li>
-                  </ul>
-              </div>
-          </div>
-      </div>
-  </div>         
-</div>
-<!--breadcrumbs area end-->
+<!doctype html>
+<html class="no-js" lang="en">
 
-             <!-- customer login start -->
-               <div class="customer_login">
-               <div class="container">
-               <div class="row">
+
+<!-- Mirrored from htmldemo.net/reid/reid/login.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 17 Feb 2024 13:44:34 GMT -->
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Reid - login</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/assets/img/favicon.ico">
+
+    <!-- CSS 
+    ========================= -->
+
+
+    <!-- Plugins CSS -->
+    <link rel="stylesheet" href="/assets/css/plugins.css">
+
+    <!-- Main Style CSS -->
+    <link rel="stylesheet" href="/assets/css/style.css">
+
+    <!-- Include SweetAlert CSS -->
+    <!-- <link rel="stylesheet" href="https://unpkg.com/sweetalert/dist/sweetalert.css"> -->
+
+    <!-- Include SweetAlert JS -->
+    <!-- <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- Include SweetAlert2 CSS -->
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+</head>
+
+<body>
+    <!--breadcrumbs area start-->
+    <div class="breadcrumbs_area other_bread">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="breadcrumb_content">
+                        <ul>
+                            <li><a href="/">home</a></li>
+                            <li>/</li>
+                            <li>Register</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs area end-->
+
+    <!-- customer login start -->
+    <div class="customer_login">
+        <div class="container">
+            <div class="row">
                 <!--register area start-->
                 <div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
                     <div style="width: 50%;">
-                        <div class="account_form register" style="background-color: #f9f9f9; padding: 20px; border-radius: 5px; box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);">
+                        <div class="account_form register"
+                            style="background-color: #f9f9f9; padding: 20px; border-radius: 5px; box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);">
                             <h2>Register</h2>
-                            <form id="signupForm" action="/signup" method="post" onsubmit="return validateForm()">
-                                <p>   
+                            <form id="signupForm">
+                                <p>
                                     <label>Name <span>*</span></label>
                                     <input type="text" name="name" id="name">
                                 </p>
-                                <span class="text-danger d-none" style="font-size: 12px; margin-left: 10px;" id="nameError"></span>
-                                <p>   
-                                    <label>Email address  <span>*</span></label>
+                                <span class="text-danger d-none" style="font-size: 12px; margin-left: 10px;"
+                                    id="nameError"></span>
+                                <p>
+                                    <label>Email address <span>*</span></label>
                                     <input type="text" name="email" id="email">
                                 </p>
-                                <span class="text-danger d-none" style="font-size: 12px; margin-left: 10px;" id="emailError"></span>
-                                <p>   
+                                <span class="text-danger d-none" style="font-size: 12px; margin-left: 10px;"
+                                    id="emailError"></span>
+                                <p>
                                     <label>Password <span>*</span></label>
                                     <input type="password" name="password" id="password">
                                 </p>
-                                <span class="text-danger d-none" style="font-size: 12px; margin-left: 10px;" id="passwordError"></span>
-                                <p>   
+                                <span class="text-danger d-none" style="font-size: 12px; margin-left: 10px;"
+                                    id="passwordError"></span>
+                                <p>
                                     <label>Confirm Password <span>*</span></label>
                                     <input type="password" name="confirmPassword" id="confirmPassword">
                                 </p>
-                                <span class="text-danger d-none" style="font-size: 12px; margin-left: 10px;" id="confirmPasswordError"></span>
-                                <p>   
+                                <span class="text-danger d-none" style="font-size: 12px; margin-left: 10px;"
+                                    id="confirmPasswordError"></span>
+                                <p>
                                     <label>Mobile Number <span>*</span></label>
                                     <input type="text" name="phone" id="phone">
                                 </p>
-                                <p>   
+                                <p>
                                     <label>Referral Code <span>*</span></label>
                                     <input type="text" name="referral" id="referral">
                                 </p>
-                                <span class="text-danger d-none" style="font-size: 12px; margin-left: 10px;" id="phoneError"></span>
+                                <span class="text-danger d-none" style="font-size: 12px; margin-left: 10px;"
+                                    id="phoneError"></span>
                                 <div class="login_submit" style="text-align: center;">
                                     <button type="submit">Register</button>
                                 </div>
@@ -64,37 +106,57 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!--register area end-->
             </div>
-        </div>    
+        </div>
     </div>
     <!-- customer login end -->
 
-    <%- include("../partials/footer") %>
+    <!-- JS
+============================================ -->
 
-    <script>
-       
-        function validateForm() {
+    <!-- Plugins JS -->
+    <script src="/assets/js/plugins.js"></script>
+
+    <!-- Main JS -->
+    <script src="/assets/js/main.js"></script>
+
+    <!-- Include SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+</body>
+
+</html>
+
+
+<script>
+
+    // Add this script to your HTML file or in a separate JavaScript file
+
+    const form = document.getElementById('signupForm');
+    const nameRegex = /^[a-zA-Z0-9_]+$/;
+    const emailRegX = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    const phoneRegex = /^\d{10}$/;
+    const passRegX = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{6,}$/;
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
         console.log('1');
-        const name = document.getElementById("name");
-        const email = document.getElementById("email");
-        const phone = document.getElementById("phone");
-        const password = document.getElementById("password");
-        const confirmPassword = document.getElementById("confirmPassword");
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const phone = document.getElementById('phone').value;
+        const referral = document.getElementById('referral').value;
 
-        const nameRegex = /^[a-zA-Z0-9_]+$/;
-        const emailRegX = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-        const phoneRegex = /^\d{10}$/;
-        const passRegX = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{6,}$/;
-
+        console.log(`${name} ${email} ${password} ${confirmPassword} ${phone} ${referral}`);
 
         // Name validation
-        if (name.value === "" || name.value === null) {
+        if (name === "" || name === null) {
             document.getElementById("nameError").classList.remove('d-none');
             document.getElementById("nameError").innerHTML = "Name must be filled!";
             return false;
-        } else if (!name.value.match(nameRegex)) {
+        } else if (!name.match(nameRegex)) {
             document.getElementById("nameError").classList.remove('d-none');
             document.getElementById("nameError").innerHTML = "Invalid name";
             return false;
@@ -102,13 +164,13 @@
             document.getElementById('nameError').innerHTML = "";
             document.getElementById('nameError').classList.add('d-none');
         }
-
+        console.log('1');
         // Email validation
-        if (email.value === "" || email.value === null) {
+        if (email === "" || email === null) {
             document.getElementById("emailError").classList.remove('d-none');
             document.getElementById("emailError").innerHTML = "Email must be filled!";
             return false;
-        } else if (!email.value.match(emailRegX)) {
+        } else if (!email.match(emailRegX)) {
             document.getElementById("emailError").classList.remove('d-none');
             document.getElementById("emailError").innerHTML = "Invalid Email Address";
             return false;
@@ -116,13 +178,13 @@
             document.getElementById("emailError").innerHTML = "";
             document.getElementById("emailError").classList.add('d-none');
         }
-
+        console.log('2');
         // Phone validation
-        if (phone.value === "" || phone.value === null) {
+        if (phone === "" || phone === null) {
             document.getElementById("phoneError").classList.remove('d-none');
             document.getElementById("phoneError").innerHTML = "Phone number must be filled!";
             return false;
-        } else if (!phone.value.match(phoneRegex)) {
+        } else if (!phone.match(phoneRegex)) {
             document.getElementById("phoneError").classList.remove('d-none');
             document.getElementById("phoneError").innerHTML = "Invalid Phone Number";
             return false;
@@ -130,35 +192,91 @@
             document.getElementById("phoneError").innerHTML = "";
             document.getElementById("phoneError").classList.add('d-none');
         }
-
+        console.log('3');
         // Password validation
-        if (password.value === "" || password.value === null) {
+        if (password === "" || password === null) {
             document.getElementById("passwordError").classList.remove('d-none');
             document.getElementById("passwordError").innerHTML = "Password must be filled!";
             return false;
-        } else if (!password.value.match(passRegX)) {
+        } else if (password.length < 6) {
             document.getElementById("passwordError").classList.remove('d-none');
             document.getElementById("passwordError").innerHTML = "Password must contain at least 6 characters.";
+            return false;
+        } else if (!password.match(passRegX)) {
+            document.getElementById("passwordError").classList.remove('d-none');
+            document.getElementById("passwordError").innerHTML = "Password must contain at least one digit, one lowercase, one uppercase letter, and one special character.";
             return false;
         } else {
             document.getElementById("passwordError").classList.add('d-none');
         }
+        console.log('4');
+        //     // Confirm password validation
 
-        // Confirm password validation
+        const confirmPasswordValue = confirmPassword.trim();
+        if (confirmPasswordValue === "" || confirmPasswordValue === null) {
+            document.getElementById("confirmPasswordError").classList.remove('d-none');
+            document.getElementById("confirmPasswordError").innerHTML = "Confirm Password must be filled!";
+            return false;
+        } else if (confirmPasswordValue !== password) {
+            document.getElementById("confirmPasswordError").classList.remove('d-none');
+            document.getElementById("confirmPasswordError").innerHTML = "Passwords do not match.";
+            return false;
+        } else {
+            document.getElementById("confirmPasswordError").classList.add('d-none');
+        }
+        console.log('5');
+        try {
+            const response = await fetch('/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name, email, password, confirmPassword, phone, referral }),
+            });
 
-    const confirmPasswordValue = confirmPassword.value.trim();
-    if (confirmPasswordValue === "" || confirmPasswordValue === null) {
-        document.getElementById("confirmPasswordError").classList.remove('d-none');
-        document.getElementById("confirmPasswordError").innerHTML = "Confirm Password must be filled!";
-        return false;
-    } else if (confirmPasswordValue !== password.value) {
-        document.getElementById("confirmPasswordError").classList.remove('d-none');
-        document.getElementById("confirmPasswordError").innerHTML = "Passwords do not match.";
-        return false;
-    } else {
-        document.getElementById("confirmPasswordError").classList.add('d-none');
-    }
-        return true; // Allow form submission if all validations pass
-    }
+            if (response.ok) {
+                console.log('Signup successful');
+                Toastify({
+                    text: 'Signup successful!',
+                    duration: 3000,
+                    gravity: 'top',
+                    position: 'center',
+                    style: {
+                        background: 'green',
+                    },
+                }).showToast();
+                // Redirect to /login after a delay
+                setTimeout(() => {
+                    window.location.href = "/otp";
+                }, 2000);
+            } else {
+                const data = await response.json();
+                // Handle the error case
+                console.error('Signup failed:', data.message);
+                Toastify({
+                    text: data.message,
+                    duration: 3000,
+                    gravity: 'top',
+                    position: 'center',
+                    style: {
+                        background: 'red',
+                    },
+                }).showToast();
 
-    </script>
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Toastify({
+                text: 'An error occurred. Please try again later.',
+                duration: 3000,
+                gravity: 'top',
+                position: 'center',
+                style: {
+                    background: 'red',
+                },
+            }).showToast();
+        }
+
+    });
+
+</script>

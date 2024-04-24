@@ -1,8 +1,8 @@
 <%- include("../partials/header") %>
- 
+
     <!--breadcrumbs area start-->
     <div class="breadcrumbs_area other_bread">
-        <div class="container">   
+        <div class="container">
             <div class="row">
                 <div class="col-12">
                     <div class="breadcrumb_content">
@@ -14,13 +14,13 @@
                     </div>
                 </div>
             </div>
-        </div>         
+        </div>
     </div>
     <!--breadcrumbs area end-->
-    
+
     <!-- my account start  -->
     <section class="main_content_area">
-        <div class="container">   
+        <div class="container">
             <div class="account_dashboard">
                 <div class="row">
                     <div class="col-sm-12 col-md-3 col-lg-3">
@@ -29,20 +29,26 @@
                             <ul role="tablist" class="nav flex-column dashboard-list">
                                 <li><a href="#dashboard" data-bs-toggle="tab" class="nav-link active">Dashboard</a></li>
                                 <li> <a href="#orders" data-bs-toggle="tab" class="nav-link">Orders</a></li>
-                                <!-- <li><a href="#downloads" data-bs-toggle="tab" class="nav-link">Downloads</a></li> -->
                                 <li><a href="#address" data-bs-toggle="tab" class="nav-link">My Address</a></li>
-                                <li><a href="#account-details" data-bs-toggle="tab" class="nav-link">Add Address</a></li>
-                                <li><a href="#change-password" data-bs-toggle="tab" class="nav-link">Change Password</a></li>
+                                <li><a href="#account-details" data-bs-toggle="tab" class="nav-link">Add Address</a>
+                                </li>
+                                <li><a href="#change-password" data-bs-toggle="tab" class="nav-link">Change Password</a>
+                                </li>
                                 <li><a href="/logout" class="nav-link">logout</a></li>
                             </ul>
-                        </div>    
+                        </div>
                     </div>
                     <div class="col-sm-12 col-md-9 col-lg-9">
                         <!-- Tab panes -->
                         <div class="tab-content dashboard_content">
                             <div class="tab-pane fade show active" id="dashboard">
                                 <h3>Dashboard </h3>
-                                <p>From your account dashboard. you can easily check &amp; view your <a href="#">recent orders</a>, manage your <a href="#">shipping and billing addresses</a> and <a href="#">Edit your password and account details. Share referral code : <span onclick="referralShare('<%= userDetails.referralCode %>')"><%= userDetails.referralCode %></span>.</a></p>
+                                <p>From your account dashboard. you can easily check &amp; view your <a href="#">recent
+                                        orders</a>, manage your <a href="#">shipping and billing addresses</a> and <a
+                                        href="#">Edit your password and account details. Share referral code : <span
+                                            onclick="referralShare('<%= userDetails.referralCode %>')">
+                                            <%= userDetails.referralCode %>
+                                        </span>.</a></p>
                             </div>
                             <div class="tab-pane fade" id="orders">
                                 <h3>Orders</h3>
@@ -58,373 +64,812 @@
                                                 <th>Total</th>
                                                 <th>Discount</th>
                                                 <th>Actions</th>
-                                                <th></th>	 	 	 	
+                                                <th></th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <% for (let i = 0; i < userOrders.length; i++) { %>
-                                            <tr>
-                                                <td><%= i + 1 %></td>
-                                                <td><%= formatDate(userOrders[i].orderDate) %></td>
-                                                <td><span class="success"><%= userOrders[i].orderStatus %></span></td>
-                                                <td><%= userOrders[i].paymentMethod %></td>
-                                                <td>
-                                                    <% if (userOrders[i].paymentStatus === 'pending') { %>
-                                                        <!-- Display a button if payment status is pending -->
-                                                        Pending
-                                                    <% } else { %>
-                                                        <!-- Display "Success" text if payment status is not pending -->
-                                                        Success
-                                                    <% } %>
-                                                </td>
-                                                <td>₹<%= userOrders[i].totalAmount %></td>
-                                                <td>₹<%= userOrders[i].totalDiscount %></td>
-                                                <td><a href="/order-details/<%= userOrders[i]._id %>" class="view">view</a></td>
-                                                <td>
-                                                    <a href="/order-details/<%= userOrders[i]._id %>" class="view"></a>
-                                                    <% if (userOrders[i].orderStatus === 'cancelled') { %>
-                                                        <span>Cancelled</span>
-                                                    <% } else if (userOrders[i].orderStatus === 'returned') { %>
-                                                        <span>Returned</span>
-                                                    <% } else if (userOrders[i].orderStatus === 'confirmed' || userOrders[i].orderStatus === 'pending') { %>
-                                                        <button class="cancel-btn" data-order-id="<%= userOrders[i]._id %>">Cancel</button>
-                                                    <% } else if (userOrders[i].orderStatus === 'delivered') { %>
-                                                        <button class="return-btn" data-order-id="<%= userOrders[i]._id %>">Return</button>
-                                                    <% } %>
-                                                </td>
-                                            </tr>
-                                            <% } %>
+                                            <% for (let i=0; i < userOrders.length; i++) { %>
+                                                <tr>
+                                                    <td>
+                                                        <%= i + 1 %>
+                                                    </td>
+                                                    <td>
+                                                        <%= formatDate(userOrders[i].orderDate) %>
+                                                    </td>
+                                                    <td><span class="success">
+                                                            <%= userOrders[i].orderStatus %>
+                                                        </span></td>
+                                                    <td>
+                                                        <%= userOrders[i].paymentMethod %>
+                                                    </td>
+                                                    <td>
+                                                        <% if (userOrders[i].paymentStatus==='pending' ) { %>
+                                                            <!-- Display a button if payment status is pending -->
+                                                            Pending
+                                                            <% } else { %>
+                                                                <!-- Display "Success" text if payment status is not pending -->
+                                                                Success
+                                                                <% } %>
+                                                    </td>
+                                                    <td>₹<%= userOrders[i].totalAmount %>
+                                                    </td>
+                                                    <td>₹<%= userOrders[i].totalDiscount %>
+                                                    </td>
+                                                    <td><a href="/order-details/<%= userOrders[i]._id %>"
+                                                            class="view">view</a></td>
+                                                    <td>
+                                                        <a href="/order-details/<%= userOrders[i]._id %>"
+                                                            class="view"></a>
+                                                        <% if (userOrders[i].orderStatus==='cancelled' ) { %>
+                                                            <span>Cancelled</span>
+                                                            <% } else if (userOrders[i].orderStatus==='returned' ) { %>
+                                                                <span>Returned</span>
+                                                                <% } else if (userOrders[i].orderStatus==='confirmed' ||
+                                                                    userOrders[i].orderStatus==='pending' ) { %>
+                                                                    <button class="cancel-btn"
+                                                                        data-order-id="<%= userOrders[i]._id %>">Cancel</button>
+                                                                    <% } else if
+                                                                        (userOrders[i].orderStatus==='delivered' ) { %>
+                                                                        <button class="return-btn"
+                                                                            data-order-id="<%= userOrders[i]._id %>">Return</button>
+                                                                        <% } %>
+                                                    </td>
+                                                </tr>
+                                                <% } %>
                                         </tbody>
                                     </table>
+                                </div>
+                                <!-- Pagination code -->
+                                <div class="pagination">
+                                    <% if (currentPage> 1) { %>
+                                        <a href="/user-profile?page=<%= currentPage - 1 %>" data-bs-toggle="tab"
+                                            data-page="<%= currentPage - 1 %>">&laquo; Previous</a>
+                                        <% } %>
+
+                                            <div class="page-numbers">
+                                                <% for (let i=1; i <=totalPages; i++) { %>
+                                                    <% if (i===currentPage) { %>
+                                                        <span class="current-page">
+                                                            <%= i %>
+                                                        </span>
+                                                        <% } else { %>
+                                                            <a href="/user-profile?page=<%= i %>">
+                                                                <%= i %>
+                                                            </a>
+                                                            <% } %>
+                                                                <% } %>
+                                            </div>
+
+                                            <% if (currentPage < totalPages) { %>
+                                                <a href="/user-profile?page=<%= currentPage + 1 %>" data-bs-toggle="tab"
+                                                    data-page="<%= currentPage + 1 %>">Next
+                                                    &raquo;</a>
+                                                <% } %>
                                 </div>
                             </div>
-                            
-                            <!-- <div class="tab-pane fade" id="downloads">
-                                <h3>Downloads</h3>
-                                <div class="table-responsive">
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th>Product</th>
-                                                <th>Downloads</th>
-                                                <th>Expires</th>
-                                                <th>Download</th>	 	 	 	
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>Shopnovilla - Free Real Estate PSD Template</td>
-                                                <td>May 10, 2022</td>
-                                                <td><span class="danger">Expired</span></td>
-                                                <td><a href="#" class="view">Click Here To Download Your File</a></td>
-                                            </tr>
-                                    
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div> -->
+
+
+
                             <div class="tab-pane" id="address" style="margin-left: 60px;">
                                 <div style="display: flex; flex-wrap: wrap;">
-                                <div style="display: flex; margin-right: 20px; margin-bottom: 20px;">
-                                <% for (let i = 0; i < allAddress.length; i++) { %>
-                                    <div class="address-item" style="margin-right: 50px;">
-                                <a href="/edit-address" class="view">Edit</a>
-                                <p><strong style="font-weight: bold; color: #333;">Name:</strong> <span style="padding-left: 10px;"><%= allAddress[i].name %></span></p>
-                                <p><strong style="font-weight: bold; color: #333;">House:</strong> <span style="padding-left: 10px;"><%= allAddress[i].house %></span></p>
-                                <p><strong style="font-weight: bold; color: #333;">City:</strong> <span style="padding-left: 10px;"><%= allAddress[i].city %></span></p>
-                                <p><strong style="font-weight: bold; color: #333;">State:</strong> <span style="padding-left: 10px;"><%= allAddress[i].state %></span></p>
-                                <p><strong style="font-weight: bold; color: #333;">Pincode:</strong> <span style="padding-left: 10px;"><%= allAddress[i].pincode %></span></p>
+                                    <% for (let i=0; i < allAddress.length; i++) { %>
+                                        <div class="address-item"
+                                            style="margin-right: 50px; margin-bottom: 20px; border: 1px solid #ccc; padding: 10px; width: 200px;">
+                                            <p><strong style="font-weight: bold; color: #333;">Name:</strong> <span
+                                                    style="padding-left: 10px;">
+                                                    <%= allAddress[i].name %>
+                                                </span></p>
+                                            <p><strong style="font-weight: bold; color: #333;">House:</strong> <span
+                                                    style="padding-left: 10px;">
+                                                    <%= allAddress[i].house %>
+                                                </span></p>
+                                            <p><strong style="font-weight: bold; color: #333;">City:</strong> <span
+                                                    style="padding-left: 10px;">
+                                                    <%= allAddress[i].city %>
+                                                </span></p>
+                                            <p><strong style="font-weight: bold; color: #333;">State:</strong> <span
+                                                    style="padding-left: 10px;">
+                                                    <%= allAddress[i].state %>
+                                                </span></p>
+                                            <p><strong style="font-weight: bold; color: #333;">Pincode:</strong> <span
+                                                    style="padding-left: 10px;">
+                                                    <%= allAddress[i].pincode %>
+                                                </span></p>
+                                            <input type="hidden" name="addressId" value="<%= allAddress[i]._id %>">
+                                            <div
+                                                style="display: flex; justify-content: space-between; margin-top: 10px;">
+                                                <a href="/edit-address?id=<%= allAddress[i]._id %>"
+                                                    class="btn btn-primary">Edit</a>
+                                                <button class="btn btn-danger">Delete</button>
+                                            </div>
+                                        </div>
+                                        <% } %>
+                                </div>
                             </div>
-                            <% } %>
+                            <!-- Add Address button -->
+                            <!-- <div style="position: absolute; top: 10px; right: 10px;">
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#addAddressModal">
+                                    Add Address
+                                </button>
+                            </div> -->
+
+                            <div id="editAddressModal" class="modal"
+                                style="display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); padding-top: 60px;">
+                                <form id="editAddressForm" action="/updateAddress" method="POST"
+                                    style="background-color: #fefefe; margin: 5% auto; padding: 20px; border: 1px solid #888; width: 50%;">
+                                    <div class="modal-content" style="text-align: center; width: 100%;">
+                                        <h2 style="margin-bottom: 20px;">Edit Address</h2>
+                                        <!-- Address inputs -->
+                                        <div class="address-form" style="margin-bottom: 20px;">
+                                            <input type="hidden" id="editAddressId" name="_id" value="" />
+                                            <label for="editName" style="margin-bottom: 5px;">Name:</label>
+                                            <input type="text" id="editName" name="name" placeholder="Name"
+                                                style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                                            <label for="editHouse" style="margin-bottom: 5px;">House:</label>
+                                            <input type="text" id="editHouse" name="house" placeholder="House"
+                                                style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                                            <label for="editCity" style="margin-bottom: 5px;">City:</label>
+                                            <input type="text" id="editCity" name="city" placeholder="City"
+                                                style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                                            <label for="editState" style="margin-bottom: 5px;">State:</label>
+                                            <input type="text" id="editState" name="state" placeholder="State"
+                                                style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                                            <label for="editPincode" style="margin-bottom: 5px;">Pincode:</label>
+                                            <input type="text" id="editPincode" name="pincode" placeholder="Pincode"
+                                                style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                                        </div>
+                                        <!-- Buttons -->
+                                        <div class="modal-buttons" style="text-align: center;">
+                                            <button type="button" id="cancelEdit" onclick="closeModal()"
+                                                style="padding: 10px 20px; margin-right: 10px; background-color: #ccc; border: none; border-radius: 5px; cursor: pointer;">Cancel</button>
+                                            <button id="submitEditAddress" type="submit"
+                                                style="padding: 10px 20px; background-color: #007bff; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Submit</button>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
-                            </div>
-                        </div>
-                               
-                            
+
+
                             <div class="tab-pane fade" id="account-details">
-                                <h3>Add Address</h3>
-                                <div class="login">
-                                    <div class="login_form_container">
+                                <h3 style="text-align: center; margin-bottom: 20px;">Add Address</h3>
+                                <div class="login" style="text-align: center;">
+                                    <div class="login_form_container"
+                                        style="display: inline-block; width: 300px; border: 1px solid #ccc; padding: 20px; border-radius: 10px;">
                                         <div class="account_login_form">
-                                            <form id="addressForm" action="/add-address" method="POST">
-                                                <label for="name">Name</label>
-                                                <input type="text" id="name" name="name" required><br>
-                                                <label for="house">House</label>
-                                                <input type="text" id="house" name="house" required><br>
-                                                <label for="city">City</label>
-                                                <input type="text" id="city" name="city" required><br>
-                                                <label for="state">State</label>
-                                                <input type="text" id="state" name="state" required><br>
-                                                <label for="pincode">Pin-code</label>
-                                                <input type="text" id="pincode" name="pincode" required><br>
-                                                <input type="hidden" id="userId" name="userId" value="<%= loginStatus._id %>">
-                                                <div style="text-align: center; margin-top: 10px;">
-                                                    <button type="submit">Save</button>
+                                            <form id="addressForm">
+                                                <label for="name">Name</label><br>
+                                                <input type="text" id="name" name="name" required
+                                                    style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid black; border-radius: 5px;">
+                                                <span class="text-danger d-none"
+                                                    style="font-size: 12px; margin-left: 10px;"
+                                                    id="nameError"></span><br>
+
+                                                <label for="house">House</label><br>
+                                                <input type="text" id="house" name="house" required
+                                                    style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid black; border-radius: 5px;">
+                                                <span class="text-danger d-none"
+                                                    style="font-size: 12px; margin-left: 10px;"
+                                                    id="houseError"></span><br>
+
+                                                <label for="city">City</label><br>
+                                                <input type="text" id="city" name="city" required
+                                                    style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid black; border-radius: 5px;">
+                                                <span class="text-danger d-none"
+                                                    style="font-size: 12px; margin-left: 10px;"
+                                                    id="cityError"></span><br>
+
+                                                <label for="state">State</label><br>
+                                                <input type="text" id="state" name="state" required
+                                                    style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid black; border-radius: 5px;">
+                                                <span class="text-danger d-none"
+                                                    style="font-size: 12px; margin-left: 10px;"
+                                                    id="stateError"></span><br>
+
+                                                <label for="pincode">Pin-code</label><br>
+                                                <input type="text" id="pincode" name="pincode" required
+                                                    style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid black; border-radius: 5px;">
+                                                <span class="text-danger d-none"
+                                                    style="font-size: 12px; margin-left: 10px;"
+                                                    id="pincodeError"></span><br>
+
+                                                <input type="hidden" id="userId" name="userId"
+                                                    value="<%= loginStatus._id %>">
+                                                <div style="text-align: center; margin-top: 20px;">
+                                                    <button type="submit"
+                                                        style="padding: 10px 20px; background-color: #007bff; color: #fff; border: none; border-radius: 5px;">Save</button>
                                                 </div>
-                                            </form> 
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+
+
 
                             <div class="tab-pane fade" id="change-password">
                                 <h3>Change Password</h3>
                                 <form id="changePasswordForm">
                                     <div class="form-group">
                                         <label for="currentPassword">Current Password:</label>
-                                        <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                                        <input type="password" class="form-control" id="currentPassword"
+                                            name="currentPassword" required>
                                     </div>
                                     <div class="form-group">
                                         <label for="newPassword">New Password:</label>
-                                        <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                                        <input type="password" class="form-control" id="newPassword" name="newPassword"
+                                            required>
                                     </div>
                                     <button type="submit" class="btn btn-primary">Change Password</button>
-                                    <span class="text-danger d-none" style="font-size: 12px; margin-left: 10px;" id="passwordError"></span>
+                                    <span class="text-danger d-none" style="font-size: 12px; margin-left: 10px;"
+                                        id="passwordError"></span>
                                 </form>
                             </div>
-                            
+
                         </div>
                     </div>
                 </div>
-            </div>  
-        </div>        	
-    </section>			
-    <!-- my account end   --> 
+            </div>
+        </div>
+    </section>
+    <!-- my account end   -->
 
 
     <%- include("../partials/footer") %>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <script>
+        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+        <script>
 
+            // Get all the "Edit" buttons
+            const editButtons = document.querySelectorAll('.address-item a.btn-primary');
 
+            // Add a click event listener to each button
+            editButtons.forEach(button => {
+                button.addEventListener('click', (event) => {
+                    event.preventDefault(); // Prevent the default link behavior
+                    const addressId = event.target.getAttribute('href').split('=')[1];
+                    openEditModal(addressId);
+                });
+            });
 
-   
+            function openEditModal(addressId) {
+                // Show the modal
+                const modal = document.getElementById('editAddressModal');
+                modal.style.display = 'block';
 
+                // Fetch the address data from the server
+                fetch(`/get-address?id=${addressId}`)
+                    .then(response => response.json())
+                    .then(address => {
+                        // Populate the modal form fields
+                        document.getElementById('editAddressId').value = address._id;
+                        document.getElementById('editName').value = address.name;
+                        document.getElementById('editHouse').value = address.house;
+                        document.getElementById('editCity').value = address.city;
+                        document.getElementById('editState').value = address.state;
+                        document.getElementById('editPincode').value = address.pincode;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching address:', error);
+                    });
+            }
 
+            function closeModal() {
+                const modal = document.getElementById('editAddressModal');
+                modal.style.display = 'none';
+            }
 
-$(document).ready(function() {
-        $('#addressForm').submit(function(event) {
-            event.preventDefault(); // Prevent default form submission
-            
-            // Collect address details from form fields
-            var addressData = {
-                name: $('#name').val(),
-                house: $('#house').val(),
-                city: $('#city').val(),
-                state: $('#state').val(),
-                pincode: $('#pincode').val(),
-                userId: $('#userId').val() // Fetch user ID from hidden input field
-            };
-            
-            // Send AJAX request to backend
-            $.ajax({
-                type: 'POST',
-                url: '/add-address',
-                data: addressData,
-                success: function(response) {
-                    console.log('Address added successfully:', response);
-                    // Clear the form fields
-                    $('#name').val('');
-                    $('#house').val('');
-                    $('#city').val('');
-                    $('#state').val('');
-                    $('#pincode').val('');
-                },
-                error: function(error) {
-                    console.error('Error adding address:', error);
+            const editAddressForm = document.getElementById('editAddressForm');
+
+            editAddressForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                const formData = Object.fromEntries(new FormData(event.target));
+                console.log(formData);
+                try {
+                    const response = await fetch('/updateAddress', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    if (response.ok) {
+                        Toastify({
+                            text: "Address updated successfully!",
+                            duration: 3000,
+                            gravity: "top",
+                            position: "center",
+                            style: {
+                                background: "linear-gradient(to right, #00b09b, #96c93d)",
+                            }
+                        }).showToast();
+
+                        setTimeout(() => {
+                            location.reload();
+                        }, 2000); // 2 seconds delay
+                    } else {
+                        const errorData = await response.json();
+                        Toastify({
+                            text: errorData.message || "Error updating address",
+                            duration: 3000,
+                            gravity: "top",
+                            position: "center",
+                            style: {
+                                background: "linear-gradient(to right, #ff6b6b, #ffa500)"
+                            }
+                        }).showToast();
+                    }
+                } catch (error) {
+                    Toastify({
+                        text: "An error occurred while updating the address",
+                        duration: 3000,
+                        gravity: "top",
+                        position: "center",
+                        style: {
+                            background: "linear-gradient(to right, #ff6b6b, #ffa500)"
+                        }
+                    }).showToast();
+                    console.error('Error updating address:', error);
                 }
             });
-        });
-    });
 
-    $(document).ready(function() {
-    $('#changePasswordForm').submit(function(event) {
-        event.preventDefault(); // Prevent the default form submission
-        
-        var currentPassword = $('#currentPassword').val();
-        var newPassword = $('#newPassword').val();
-        
-        // Check if passwords are the same
-        if (currentPassword === newPassword) {
-            // Show error message
-            $('#passwordError').text('Current password and new password cannot be the same.').removeClass('d-none');
-            return; // Stop further execution
-        }
+            // Get all the delete buttons
+            const deleteButtons = document.querySelectorAll('.address-item button.btn-danger');
 
-        // Get the form data
-        var formData = $(this).serialize();
-        
-        // Send an AJAX request to the server
-        $.ajax({
-            type: 'POST', // Use POST method
-            url: '/change-password', // Specify the server endpoint
-            data: formData, // Pass the form data
-            success: function(response) {
-                // Handle the success response
-                console.log('Password changed successfully');
-                // Show success message using SweetAlert2
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Password Changed',
-                    text: 'Your password has been changed successfully.'
+            // Add a click event listener to each button
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const addressItem = event.target.closest('.address-item');
+                    deleteAddress(addressItem);
                 });
-                // Clear the password fields
-                $('#currentPassword').val('');
-                $('#newPassword').val('');
-            },
-            error: function(xhr, status, error) {
-                // Handle any errors
-                console.error('Error changing password:', error);
-                // Show error message using SweetAlert2
+            });
+
+            function deleteAddress(addressItem) {
+                // Get the addressId from the hidden input field
+                const addressId = addressItem.querySelector('input[name="addressId"]').value;
+                console.log(addressId);
+                // Show the confirmation dialog
                 Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'An error occurred while changing your password. Please try again.'
-                });
-            }
-        });
-    });
-});
-
-document.getElementById('changePasswordForm').addEventListener('submit', function(event) {
-    const newPassword = document.getElementById('newPassword').value;
-    const currentPassword = document.getElementById('currentPassword').value;
-    console.log(newPassword);
-    console.log(currentPassword);
-    if (newPassword === currentPassword) {
-      event.preventDefault(); // Prevent form submission
-      document.getElementById('passwordError').style.display = 'block';
-      
-    }
-  });
-
-  $(document).ready(function() {
-    $('.cancel-btn').click(function() {
-        var orderId = $(this).data('order-id');
-        
-        // Display confirmation dialog using SweetAlert2
-        Swal.fire({
-            title: 'Are you sure?',
-            text: 'Once cancelled, you will not be able to recover this order!',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, cancel it!',
-            cancelButtonText: 'No, keep it'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // User confirmed the cancellation, make AJAX request
-                $.ajax({
-                    url: '/cancel-order',
-                    method: 'POST',
-                    data: { orderId: orderId },
-                    success: function(response) {
-                        // Update the button text to "Cancelled" upon successful cancellation
-                        $('.cancel-btn[data-order-id="' + orderId + '"]').text('Cancelled');
-                        // Show success message using SweetAlert2
-                        Swal.fire(
-                            'Cancelled!',
-                            'Your order has been cancelled.',
-                            'success'
-                        );
-                    },
-                    error: function(err) {
-                        console.error('Error cancelling order:', err);
-                        // Show error message using SweetAlert2
-                        Swal.fire(
-                            'Error!',
-                            'Failed to cancel the order. Please try again later.',
-                            'error'
-                        );
+                    title: 'Are you sure?',
+                    text: 'You won\'t be able to revert this!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Create the AJAX request
+                        fetch(`/delete-address?id=${addressId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                            .then(response => {
+                                if (response.ok) {
+                                    // Remove the address item from the DOM
+                                    addressItem.remove();
+                                    Toastify({
+                                        text: "Address deleted successfully!",
+                                        duration: 3000,
+                                        gravity: "top",
+                                        position: "center",
+                                        style: {
+                                            background: "linear-gradient(to right, #00b09b, #96c93d)",
+                                        }
+                                    }).showToast();
+                                } else {
+                                    Toastify({
+                                        text: "Failed to delete address!",
+                                        duration: 3000,
+                                        gravity: "top",
+                                        position: "center",
+                                        style: {
+                                            background: "linear-gradient(to right, #ff6b6b, #ffa500)"
+                                        }
+                                    }).showToast();
+                                }
+                            })
+                            .catch(error => {
+                                Toastify({
+                                    text: "Error deleting address: " + error,
+                                    duration: 3000,
+                                    gravity: "top",
+                                    position: "right",
+                                    style: {
+                                        background: "linear-gradient(to right, #ff6b6b, #ffa500)"
+                                    }
+                                }).showToast();
+                            });
                     }
                 });
-            } else if (result.dismiss === Swal.DismissReason.cancel) {
-                // User clicked "No", keep the order
-                Swal.fire(
-                    'Cancelled',
-                    'Your order is safe :)',
-                    'error'
-                );
             }
-        });
-    });
-});
 
-$(document).ready(function() {
-    $('.return-btn').click(function() {
-        var orderId = $(this).data('order-id');
-        
-        
-        Swal.fire({
-            title: 'Are you sure?',
-            text: 'Once returned, you will not be able to recover this order!',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, return it!',
-            cancelButtonText: 'No, keep it'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // User confirmed the return, make AJAX request
-                $.ajax({
-                    url: '/return-order',
-                    method: 'POST',
-                    data: { orderId: orderId },
-                    success: function(response) {
-                        // Update the button text to "Returned" upon successful return
-                        $('.return-btn[data-order-id="' + orderId + '"]').text('Returned');
-                        // Show success message using SweetAlert2
-                        Swal.fire(
-                            'Returned!',
-                            'Your order has been returned.',
-                            'success'
-                        );
-                    },
-                    error: function(err) {
-                        console.error('Error returning order:', err);
-                        // Show error message using SweetAlert2
-                        Swal.fire(
-                            'Error!',
-                            'Failed to return the order. Please try again later.',
-                            'error'
-                        );
+            // $(document).ready(function () {
+            //     // Attach click event listener to the parent element
+            //     $(document).on('click', '.btn-delete', function () {
+            //         console.log('inside delete');
+            //         // Extract address ID from the hidden input field
+            //         var addressId = $(this).siblings('input[name="addressId"]').val();
+            //         console.log(addressId);
+            //         // Show confirmation dialog using SweetAlert2
+            //         Swal.fire({
+            //             title: 'Are you sure?',
+            //             text: 'You won\'t be able to revert this!',
+            //             icon: 'warning',
+            //             showCancelButton: true,
+            //             confirmButtonColor: '#3085d6',
+            //             cancelButtonColor: '#d33',
+            //             confirmButtonText: 'Yes, delete it!'
+            //         }).then((result) => {
+            //             if (result.isConfirmed) {
+            //                 // User confirmed, send AJAX request to delete address
+            //                 $.ajax({
+            //                     type: 'POST',
+            //                     url: '/delete-address',
+            //                     data: { id: addressId },
+            //                     success: function (response) {
+            //                         if (response.success) {
+            //                             // Show success toast
+            //                             Toastify({
+            //                                 text: 'Address deleted successfully',
+            //                                 duration: 3000,
+            //                                 gravity: 'top',
+            //                                 position: 'center',
+            //                                 style: {
+            //                                     background: 'linear-gradient(to right, #00b09b, #96c93d)'
+            //                                 }
+            //                             }).showToast();
+
+            //                             // Reload the page
+            //                             location.reload();
+            //                         } else {
+            //                             // Show error toast
+            //                             Toastify({
+            //                                 text: 'Error deleting address',
+            //                                 duration: 3000,
+            //                                 gravity: 'top',
+            //                                 position: 'center',
+            //                                 style: {
+            //                                     background: 'linear-gradient(to right, #ff6b6b, #ffa500)'
+            //                                 }
+            //                             }).showToast();
+            //                         }
+            //                     },
+            //                     error: function (error) {
+            //                         console.error('Error deleting address:', error);
+            //                         // Show error toast
+            //                         Toastify({
+            //                             text: 'Error deleting address',
+            //                             duration: 3000,
+            //                             gravity: 'top',
+            //                             position: 'center',
+            //                             style: {
+            //                                 background: 'linear-gradient(to right, #ff6b6b, #ffa500)'
+            //                             }
+            //                         }).showToast();
+            //                     }
+            //                 });
+            //             }
+            //         });
+            //     });
+            // });
+
+
+            $(document).ready(function () {
+                $('#addressForm').submit(function (event) {
+                    event.preventDefault(); // Prevent default form submission
+
+                    // Collect address details from form fields
+                    var addressData = {
+                        name: $('#name').val(),
+                        house: $('#house').val(),
+                        city: $('#city').val(),
+                        state: $('#state').val(),
+                        pincode: $('#pincode').val(),
+                        userId: $('#userId').val() // Fetch user ID from hidden input field
+                    };
+
+                    var name = $('#name').val();
+                    var house = $('#house').val();
+                    var city = $('#city').val();
+                    var state = $('#state').val();
+                    var pincode = $('#pincode').val();
+                    var userId = $('#userId').val();
+
+                    const nameRegex = /^[a-zA-Z0-9_]+$/;
+                    const houseRegex = /^[a-zA-Z]+$/;
+                    const cityRegex = /^[a-zA-Z]+$/;
+                    const stateRegex = /^[a-zA-Z]+$/;
+                    const pincodeRegex = /^\d+$/;
+
+
+                    if (name === "" || name === null) {
+                        document.getElementById("nameError").classList.remove('d-none');
+                        document.getElementById("nameError").innerHTML = "Name must be filled!";
+                        return false;
+                    } else if (!name.match(nameRegex)) {
+                        document.getElementById("nameError").classList.remove('d-none');
+                        document.getElementById("nameError").innerHTML = "Invalid name";
+                        return false;
+                    } else {
+                        document.getElementById('nameError').innerHTML = "";
+                        document.getElementById('nameError').classList.add('d-none');
                     }
+                    if (house === "" || house === null) {
+                        document.getElementById("houseError").classList.remove('d-none');
+                        document.getElementById("houseError").innerHTML = "Name must be filled!";
+                        return false;
+                    } else if (!house.match(houseRegex)) {
+                        document.getElementById("houseError").classList.remove('d-none');
+                        document.getElementById("houseError").innerHTML = "Invalid house name";
+                        return false;
+                    } else {
+                        document.getElementById('houseError').innerHTML = "";
+                        document.getElementById('houseError').classList.add('d-none');
+                    }
+                    if (city === "" || city === null) {
+                        document.getElementById("cityError").classList.remove('d-none');
+                        document.getElementById("cityError").innerHTML = "Name must be filled!";
+                        return false;
+                    } else if (!city.match(cityRegex)) {
+                        document.getElementById("cityError").classList.remove('d-none');
+                        document.getElementById("cityError").innerHTML = "Invalid city name";
+                        return false;
+                    } else {
+                        document.getElementById('cityError').innerHTML = "";
+                        document.getElementById('cityError').classList.add('d-none');
+                    }
+                    if (state === "" || state === null) {
+                        document.getElementById("stateError").classList.remove('d-none');
+                        document.getElementById("stateError").innerHTML = "Name must be filled!";
+                        return false;
+                    } else if (!state.match(stateRegex)) {
+                        document.getElementById("stateError").classList.remove('d-none');
+                        document.getElementById("stateError").innerHTML = "Invalid state name";
+                        return false;
+                    } else {
+                        document.getElementById('stateError').innerHTML = "";
+                        document.getElementById('stateError').classList.add('d-none');
+                    }
+                    if (pincode === "" || pincode === null) {
+                        document.getElementById("pincodeError").classList.remove('d-none');
+                        document.getElementById("pincodeError").innerHTML = "Name must be filled!";
+                        return false;
+                    } else if (!pincode.match(pincodeRegex)) {
+                        document.getElementById("pincodeError").classList.remove('d-none');
+                        document.getElementById("pincodeError").innerHTML = "Invalid pincode";
+                        return false;
+                    } else {
+                        document.getElementById('pincodeError').innerHTML = "";
+                        document.getElementById('pincodeError').classList.add('d-none');
+                    }
+                    // Send AJAX request to backend
+                    $.ajax({
+                        type: 'POST',
+                        url: '/add-address',
+                        data: addressData,
+                        success: function (response) {
+                            console.log('Address added successfully:', response);
+                            // Clear the form fields
+                            $('#name').val('');
+                            $('#house').val('');
+                            $('#city').val('');
+                            $('#state').val('');
+                            $('#pincode').val('');
+                            // Show success toast
+                            Toastify({
+                                text: 'Address added successfully',
+                                duration: 3000,
+                                gravity: 'top',
+                                position: 'center',
+                                style: {
+                                    background: 'linear-gradient(to right, #00b09b, #96c93d)',
+                                },
+                            }).showToast();
+                        },
+                        error: function (error) {
+                            console.error('Error adding address:', error);
+                            // Show error toast
+                            Toastify({
+                                text: 'Error adding address',
+                                duration: 3000,
+                                gravity: 'top',
+                                position: 'center',
+                                style: {
+                                    background: 'linear-gradient(to right, #ff6b6b, #ffa500)',
+                                },
+                            }).showToast();
+                        }
+                    });
                 });
-            } else if (result.dismiss === Swal.DismissReason.cancel) {
-                // User clicked "No", keep the order
-                Swal.fire(
-                    'Cancelled',
-                    'Your order is safe :)',
-                    'error'
-                );
+            });
+
+            $(document).ready(function () {
+                $('#changePasswordForm').submit(function (event) {
+                    event.preventDefault(); // Prevent the default form submission
+
+                    var currentPassword = $('#currentPassword').val();
+                    var newPassword = $('#newPassword').val();
+
+                    // Check if passwords are the same
+                    if (currentPassword === newPassword) {
+                        // Show error message
+                        $('#passwordError').text('Current password and new password cannot be the same.').removeClass('d-none');
+                        return; // Stop further execution
+                    }
+
+                    // Get the form data
+                    var formData = $(this).serialize();
+
+                    // Send an AJAX request to the server
+                    $.ajax({
+                        type: 'POST', // Use POST method
+                        url: '/change-password', // Specify the server endpoint
+                        data: formData, // Pass the form data
+                        success: function (response) {
+                            // Handle the success response
+                            console.log('Password changed successfully');
+                            // Show success message using SweetAlert2
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Password Changed',
+                                text: 'Your password has been changed successfully.'
+                            });
+                            // Clear the password fields
+                            $('#currentPassword').val('');
+                            $('#newPassword').val('');
+                        },
+                        error: function (xhr, status, error) {
+                            // Handle any errors
+                            console.error('Error changing password:', error);
+                            // Show error message using SweetAlert2
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'An error occurred while changing your password. Please try again.'
+                            });
+                        }
+                    });
+                });
+            });
+
+            document.getElementById('changePasswordForm').addEventListener('submit', function (event) {
+                const newPassword = document.getElementById('newPassword').value;
+                const currentPassword = document.getElementById('currentPassword').value;
+                console.log(newPassword);
+                console.log(currentPassword);
+                if (newPassword === currentPassword) {
+                    event.preventDefault(); // Prevent form submission
+                    document.getElementById('passwordError').style.display = 'block';
+
+                }
+            });
+
+            $(document).ready(function () {
+                $('.cancel-btn').click(function () {
+                    var orderId = $(this).data('order-id');
+
+                    // Display confirmation dialog using SweetAlert2
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: 'Once cancelled, you will not be able to recover this order!',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, cancel it!',
+                        cancelButtonText: 'No, keep it'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // User confirmed the cancellation, make AJAX request
+                            $.ajax({
+                                url: '/cancel-order',
+                                method: 'POST',
+                                data: { orderId: orderId },
+                                success: function (response) {
+                                    // Update the button text to "Cancelled" upon successful cancellation
+                                    $('.cancel-btn[data-order-id="' + orderId + '"]').text('Cancelled');
+                                    // Show success message using SweetAlert2
+                                    Swal.fire(
+                                        'Cancelled!',
+                                        'Your order has been cancelled.',
+                                        'success'
+                                    );
+                                },
+                                error: function (err) {
+                                    console.error('Error cancelling order:', err);
+                                    // Show error message using SweetAlert2
+                                    Swal.fire(
+                                        'Error!',
+                                        'Failed to cancel the order. Please try again later.',
+                                        'error'
+                                    );
+                                }
+                            });
+                        } else if (result.dismiss === Swal.DismissReason.cancel) {
+                            // User clicked "No", keep the order
+                            Swal.fire(
+                                'Cancelled',
+                                'Your order is safe :)',
+                                'error'
+                            );
+                        }
+                    });
+                });
+            });
+
+            $(document).ready(function () {
+                $('.return-btn').click(function () {
+                    var orderId = $(this).data('order-id');
+
+
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: 'Once returned, you will not be able to recover this order!',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, return it!',
+                        cancelButtonText: 'No, keep it'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // User confirmed the return, make AJAX request
+                            $.ajax({
+                                url: '/return-order',
+                                method: 'POST',
+                                data: { orderId: orderId },
+                                success: function (response) {
+                                    // Update the button text to "Returned" upon successful return
+                                    $('.return-btn[data-order-id="' + orderId + '"]').text('Returned');
+                                    // Show success message using SweetAlert2
+                                    Swal.fire(
+                                        'Returned!',
+                                        'Your order has been returned.',
+                                        'success'
+                                    );
+                                },
+                                error: function (err) {
+                                    console.error('Error returning order:', err);
+                                    // Show error message using SweetAlert2
+                                    Swal.fire(
+                                        'Error!',
+                                        'Failed to return the order. Please try again later.',
+                                        'error'
+                                    );
+                                }
+                            });
+                        } else if (result.dismiss === Swal.DismissReason.cancel) {
+                            // User clicked "No", keep the order
+                            Swal.fire(
+                                'Cancelled',
+                                'Your order is safe :)',
+                                'error'
+                            );
+                        }
+                    });
+                });
+            });
+
+            async function referralShare(userReferralCode) {
+                console.log(userReferralCode);
+
+                if (navigator.share) {
+
+                    const shareData = {
+                        title: 'Reid',
+                        text: `Use my referral code ${userReferralCode} to sign up and explore `,
+
+                    };
+
+
+                    try {
+                        await navigator.share(shareData);
+                        console.log('Shared successfully');
+                    } catch (error) {
+                        console.error('Error sharing:', error);
+                    }
+                } else {
+                    console.log('Web Share API is not supported in this browser');
+                }
             }
-        });
-    });
-});
-
-async function referralShare(userReferralCode) {
-    console.log(userReferralCode);
-
-    if (navigator.share) {
-        
-        const shareData = {
-            title: 'Reid',
-            text: `Use my referral code ${userReferralCode} to sign up and explore `,
-            
-        };
-
-        
-        try {
-            await navigator.share(shareData);
-            console.log('Shared successfully');
-        } catch (error) {
-            console.error('Error sharing:', error);
-        }
-    } else {
-        console.log('Web Share API is not supported in this browser');
-    }
-}
-    </script>
-
-    
-    
-
-   
+        </script>

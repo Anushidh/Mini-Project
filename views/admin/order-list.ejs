@@ -1,45 +1,43 @@
 <%- include("../partials/adminHeader") %>
 
-<style>
-    .pagination {
-      display: flex;
-      justify-content: center;
-    }
-    
-    .btn {
-      /* Add your button styling here */
-      margin: 0 5px;
-      padding: 5px 10px;
-      background-color: #f0f0f0;
-      border: 1px solid #ccc;
-      text-decoration: none;
-      color: #333;
-    }
-    
-    .active {
-      /* Add styles for the active page */
-     
-      color: #fff;
-    }
-    
-    .btn:hover {
-      /* Add styles for button hover state */
-      background-color: #ddd;
-    }
-    
-    
+    <style>
+        .pagination {
+            display: flex;
+            justify-content: center;
+        }
+
+        .btn {
+            /* Add your button styling here */
+            margin: 0 5px;
+            padding: 5px 10px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .active {
+            /* Add styles for the active page */
+
+            color: #fff;
+        }
+
+        .btn:hover {
+            /* Add styles for button hover state */
+            background-color: #ddd;
+        }
     </style>
 
 
-<section class="content-main">
-    <div class="content-header">
-        <div>
-            <h2 class="content-title card-title">Order List </h2>
-            <!-- <p>Lorem ipsum dolor sit amet.</p> -->
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Order List </h2>
+                <!-- <p>Lorem ipsum dolor sit amet.</p> -->
+            </div>
+
         </div>
-    
-    </div>
-   
+
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-hover" style="text-align: center;">
@@ -51,45 +49,100 @@
                             <th scope="col" style="text-align: center;">Amount</th>
                             <th scope="col" style="text-align: center;">Status</th>
                             <th scope="col" style="text-align: center;">Payment Type</th>
-                            <th scope="col" style="text-align: center;" class="text-end"> Action </th>
+                            <th scope="col" style="text-align: center;" class="text-end">Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <% for (let i = 0; i < allOrderDetails.length; i++) { %>
-                            <tr>
-                            <td style="text-align: center;"><%= i+1 %></td>
-                            <!-- <td></td> -->
-                            <td style="text-align: center;"><%= allOrderDetails[i].userDetails[0].name %></td>
-                            <td style="text-align: center;"> <%= new Date(allOrderDetails[i].orderDate).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }) %></td>
-                            <td style="text-align: center;">
-                              <%= allOrderDetails[i].totalAmount.toLocaleString() %>
-                            </td>
-                            <td style="text-align: center;">
-                                <% if (allOrderDetails[i].orderStatus == "cancelled") { %>
-                                    <span class="badge rounded-pill alert-danger"><%= allOrderDetails[i].orderStatus %></span>
-                                <% } else if (allOrderDetails[i].orderStatus == "confirmed") { %>
-                                    <span class="badge rounded-pill alert-warning"><%= allOrderDetails[i].orderStatus %></span>
-                                <% } else if (allOrderDetails[i].orderStatus == "shipped") { %>
-                                    <span class="badge rounded-pill alert-primary"><%= allOrderDetails[i].orderStatus %></span>
-                                <% }else if (allOrderDetails[i].orderStatus == "delivered") { %>
-                                    <span class="badge rounded-pill alert-success"><%= allOrderDetails[i].orderStatus %></span>
-                                <% }else if (allOrderDetails[i].orderStatus == "returned") { %>
-                                    <span class="badge rounded-pill alert-warning"><%= allOrderDetails[i].orderStatus %></span>
-                                <% } %> 
-                            </td>
-                            <td style="text-align: center;"><%= allOrderDetails[i].paymentMethod %></td>
-                            <td style="text-align: center;" class="text-end">
-                                <a href="/admin/orderDetailsAdmin/<%= allOrderDetails[i]._id %>" class="btn btn-md rounded font-sm">Detail</a> 
-                            </td>
-                        </tr>    
-                      <%  } %>
+                        <% if (allOrderDetails.length> 0) { %>
+                            <% for (let i=0; i < allOrderDetails.length; i++) { %>
+                                <tr>
+                                    <td style="text-align: center;">
+                                        <%= (currentPage - 1) * 9 + i + 1 %>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <%= allOrderDetails[i].userDetails[0].name %>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <%= new Date(allOrderDetails[i].orderDate).toLocaleDateString('en-US', {
+                                            day: '2-digit' , month: 'short' , year: 'numeric' }) %>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <%= allOrderDetails[i].totalAmount.toLocaleString() %>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <% if (allOrderDetails[i].orderStatus==="cancelled" ) { %>
+                                            <span class="badge rounded-pill alert-danger">
+                                                <%= allOrderDetails[i].orderStatus %>
+                                            </span>
+                                            <% } else if (allOrderDetails[i].orderStatus==="confirmed" ) { %>
+                                                <span class="badge rounded-pill alert-warning">
+                                                    <%= allOrderDetails[i].orderStatus %>
+                                                </span>
+                                                <% } else if (allOrderDetails[i].orderStatus==="shipped" ) { %>
+                                                    <span class="badge rounded-pill alert-primary">
+                                                        <%= allOrderDetails[i].orderStatus %>
+                                                    </span>
+                                                    <% } else if (allOrderDetails[i].orderStatus==="delivered" ) { %>
+                                                        <span class="badge rounded-pill alert-success">
+                                                            <%= allOrderDetails[i].orderStatus %>
+                                                        </span>
+                                                        <% } else if (allOrderDetails[i].orderStatus==="returned" ) { %>
+                                                            <span class="badge rounded-pill alert-warning">
+                                                                <%= allOrderDetails[i].orderStatus %>
+                                                            </span>
+                                                            <% } %>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <%= allOrderDetails[i].paymentMethod %>
+                                    </td>
+                                    <td style="text-align: center;" class="text-end">
+                                        <a href="/admin/orderDetailsAdmin/<%= allOrderDetails[i]._id %>"
+                                            class="btn btn-md rounded font-sm">Detail</a>
+                                    </td>
+                                </tr>
+                                <% } %>
+                                    <% } else { %>
+                                        <tr>
+                                            <td colspan="7" style="text-align: center;">No orders found.</td>
+                                        </tr>
+                                        <% } %>
                     </tbody>
                 </table>
             </div> <!-- table-responsive //end -->
         </div> <!-- card-body end// -->
-    </div> <!-- card end// -->
-   
-</section>
+        </div> <!-- card end// -->
 
+    </section>
 
-<%- include("../partials/adminFooter") %>
+    <!-- Render the pagination links -->
+    <% if (totalPages> 1) { %>
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <% if (currentPage> 1) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="/admin/order-list?page=<%= currentPage - 1 %>">Previous</a>
+                    </li>
+                    <% } %>
+                        <% for (let page=1; page <=totalPages; page++) { %>
+                            <% if (page===currentPage) { %>
+                                <li class="page-item active"><span class="page-link">
+                                        <%= page %>
+                                    </span></li>
+                                <% } else { %>
+                                    <li class="page-item"><a class="page-link"
+                                            href="/admin/order-list?page=<%= page %>">
+                                            <%= page %>
+                                        </a></li>
+                                    <% } %>
+                                        <% } %>
+                                            <% if (currentPage < totalPages) { %>
+                                                <li class="page-item">
+                                                    <a class="page-link"
+                                                        href="/admin/order-list?page=<%= currentPage + 1 %>">Next</a>
+                                                </li>
+                                                <% } %>
+            </ul>
+        </nav>
+        <% } %>
+
+            <%- include("../partials/adminFooter") %>

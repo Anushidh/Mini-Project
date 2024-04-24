@@ -1,230 +1,543 @@
 <%- include("../partials/adminHeader") %>
 
-<div class="content-header">
-    <div>
-        <h2 class="content-title card-title">Product Offer Management</h2>  
-    </div>
-    <!-- <div style="float: right; margin-right: 10px;">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Product Offer Management</h2>
+        </div>
+        <!-- <div style="float: right; margin-right: 10px;">
         <button style="background-color: green; color: white; border: none; padding: 10px 20px; cursor: pointer;">Add Offer</button>
     </div> -->
-    <div>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCoupon"
-            data-bs-whatever="@getbootstrap">Add Offer +</button>
+        <div>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCoupon"
+                data-bs-whatever="@getbootstrap">Add Offer +</button>
+        </div>
     </div>
-</div>
 
 
-<div class="right mt-5">
-    <table class="table table-striped">
-        <thead>
-          <tr>
-            <th scope="col"><b>No</b></th>
-            <th scope="col"><b>Offer Name</b></th>
-            <th scope="col"><b>Product</b></th>
-            <!-- <th scope="col"><b>Brand</b></th> -->
-            <th scope="col"><b>Discount</b></th>
-            <th scope="col"><b>Starting Date</b></th>
-            <th scope="col"><b>Ending Date</b></th>
-            <th scope="col"><b>Delete</b></th>
-            <th scope="col"><b>Edit</b></th>
-          </tr>
-        </thead>
-        <tbody>
-            <% for(let i = 0; i < prodoffers.length; i++) { %>
+    <div class="right mt-5">
+        <table class="table table-striped">
+            <thead>
                 <tr>
-                    <td><%= i + 1 %></td>
-                    <td><%= prodoffers[i].name %></td>
-                    <td><%= prodoffers[i].productOffer.product.productName %></td>
-                    <td><%= prodoffers[i].discount %> ₹</td>
-                    <td><%= prodoffers[i].startingDate.toLocaleDateString() %></td>
-                    <td><%= prodoffers[i].endingDate.toLocaleDateString() %></td>
-                    <td width="10%"><a onclick="deleteOffer('<%= prodoffers[i]._id %>')"
-                        class="btn btn-sm btn-danger rounded font-sm mt-15">Delete</a> </td> 
+                    <th scope="col"><b>No</b></th>
+                    <th scope="col"><b>Offer Name</b></th>
+                    <th scope="col"><b>Product</b></th>
+                    <!-- <th scope="col"><b>Brand</b></th> -->
+                    <th scope="col"><b>Discount</b></th>
+                    <th scope="col"><b>Starting Date</b></th>
+                    <th scope="col"><b>Ending Date</b></th>
+                    <th scope="col"><b>Delete</b></th>
+                    <th scope="col"><b>Edit</b></th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for(let i=0; i < prodoffers.length; i++) { %>
+                    <tr>
                         <td>
-                            <button type="button" class="btn btn-primary edit-offer-btn" 
-                                style="padding: 5px 10px; font-size: 12px;" 
-                                data-bs-toggle="modal" data-bs-target="#editCoupon" data-bs-whatever="@getbootstrap"
-                                data-offer-id="<%= prodoffers[i]._id %>"
-                                data-offer-name="<%= prodoffers[i].name %>"
+                            <%= i + 1 %>
+                        </td>
+                        <td>
+                            <%= prodoffers[i].name %>
+                        </td>
+                        <td>
+                            <%= prodoffers[i].productOffer.product.productName %>
+                        </td>
+                        <td>
+                            <%= prodoffers[i].discount %> ₹
+                        </td>
+                        <td>
+                            <%= prodoffers[i].startingDate.toLocaleDateString() %>
+                        </td>
+                        <td>
+                            <%= prodoffers[i].endingDate.toLocaleDateString() %>
+                        </td>
+                        <td width="10%"><a onclick="deleteOffer('<%= prodoffers[i]._id %>')"
+                                class="btn btn-sm btn-danger rounded font-sm mt-15">Delete</a> </td>
+                        <td>
+                            <button type="button" class="btn btn-primary edit-offer-btn"
+                                style="padding: 5px 10px; font-size: 12px;" data-bs-toggle="modal"
+                                data-bs-target="#editCoupon" data-bs-whatever="@getbootstrap"
+                                data-offer-id="<%= prodoffers[i]._id %>" data-offer-name="<%= prodoffers[i].name %>"
                                 data-product-name="<%= prodoffers[i].productOffer.product.productName %>"
                                 data-discount="<%= prodoffers[i].discount %>"
-                                data-start-date="<%= prodoffers[i].startingDate %>"
-                                data-end-date="<%= prodoffers[i].endingDate %>"
-                            >
+                                data-start-date="<%= prodoffers[i].startingDate.toISOString().split('T')[0] %>"
+                                data-end-date="<%= prodoffers[i].endingDate.toISOString().split('T')[0] %>">
                                 Edit Offer +
                             </button>
                         </td>
-                </tr>
-            <% } %>
-        </tbody>
-      </table>
-</div>
+                    </tr>
+                    <% } %>
+            </tbody>
+        </table>
+    </div>
 
 
-<div class="modal fade" id="addCoupon" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Add Offer </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form action="/admin/add-ProdOffer" method="post" id="prodOffer">
-                    <div class="mb-3">
-                        <label for="recipient-name" class="col-form-label">Offer Name</label>
-                        <input type="text" class="form-control" name="name" id="offerName" >
-                        <div id="error1" class="text-danger"></div>
-                    </div>
-                    <div class="mb-3">
-                      <label for="recipient-name" class="col-form-label">Product</label>
-                      <select name="product" id="productName" class="form-select">
-                        <% for( let i = 0; i < products.length; i++ ) { %>
-                        <option class="form-option" value="<%= products[i]._id %>"><%= products[i].productName %></option>
-                        <% } %>
-                      </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="recipient-name" class="col-form-label">Discount %</label>
-                        <input type="text" class="form-control" name="discount" id="prodOfferAmount">
-                        <div id="error2" class="text-danger"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="recipient-name" class="col-form-label">Starting date</label>
-                        <input type="date" class="form-control" name="startingDate" required="true" id="startingDate">
-                    </div>
-                    <div class="mb-3">
-                        <label for="recipient-name" class="col-form-label">Ending date</label>
-                        <input type="date" class="form-control" name="endingDate" required="true" id="expiringDate">
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Create Offer</button>
-                    </div>
-                </form>
+    <div class="modal fade" id="addCoupon" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add Offer </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="/admin/add-ProdOffer" method="post" id="prodOffer">
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">Offer Name</label>
+                            <input type="text" class="form-control" name="name" id="offerName">
+                            <div id="error1" class="text-danger"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">Product</label>
+                            <select name="product" id="productName" class="form-select">
+                                <% for( let i=0; i < products.length; i++ ) { %>
+                                    <option class="form-option" value="<%= products[i]._id %>">
+                                        <%= products[i].productName %>
+                                    </option>
+                                    <% } %>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">Discount %</label>
+                            <input type="text" class="form-control" name="discount" id="prodOfferAmount">
+                            <div id="error2" class="text-danger"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">Starting date</label>
+                            <input type="date" class="form-control" name="startingDate" required="true"
+                                id="startingDate">
+                            <div id="error3" class="text-danger"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">Ending date</label>
+                            <input type="date" class="form-control" name="endingDate" required="true" id="expiringDate">
+                            <div id="error4" class="text-danger"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Create Offer</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Edit Offer Modal -->
-<div class="modal fade" id="editCoupon" tabindex="-1" aria-labelledby="editCouponLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editCouponLabel">Edit Offer</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- Form for editing offer details -->
-                <form action="/admin/edit-ProdOffer" method="post" id="editProdOfferForm">
-                    <input type="hidden" id="editOfferId" name="offerId">
-                    <div class="mb-3">
-                        <label for="editOfferName" class="col-form-label">Offer Name</label>
-                        <input type="text" class="form-control" name="name" id="editOfferName">
-                    </div>
-                    <div class="mb-3">
-                        <label for="editProductName" class="col-form-label">Product</label>
-                        <select name="product" id="editProductName" class="form-select">
-                        <% for( let i = 0; i < products.length; i++ ) { %>
-                            <option class="form-option" value="<%= products[i]._id %>"><%= products[i].productName %></option>
-                        <% } %>
-                    </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editOfferDiscount" class="col-form-label">Discount Amount</label>
-                        <input type="text" class="form-control" name="discount" id="editOfferDiscount">
-                    </div>
-                    <div class="mb-3">
-                        <label for="editOfferStartDate" class="col-form-label">Starting Date</label>
-                        <input type="date" class="form-control" name="startingDate" id="editOfferStartDate">
-                    </div>
-                    <div class="mb-3">
-                        <label for="editOfferEndDate" class="col-form-label">Ending Date</label>
-                        <input type="date" class="form-control" name="endingDate" id="editOfferEndDate">
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Update Offer</button>
-                    </div>
-                </form>
+    <!-- Edit Offer Modal -->
+    <div class="modal fade" id="editCoupon" tabindex="-1" aria-labelledby="editCouponLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editCouponLabel">Edit Offer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form for editing offer details -->
+                    <form action="/admin/edit-ProdOffer" method="post" id="editProdOfferForm">
+                        <input type="hidden" id="editOfferId" name="offerId">
+                        <div class="mb-3">
+                            <label for="editOfferName" class="col-form-label">Offer Name</label>
+                            <input type="text" class="form-control" name="name" id="editOfferName">
+                            <div id="error1" class="text-danger"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editProductName" class="col-form-label">Product</label>
+                            <select name="product" id="editProductName" class="form-select">
+                                <% for( let i=0; i < products.length; i++ ) { %>
+                                    <option class="form-option" value="<%= products[i]._id %>">
+                                        <%= products[i].productName %>
+                                    </option>
+                                    <% } %>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editOfferDiscount" class="col-form-label">Discount Amount</label>
+                            <input type="text" class="form-control" name="discount" id="editOfferDiscount">
+                            <div id="error2" class="text-danger"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editOfferStartDate" class="col-form-label">Starting Date</label>
+                            <input type="date" class="form-control" name="startingDate" id="editOfferStartDate">
+                            <div id="error3" class="text-danger"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editOfferEndDate" class="col-form-label">Ending Date</label>
+                            <input type="date" class="form-control" name="endingDate" id="editOfferEndDate">
+                            <div id="error4" class="text-danger"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Update Offer</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<%- include("../partials/adminFooter") %>
+    <%- include("../partials/adminFooter") %>
 
-<script>
+        <script>
 
-    // JavaScript to populate the edit modal fields with offer details
-function populateEditModal(offerId, offerName, productName, discount, startDate, endDate) {
-    document.getElementById('editOfferId').value = offerId;
-    document.getElementById('editOfferName').value = offerName;
-    document.getElementById('editOfferDiscount').value = discount;
-    document.getElementById('editOfferStartDate').value = startDate;
-    document.getElementById('editOfferEndDate').value = endDate;
+            document.getElementById('prodOffer').addEventListener('submit', async (event) => {
+                event.preventDefault(); // Prevent the default form submission behavior
+                console.log('inside prodOffer');
+                const nameInput = document.getElementById('offerName');
+                const productInput = document.getElementById('productName');
+                const discountInput = document.getElementById('prodOfferAmount');
+                const startingDateInput = document.getElementById('startingDate');
+                const endingDateInput = document.getElementById('expiringDate');
 
-    // Set the selected product in the dropdown
-    var select = document.getElementById('editProductName');
-    for (var i = 0; i < select.options.length; i++) {
-        if (select.options[i].text === productName) {
-            select.selectedIndex = i;
-            break;
-        }
-    }
+                const name = nameInput.value.trim();
+                const product = productInput.value;
+                const discount = discountInput.value.trim();
+                const startingDate = startingDateInput.value;
+                const endingDate = endingDateInput.value;
+                console.log(`${name} ${product} ${discount} ${startingDate} ${endingDate}`);
+                // Reset error messages
+                document.getElementById('error1').textContent = '';
+                document.getElementById('error2').textContent = '';
 
-    // Show the edit modal
-    var editModal = new bootstrap.Modal(document.getElementById('editCoupon'));
-    editModal.show();
-}
-
-// Add event listeners to all "Edit Offer" buttons
-document.querySelectorAll('.edit-offer-btn').forEach(button => {
-    button.addEventListener('click', function() {
-        // Extract offer details from the data attributes of the button
-        var offerId = this.getAttribute('data-offer-id');
-        var offerName = this.getAttribute('data-offer-name');
-        var productName = this.getAttribute('data-product-name');
-        var discount = this.getAttribute('data-discount');
-        var startDate = this.getAttribute('data-start-date');
-        var endDate = this.getAttribute('data-end-date');
-
-        // Populate the edit modal with offer details
-        populateEditModal(offerId, offerName, productName, discount, startDate, endDate);
-    });
-});
-
-
-
-    function deleteOffer(offerId) {
-    console.log("clicked", offerId);
-    Swal.fire({
-        title: 'Are you sure you want to delete this offer?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'No, cancel'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            $.ajax({
-                url: "/admin/delete-ProdOffer/" + offerId,
-                type: 'get',
-            }).done((res) => {
-                if (res) {
-                    Swal.fire(
-                        'Successful',
-                        'Offer deleted successfully',
-                        'success'
-                    ).then(() => {
-                        location.reload();
-                    });
+                const startingDateError = startingDateInput.nextElementSibling;
+                if (startingDateError) {
+                    startingDateError.textContent = '';
                 }
-            }).fail((error) => {
-                console.log(error);
+
+                const endingDateError = endingDateInput.nextElementSibling;
+                if (endingDateError) {
+                    endingDateError.textContent = '';
+                }
+                console.log('1');
+                // Validate name (assuming this field is required)
+                if (!name) {
+                    document.getElementById('error1').textContent = 'Please enter an offer name';
+                    return;
+                }
+                console.log('2');
+                // Validate discount
+                const discountRegex = /^\d+$/;
+                if (!discountRegex.test(discount)) {
+                    document.getElementById('error2').textContent = 'Discount should be a valid integer';
+                    return;
+                }
+                console.log('3');
+                // Validate starting date
+                const today = new Date().toISOString().split('T')[0];
+                if (startingDate < today) {
+                    document.getElementById('error3').textContent = 'Starting date cannot be earlier than today';
+                    return;
+                }
+                console.log('4');
+                // Validate ending date
+                if (endingDate <= startingDate) {
+                    document.getElementById('error4').textContent = 'Ending date must be after the starting date';
+                    return;
+                }
+                console.log('5');
+                const formData = {
+                    name,
+                    product,
+                    discount,
+                    startingDate,
+                    endingDate
+                };
+                console.log(formData);
+                try {
+                    const response = await fetch('/admin/add-ProdOffer', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        // Handle successful response
+                        Toastify({
+                            text: 'Product offer created successfully',
+                            duration: 3000,
+                            gravity: 'top',
+                            position: 'center',
+                            style: {
+                                background: 'green',
+                                color: 'white'
+                            }
+                        }).showToast();
+
+                        // Optionally, you can redirect or perform additional actions
+                        setTimeout(() => {
+                            window.location.href = '/admin/productOffer';
+                        }, 2000);
+                    } else {
+                        // Handle error response
+                        Toastify({
+                            text: data.message || 'An error occurred while creating the product offer',
+                            duration: 3000,
+                            gravity: 'top',
+                            position: 'center',
+                            style: {
+                                background: 'red',
+                                color: 'white'
+                            }
+                        }).showToast();
+                    }
+                } catch (error) {
+                    // Handle network or other errors
+                    Toastify({
+                        text: 'An error occurred while creating the product offer',
+                        duration: 3000,
+                        gravity: 'top',
+                        position: 'center',
+                        style: {
+                            background: 'red',
+                            color: 'white'
+                        }
+                    }).showToast();
+                    console.error('Error:', error);
+                }
             });
-        }
-    });
-}
-</script>
+            // JavaScript to populate the edit modal fields with offer details
+            function populateEditModal(offerId, offerName, productName, discount, startDate, endDate) {
+                document.getElementById('editOfferId').value = offerId;
+                document.getElementById('editOfferName').value = offerName;
+                document.getElementById('editOfferDiscount').value = discount;
+                document.getElementById('editOfferStartDate').value = startDate;
+                document.getElementById('editOfferEndDate').value = endDate;
+
+                // Set the selected product in the dropdown
+                var select = document.getElementById('editProductName');
+                for (var i = 0; i < select.options.length; i++) {
+                    if (select.options[i].text === productName) {
+                        select.selectedIndex = i;
+                        break;
+                    }
+                }
+
+                // Show the edit modal
+                var editModal = new bootstrap.Modal(document.getElementById('editCoupon'));
+                editModal.show();
+            }
+
+            // Add event listeners to all "Edit Offer" buttons
+            document.querySelectorAll('.edit-offer-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    // Extract offer details from the data attributes of the button
+                    var offerId = this.getAttribute('data-offer-id');
+                    var offerName = this.getAttribute('data-offer-name');
+                    var productName = this.getAttribute('data-product-name');
+                    var discount = this.getAttribute('data-discount');
+                    var startDate = this.getAttribute('data-start-date');
+                    var endDate = this.getAttribute('data-end-date');
+
+                    // Populate the edit modal with offer details
+                    populateEditModal(offerId, offerName, productName, discount, startDate, endDate);
+                });
+            });
+
+            document.getElementById('editProdOfferForm').addEventListener('submit', async (event) => {
+                event.preventDefault(); // Prevent the default form submission behavior
+                console.log('inside edit');
+
+                const offerIdInput = document.getElementById('editOfferId');
+                const nameInput = document.getElementById('editOfferName');
+                const productInput = document.getElementById('editProductName');
+                const discountInput = document.getElementById('editOfferDiscount');
+                const startingDateInput = document.getElementById('editOfferStartDate');
+                const endingDateInput = document.getElementById('editOfferEndDate');
+
+
+                const offerId = offerIdInput.value;
+                const name = nameInput.value;
+                const product = productInput.value;
+                const discount = discountInput.value;
+                const startingDate = startingDateInput.value;
+                const endingDate = endingDateInput.value;
+
+                console.log(`${name} ${product} ${discount} ${startingDate} ${endingDate}`);
+
+                // Reset error messages
+                document.getElementById('error1').textContent = '';
+                document.getElementById('error2').textContent = '';
+
+                const startingDateError = startingDateInput.nextElementSibling;
+                if (startingDateError) {
+                    startingDateError.textContent = '';
+                }
+
+                const endingDateError = endingDateInput.nextElementSibling;
+                if (endingDateError) {
+                    endingDateError.textContent = '';
+                }
+
+                console.log('1');
+
+                // Validate name (assuming this field is required)
+                if (!name) {
+                    console.log('inside name validation');
+                    const nameInput = document.getElementById('editOfferName');
+                    const nameErrorContainer = nameInput.parentElement.querySelector('#error1');
+                    nameErrorContainer.textContent = 'Please enter an offer name';
+                    return;
+                }
+
+                // Validate if name contains spaces
+                if (/\s/.test(name)) {
+                    console.log('inside name spaces validation');
+                    const nameInput = document.getElementById('editOfferName');
+                    const nameErrorContainer = nameInput.parentElement.querySelector('#error1');
+                    nameErrorContainer.textContent = 'Offer name should not contain spaces';
+                    return;
+                }
+                console.log('2');
+
+                // const discountRegex = /^\d+$/;
+                if(!discount) {
+                    console.log('inside discount validation');
+                    const discountInput = document.getElementById('editOfferDiscount');
+                    const discountErrorContainer = discountInput.parentElement.querySelector('#error2');
+                    discountErrorContainer.textContent = 'Please enter a discount';
+                    return; 
+                }
+                // Validate if discount contains spaces
+                if (/\s/.test(discount)) {
+                    console.log('inside discount spaces validation');
+                    const discountInput = document.getElementById('editOfferDiscount');
+                    const discountErrorContainer = discountInput.parentElement.querySelector('#error2');
+                    discountErrorContainer.textContent = 'Discount should not contain spaces';
+                    return;
+                }
+                if (!/^\d+$/.test(discount)) {
+                    console.log('inside discount validation');
+                    const discountInput = document.getElementById('editOfferDiscount');
+                    const discountErrorContainer = discountInput.parentElement.querySelector('#error2');
+                    discountErrorContainer.textContent = 'Discount should be a valid integer';
+                    return;
+                }
+
+                
+
+                console.log('3');
+
+                // Validate starting date
+                const today = new Date().toISOString().split('T')[0];
+                if (startingDate < today) {
+                    console.log('inside start date validation');
+                    const startingDateInput = document.getElementById('editOfferStartDate');
+                    const startingDateErrorContainer = startingDateInput.parentElement.querySelector('#error3');
+                    startingDateErrorContainer.textContent = 'Starting date cannot be earlier than today';
+                    return;
+                }
+
+                console.log('4');
+
+                // Validate ending date
+                if (endingDate <= startingDate) {
+                    console.log('inside end date validation');
+                    const endingDateInput = document.getElementById('editOfferEndDate');
+                    const endingDateErrorContainer = endingDateInput.parentElement.querySelector('#error4');
+                    endingDateErrorContainer.textContent = 'Ending date must be after the starting date';
+                    return;
+                }
+
+                console.log('5');
+
+                const formData = {
+                    offerId,
+                    name,
+                    product,
+                    discount,
+                    startingDate,
+                    endingDate
+                };
+
+                console.log(formData);
+
+                try {
+                    const response = await fetch('/admin/edit-ProdOffer', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        // Handle successful response
+                        Toastify({
+                            text: 'Product offer updated successfully',
+                            duration: 3000,
+                            gravity: 'top',
+                            position: 'center',
+                            style: {
+                                background: 'green',
+                                color: 'white'
+                            }
+                        }).showToast();
+
+                        // Optionally, you can redirect or perform additional actions
+                        setTimeout(() => {
+                            window.location.href = '/admin/productOffer';
+                        }, 2000);
+                    } else {
+                        // Handle error response
+                        Toastify({
+                            text: data.message || 'An error occurred while updating the product offer',
+                            duration: 3000,
+                            gravity: 'top',
+                            position: 'center',
+                            style: {
+                                background: 'red',
+                                color: 'white'
+                            }
+                        }).showToast();
+                    }
+                } catch (error) {
+                    // Handle network or other errors
+                    Toastify({
+                        text: 'An error occurred while updating the product offer',
+                        duration: 3000,
+                        gravity: 'top',
+                        position: 'center',
+                        style: {
+                            background: 'red',
+                            color: 'white'
+                        }
+                    }).showToast();
+                    console.error('Error:', error);
+                }
+            });
+
+            function deleteOffer(offerId) {
+                console.log("clicked", offerId);
+                Swal.fire({
+                    title: 'Are you sure you want to delete this offer?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'No, cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "/admin/delete-ProdOffer/" + offerId,
+                            type: 'get',
+                        }).done((res) => {
+                            if (res) {
+                                Swal.fire(
+                                    'Successful',
+                                    'Offer deleted successfully',
+                                    'success'
+                                ).then(() => {
+                                    location.reload();
+                                });
+                            }
+                        }).fail((error) => {
+                            console.log(error);
+                        });
+                    }
+                });
+            }
+        </script>

@@ -3,25 +3,34 @@ const categoryHelper = require("../helper/categoryHelper");
 
 
 
-const getCategory = (req, res) => {
-  categoryHelper.getAllCategory()
-    .then((categories) => {
-      res.render('admin/category', { categories: categories });
-    })
-    .catch((error) => {
-      console.error("Error fetching categories:", error);
-      res.status(500).send("Internal Server Error");
+const getCategory = async (req, res) => {
+  const currentPage = parseInt(req.params.page) || 1; // Get the current page number from the query parameter
+  console.log(currentPage);
+  const pageSize = 5; // Set the desired page size
+  console.log(pageSize);
+  try {
+    const { categories, totalPages } = await categoryHelper.getAllCategory(currentPage, pageSize);
+
+    res.render('admin/category', {
+      categories,
+      currentPage,
+      totalPages,
     });
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    res.status(500).send("Internal Server Error");
+  }
 };
 
 const addCategory = (req, res) => {
   try {
+    console.log(req.body);
     categoryHelper.addCategoryToDb(req.body).then((response) => {
-      console.log('category already exists');
-      res.redirect("/admin/category");
+      return res.json(response);
     })
   } catch (err) {
-    console.error(err)
+    console.error(err);
+    return res.status(500).json({ error: 'An error occurred while creating the category' });
   }
 };
 

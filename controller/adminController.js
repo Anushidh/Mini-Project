@@ -19,12 +19,12 @@ const dashboard = async (req,res) => {
   try {
     if(req.session.admin) {
       const salesDetails = await Order.find();
-        console.log(salesDetails);
+        // console.log(salesDetails);
         // Fetch all products and categories
         const products = await Product.find();
-        console.log(products);
+        // console.log(products);
         const categories = await Category.find();
-        console.log(categories);
+        // console.log(categories);
         const topSellingProducts = await Order.aggregate([
           { $unwind: "$orderedItems" }, // Split orders into individual items
           {
@@ -36,16 +36,16 @@ const dashboard = async (req,res) => {
           { $sort: { totalQuantity: -1 } }, // Sort by total quantity descending
           { $limit: 10 }, // Limit to top 10 products
         ]);
-        console.log(topSellingProducts);
+        // console.log(topSellingProducts);
         // Extract product IDs of top selling products
         const productIds = topSellingProducts.map((product) => product._id.toString());
-        console.log(productIds);
+        // console.log(productIds);
         // Fetch details of top selling products
         const productsData = await Product.find(
           { _id: { $in: productIds } },
           { productName: 1, productImage: 1 } // Modify the fields you want to fetch
         );
-        console.log(productsData);
+        // console.log(productsData);
         const topSellingCategories = await Order.aggregate([
           { $unwind: "$orderedItems" }, // Split orders into individual items
           {
@@ -76,7 +76,7 @@ const dashboard = async (req,res) => {
           { $sort: { totalQuantity: -1 } }, // Sort by total quantity descending
           { $limit: 10 }, // Limit to top 10 categories
         ]);
-        console.log(topSellingCategories);
+        // console.log(topSellingCategories);
         // Extract category IDs of top selling categories
         const categoryIds = topSellingCategories.map((category) => category._id);
   
@@ -110,12 +110,12 @@ const adminLoginPost = async (req, res) => {
     if (adminDetails) {
       req.session.admin = adminDetails;
       const salesDetails = await Order.find();
-      console.log(salesDetails);
+      // console.log(salesDetails);
       // Fetch all products and categories
       const products = await Product.find();
-      console.log(products);
+      // console.log(products);
       const categories = await Category.find();
-      console.log(categories);
+      // console.log(categories);
       const topSellingProducts = await Order.aggregate([
         { $unwind: "$orderedItems" }, // Split orders into individual items
         {
@@ -127,16 +127,16 @@ const adminLoginPost = async (req, res) => {
         { $sort: { totalQuantity: -1 } }, // Sort by total quantity descending
         { $limit: 10 }, // Limit to top 10 products
       ]);
-      console.log(topSellingProducts);
+      // console.log(topSellingProducts);
       // Extract product IDs of top selling products
       const productIds = topSellingProducts.map((product) => product._id.toString());
-      console.log(productIds);
+      // console.log(productIds);
       // Fetch details of top selling products
       const productsData = await Product.find(
         { _id: { $in: productIds } },
         { productName: 1, productImage: 1 } // Modify the fields you want to fetch
       );
-      console.log(productsData);
+      // console.log(productsData);
       const topSellingCategories = await Order.aggregate([
         { $unwind: "$orderedItems" }, // Split orders into individual items
         {
@@ -167,7 +167,7 @@ const adminLoginPost = async (req, res) => {
         { $sort: { totalQuantity: -1 } }, // Sort by total quantity descending
         { $limit: 10 }, // Limit to top 10 categories
       ]);
-      console.log(topSellingCategories);
+      // console.log(topSellingCategories);
       // Extract category IDs of top selling categories
       const categoryIds = topSellingCategories.map((category) => category._id);
 

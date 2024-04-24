@@ -58,57 +58,53 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-3">
-                        <form method="post" action="/admin/add-coupon">
+                        <form id="coupon-form">
 
                             <!-- <body onload="setDefaultStartDate()"> -->
 
-                                <div class="mb-4">
-                                    <label for="coupon-name" class="form-label">Coupon Name</label>
-                                    <input type="text" id="coupon-name" name="couponName" placeholder="Type here"
-                                        class="form-control" />
-                                    <!-- <div id="error-coupon-name" class="error-message"></div> -->
-                                </div>
+                            <div class="mb-4">
+                                <label for="coupon-name" class="form-label">Coupon Name</label>
+                                <input type="text" id="coupon-name" name="couponName" placeholder="Type here"
+                                    class="form-control" />
+                                <div id="error-coupon-name" class="error-message"></div>
+                            </div>
 
-                                <!-- <div class="mb-4">
+                            <!-- <div class="mb-4">
                                     <label for="coupon-code" class="form-label">Coupon Code</label>
                                     <input type="text" id="coupon-code" name="couponCode" placeholder="Enter coupon code" class="form-control" />
                                      <div id="error-coupon-code" class="error-message"></div> 
                                 </div> -->
 
-                                <div>
-                                    <label for="startingDate" class="form-label">Start Date</label>
-                                    <input type="date" name="startDate" class="form-control" required="true"
-                                        id="startingDate" />
-                                    <!-- <div id="error-start-date" class="error-message"></div> -->
-                                </div>
+                            <div>
+                                <label for="startingDate" class="form-label">Start Date</label>
+                                <input type="date" name="startDate" class="form-control" id="startingDate" />
+                                <div id="error-start-date" class="error-message"></div>
+                            </div>
 
-                                <div>
-                                    <label for="expiringDate" class="form-label">End Date</label>
-                                    <input type="date" name="endDate" class="form-control" id="expiringDate"
-                                        required="true" />
-                                    <!-- <div id="error-end-date" class="error-message"></div> -->
-                                </div>
+                            <div>
+                                <label for="expiringDate" class="form-label">End Date</label>
+                                <input type="date" name="endDate" class="form-control" id="expiringDate" />
+                                <div id="error-end-date" class="error-message"></div>
+                            </div>
 
-                                <!-- <div>
+                            <!-- <div>
                                     <label for="offer-price" class="form-label">Offer Price</label>
                                     <input type="text" name="offerPrice" placeholder="Type here" class="form-control" />
                                     <div id="error-offer-price" class="error-message"></div>
                                 </div> -->
 
-                                <div>
-                                    <label for="minimum-price" class="form-label">Discount Amount</label>
-                                    <input type="text" name="discountAmount" placeholder="Type here"
-                                        class="form-control" />
-                                    <!-- <div id="error-discount-amount" class="error-message"></div> -->
-                                </div>
+                            <div>
+                                <label for="minimum-price" class="form-label">Discount Amount</label>
+                                <input type="text" name="discountAmount" placeholder="Type here" class="form-control" />
+                                <div id="error-discount-amount" class="error-message"></div>
+                            </div>
 
-                                <div class="d-grid">
-                                    <button class="btn btn-primary mt-20"
-                                        type="submit">Add Coupon</button>
-                                </div>
+                            <div class="d-grid">
+                                <button class="btn btn-primary mt-20" type="submit">Add Coupon</button>
+                            </div>
 
-                                <!-- Container for global error messages -->
-                                <div id="err-msg" class="error-message"></div>
+                            <!-- Container for global error messages -->
+                            <div id="err-msg" class="error-message"></div>
 
                             </body>
                         </form>
@@ -124,13 +120,14 @@
                                         <th>Created On</th>
                                         <th>Expire On</th>
                                         <th>Discount Amount</th>
+                                        <th>Edit</th>
                                         <th>Delete</th>
 
                                     </tr>
                                 </thead>
 
                                 <% for (let i=0; i < coupons.length; i++) { %>
-                               
+
                                     <tbody>
 
                                         <td class="text-start">
@@ -148,9 +145,20 @@
                                         <td class="text-start">
                                             <%= coupons[i].discount %>
                                         </td>
-                                        
+                                        <td>
+                                            <button type="button" class="btn btn-primary edit-offer-btn"
+                                                style="padding: 5px 10px; font-size: 12px;" data-bs-toggle="modal"
+                                                data-bs-target="#editCoupon" data-bs-whatever="@getbootstrap"
+                                                data-coupon-id="<%= coupons[i]._id %>"
+                                                data-coupon-name="<%= coupons[i].couponName %>"
+                                                data-discount="<%= coupons[i].discount %>"
+                                                data-start-date="<%= coupons[i].createdOn.toISOString().split('T')[0] %>"
+                                                data-end-date="<%= coupons[i].expiryDate.toISOString().split('T')[0] %>">
+                                                Edit
+                                            </button>
+                                        </td>
                                         <td width="10%"><a onclick="deleteCoupon('<%= coupons[i]._id %>')"
-                                            class="btn btn-sm btn-danger rounded font-sm mt-15">Delete</a> </td>
+                                                class="btn btn-sm btn-danger rounded font-sm mt-15">Delete</a> </td>
 
                                     </tbody>
                                     <% } %>
@@ -165,43 +173,406 @@
         </div> <!-- card .// -->
     </section> <!-- content-main end// -->
 
+    <div class="modal fade" id="editCoupon" tabindex="-1" aria-labelledby="editCouponLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editCouponLabel">Edit Coupon</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form for editing offer details -->
+                    <form id="editCouponForm">
+                        <input type="hidden" id="editCouponId" name="offerId">
+                        <div class="mb-3">
+                            <label for="editCouponName" class="col-form-label">Coupon Name</label>
+                            <input type="text" class="form-control" name="name" id="editCouponName">
+                            <div id="error1" class="text-danger"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editCouponStartDate" class="col-form-label">Created On</label>
+                            <input type="date" class="form-control" name="startingDate" id="editCouponStartDate">
+                            <div id="error2" class="text-danger"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editCouponEndDate" class="col-form-label">Expired On</label>
+                            <input type="date" class="form-control" name="endingDate" id="editCouponEndDate">
+                            <div id="error3" class="text-danger"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editCouponDiscount" class="col-form-label">Discount Amount</label>
+                            <input type="text" class="form-control" name="discount" id="editCouponDiscount">
+                            <div id="error4" class="text-danger"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" id="updateCouponButton">Update Coupon</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
     <%- include("../partials/adminFooter") %>
 
-    <script>
-        function deleteCoupon(couponId) {
-    console.log("clicked", couponId);
-    Swal.fire({
-        title: 'Are you sure you want to delete this coupon?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'No, cancel'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            $.ajax({
-                url: "/admin/deleteCoupon/" + couponId,
-                type: 'get',
-            }).done((res) => {
-                if (res) {
-                    Swal.fire(
-                        'Successful',
-                        `${res.message}`,
-                        'success'
-                    ).then(() => {
-                        location.reload();
-                    }).then(() => {
-                        location.href = '/admin/coupons';
-                    });
-                }
-            }).fail((error) => {
-                console.log(error);
-            });
-        }
-    });
-}
+        <script>
 
-    </script>
+            // JavaScript to populate the edit modal fields with offer details
+            function populateEditModal(couponId, couponName, discount, startDate, endDate) {
+                document.getElementById('editCouponId').value = couponId;
+                document.getElementById('editCouponName').value = couponName;
+                document.getElementById('editCouponDiscount').value = discount;
+                document.getElementById('editCouponStartDate').value = startDate;
+                document.getElementById('editCouponEndDate').value = endDate;
+
+
+
+                // Show the edit modal
+                var editModal = new bootstrap.Modal(document.getElementById('editCoupon'));
+                editModal.show();
+            }
+
+            // Add event listeners to all "Edit Offer" buttons
+            document.querySelectorAll('.edit-offer-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    // Extract offer details from the data attributes of the button
+                    var couponId = this.getAttribute('data-coupon-id');
+                    var couponName = this.getAttribute('data-coupon-name');
+                    var discount = this.getAttribute('data-discount');
+                    var startDate = this.getAttribute('data-start-date');
+                    var endDate = this.getAttribute('data-end-date');
+
+                    // Populate the edit modal with offer details
+                    populateEditModal(couponId, couponName, discount, startDate, endDate);
+                });
+            });
+
+
+
+            const couponForm = document.getElementById('coupon-form');
+            const couponNameError = document.getElementById('error-coupon-name');
+            const startDateError = document.getElementById('error-start-date');
+            const endDateError = document.getElementById('error-end-date');
+            const discountAmountError = document.getElementById('error-discount-amount');
+
+            couponForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const couponName = document.getElementById('coupon-name').value;
+                const startDate = document.getElementById('startingDate').value;
+                const endDate = document.getElementById('expiringDate').value;
+                const discountAmount = document.querySelector('input[name="discountAmount"]').value;
+                console.log(`${couponName} ${startDate} ${endDate} ${discountAmount}`);
+
+                // Reset previous error messages
+                couponNameError.textContent = '';
+                startDateError.textContent = '';
+                endDateError.textContent = '';
+                discountAmountError.textContent = '';
+
+                // Validate coupon name (assuming this field is required)
+                if (!couponName) {
+                    couponNameError.textContent = 'Please enter a coupon name';
+                    return;
+                } else if (/\s/.test(couponName)) {
+                    console.log('coupon name blank');
+                    couponNameError.textContent = 'Coupon name cannot contain spaces';
+                    return;
+                }
+
+                // Validate start date
+                if (!startDate) {
+                    startDateError.textContent = 'Please select a start date';
+                    return; // Exit the function if start date is not selected
+                }
+
+                const today = new Date().toISOString().split('T')[0];
+                if (startDate < today) {
+                    startDateError.textContent = 'Start date cannot be earlier than today';
+                    return; // Exit the function if start date is earlier than today
+                }
+
+                // Validate end date
+                if (!endDate) {
+                    endDateError.textContent = 'Please select an end date';
+                    return; // Exit the function if end date is not selected
+                }
+
+                if (endDate < startDate) {
+                    endDateError.textContent = 'End date cannot be earlier than start date';
+                    return; // Exit the function if end date is earlier than start date
+                }
+
+                // Validate discount amount
+                if (!discountAmount) {
+                    discountAmountError.textContent = 'Please enter a discount amount';
+                    return; // Exit the function if discount amount is not entered
+                }
+
+                if (/\s/.test(discountAmount)) {
+                    discountAmountError.textContent = 'Discount amount cannot contain spaces';
+                    return; // Exit the function if discount amount contains spaces
+                }
+
+                const parsedDiscountAmount = parseInt(discountAmount);
+                if (isNaN(parsedDiscountAmount)) {
+                    discountAmountError.textContent = 'Discount amount must be a number';
+                    return; // Exit the function if discount amount is not a valid number
+                }
+
+                if (!Number.isInteger(parsedDiscountAmount)) {
+                    discountAmountError.textContent = 'Discount amount must be an integer';
+                    return; // Exit the function if discount amount is not an integer
+                }
+
+                if (parsedDiscountAmount > 50) {
+                    discountAmountError.textContent = 'Discount amount cannot be greater than 50';
+                    return; // Exit the function if discount amount is greater than 50
+                }
+                const couponData = {
+                    couponName,
+                    startDate,
+                    endDate,
+                    discountAmount
+                };
+
+                try {
+                    const response = await fetch('/admin/add-coupon', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(couponData)
+                    });
+                    console.log(response);
+                    const data = await response.json();
+
+                    if (response.ok) {
+
+                        Toastify({
+                            text: data.message || "Coupon added successfully",
+                            duration: 3000,
+                            gravity: 'top',
+                            position: 'center',
+                            style: {
+                                background: 'green',
+                                color: 'white'
+                            }
+                        }).showToast();
+                        // Delay and redirect to /admin/coupons
+                        setTimeout(() => {
+                            window.location.href = '/admin/coupons';
+                        }, 2000);
+                    } else {
+                        Toastify({
+                            text: data.message || 'An error occurred',
+                            duration: 3000,
+                            gravity: 'top',
+                            position: 'center',
+                            style: {
+                                background: 'red',
+                                color: 'white'
+                            }
+                        }).showToast();
+                    }
+                } catch (error) {
+                    Toastify({
+                        text: 'An error occurred while processing the request',
+                        duration: 3000,
+                        gravity: 'top',
+                        position: 'center',
+                        style: {
+                            background: 'red',
+                            color: 'white'
+                        }
+                    }).showToast();
+                    console.error(error);
+                }
+
+
+            });
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const editCouponForm = document.getElementById('editCouponForm');
+                // const updateCouponButton = document.getElementById('updateCouponButton');
+
+                editCouponForm.addEventListener('submit', async () => {
+                    event.preventDefault();
+                    console.log('inside editcoupon');
+                    const editCouponId = document.getElementById('editCouponId').value;
+                    const editCouponName = document.getElementById('editCouponName').value;
+                    const editCouponStartDate = document.getElementById('editCouponStartDate').value;
+                    const editCouponEndDate = document.getElementById('editCouponEndDate').value;
+                    const editCouponDiscount = document.getElementById('editCouponDiscount').value;
+
+                    // Reset error message
+                    document.getElementById('error1').textContent = '';
+                    document.getElementById('error2').textContent = '';
+                    document.getElementById('error3').textContent = '';
+                    document.getElementById('error4').textContent = '';
+
+                    if (!editCouponName) {
+                        document.getElementById('error1').textContent = 'Coupon name cannot be empty';
+                        return;
+                    }
+
+                    if (editCouponName.includes(' ')) {
+                        document.getElementById('error1').textContent = 'Coupon name cannot contain spaces';
+                        return;
+                    }
+
+                    // Validate start date
+                    if (!editCouponStartDate) {
+                        document.getElementById('error2').textContent = 'Please select a start date';
+                        return;
+                    }
+
+                    const today = new Date().toISOString().split('T')[0];
+                    if (editCouponStartDate < today) {
+                        document.getElementById('error2').textContent = 'Start date cannot be earlier than today';
+                        return;
+                    }
+
+                    // Validate end date
+                    if (!editCouponEndDate) {
+                        document.getElementById('error3').textContent = 'Please select an end date';
+                        return;
+                    }
+
+                    if (editCouponEndDate < editCouponStartDate) {
+                        document.getElementById('error3').textContent = 'End date cannot be earlier than start date';
+                        return;
+                    }
+
+                    // Validate discount amount
+                    if (!editCouponDiscount) {
+                        document.getElementById('error4').textContent = 'Please enter a discount amount';
+                        return;
+                    }
+
+                    if (editCouponDiscount.includes(' ')) {
+                        document.getElementById('error4').textContent = 'Discount amount cannot contain spaces';
+                        return;
+                    }
+
+                    const discountValue = parseFloat(editCouponDiscount);
+                    if (isNaN(discountValue) || discountValue > 50) {
+                        document.getElementById('error4').textContent = 'Discount amount should be less than or equal to 50';
+                        return;
+                    }
+
+
+
+
+
+
+
+
+
+                    const couponData = {
+                        couponId: editCouponId,
+                        couponName: editCouponName,
+                        createdOn: editCouponStartDate,
+                        expiryDate: editCouponEndDate,
+                        discount: editCouponDiscount,
+                    };
+                    console.log(couponData);
+                    try {
+                        const response = await fetch('/admin/edit-coupon', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(couponData),
+                        });
+
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            // Handle successful response
+                            Toastify({
+                                text: data.message || 'Coupon updated successfully',
+                                duration: 3000,
+                                gravity: 'top',
+                                position: 'center',
+                                style: {
+                                    background: 'green',
+                                    color: 'white'
+                                }
+                            }).showToast();
+
+                            // Optionally, you can redirect or perform additional actions
+                            setTimeout(() => {
+                                window.location.href = '/admin/coupons';
+                            }, 2000);
+                        } else {
+                            const data = await response.json();
+                            // Handle error response
+                            Toastify({
+                                text: data.message || 'Something went wrong',
+                                duration: 3000,
+                                gravity: 'top',
+                                position: 'center',
+                                style: {
+                                    background: 'red',
+                                    color: 'white'
+                                }
+                            }).showToast();
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        // Show error message
+                        Toastify({
+                            text: 'Internal server error',
+                            duration: 3000,
+                            close: true,
+                            gravity: "top",
+                            position: "center",
+                            style: {
+                                background: "linear-gradient(to right, #ff5f6d, #ffc371)",
+                            },
+                        }).showToast();
+                    }
+                });
+            });
+
+
+
+
+            function deleteCoupon(couponId) {
+                console.log("clicked", couponId);
+                Swal.fire({
+                    title: 'Are you sure you want to delete this coupon?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'No, cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "/admin/deleteCoupon/" + couponId,
+                            type: 'get',
+                        }).done((res) => {
+                            if (res) {
+                                Swal.fire(
+                                    'Successful',
+                                    `${res.message}`,
+                                    'success'
+                                ).then(() => {
+                                    location.reload();
+                                }).then(() => {
+                                    location.href = '/admin/coupons';
+                                });
+                            }
+                        }).fail((error) => {
+                            console.log(error);
+                        });
+                    }
+                });
+            }
+
+        </script>

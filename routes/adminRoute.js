@@ -24,7 +24,7 @@ adminRoute.post("/showChart",adminController.showChart);
 adminRoute.get("/logout",adminController.adminLogout);
 
 //Category Management
-adminRoute.get("/category",isAdmin,categoryController.getCategory);
+adminRoute.get("/category/:page?",isAdmin,categoryController.getCategory);
 adminRoute.post("/category",isAdmin,categoryController.addCategory);
 adminRoute.get("/listCategory",isAdmin,categoryController.getListCategory);
 adminRoute.get("/unListCategory",isAdmin,categoryController.getUnlistCategory);
@@ -36,6 +36,7 @@ adminRoute.get("/soft-delete-category/:id",isAdmin,categoryController.softDelete
 adminRoute.get("/addProducts",isAdmin,productController.getProductAddPage);
 adminRoute.post("/addProducts",isAdmin,upload.array("images", 5),productController.addProducts);
 adminRoute.get("/products",isAdmin,productController.adminProductList);
+adminRoute.get("/search-product",isAdmin,productController.adminSearchProduct);
 adminRoute.get("/editProduct",isAdmin,productController.getEditProduct);
 adminRoute.post("/editProduct/:id",isAdmin,upload.array("images", 5), productController.editProduct);
 adminRoute.post("/deleteImage",isAdmin,productController.deleteSingleImage);
@@ -58,6 +59,7 @@ adminRoute.post('/updateOrderStatus/:orderId', isAdmin, orderController.updateOr
 // Coupon Management
 adminRoute.get("/coupons",isAdmin,couponController.getCouponPage);
 adminRoute.post("/add-coupon",isAdmin,couponController.addCoupon);
+adminRoute.post("/edit-coupon",isAdmin,couponController.editCoupon);
 adminRoute.get('/deleteCoupon/:id',isAdmin,couponController.deleteCoupon);
 
 //Offer Management
