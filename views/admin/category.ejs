@@ -63,13 +63,13 @@
                             <div class="mb-4">
                                 <label for="product_name" class="form-label">Name</label>
                                 <input type="text" name="categoryName" placeholder="Type here" class="form-control"
-                                    id="product_name" required />
+                                    id="product_name" />
                                 <div id="nameError" class="text-danger"></div>
                             </div>
                             <div class="mb-4">
                                 <label class="form-label">Description</label>
                                 <textarea placeholder="Type here" name="categoryDescription" class="form-control"
-                                    id="category_description" required></textarea>
+                                    id="category_description"></textarea>
                                 <div id="descriptionError" class="text-danger"></div>
                             </div>
                             <div class="d-grid">
@@ -181,8 +181,8 @@
                 <script>
                     function validateForm() {
                         console.log('1');
-                        var name = document.getElementById("product_name").value.trim();
-                        var description = document.getElementById("category_description").value.trim();
+                        var name = document.getElementById("product_name").value;
+                        var description = document.getElementById("category_description").value;
                         var nameError = document.getElementById("nameError");
                         var descriptionError = document.getElementById("descriptionError");
                         var regex = /^[a-zA-Z]{3,}$/;
@@ -192,14 +192,42 @@
                         descriptionError.innerHTML = "";
 
                         // Validate Name
-                        if (!name.match(regex) || name.startsWith(" ")) {
-                            nameError.innerHTML = "Name must start with at least 3 alphabets, not start with a space, and contain no numbers.";
+                        if (!name) {
+                            nameError.innerHTML = "Name cannot be left blank.";
+                            return false;
+                        }
+
+                        if (name.includes(" ")) {
+                            nameError.innerHTML = "Name should not contain any spaces.";
+                            return false;
+                        }
+
+                        const specialCharsRegex = /[!@#$%^&*(),.?":{}|<>]/;
+                        if (specialCharsRegex.test(name) || /\d/.test(name)) {
+                            nameError.innerHTML = "Name should not contain special characters or numbers.";
+                            return false;
+                        }
+
+                        if (name.includes("-")) {
+                            nameError.innerHTML = "Name should not contain negative values.";
                             return false;
                         }
 
                         // Validate Description
-                        if (description.length < 3) {
-                            descriptionError.innerHTML = "Description must contain at least 3 characters.";
+                        if (!description) {
+                            descriptionError.innerHTML = "Description cannot be left blank.";
+                            return false;
+                        }
+
+
+                        const specialCharsRegex2 = /[!@#$%^&*(),.?":{}|<>]/;
+                        if (specialCharsRegex2.test(description) || /\d/.test(description)) {
+                            descriptionError.innerHTML = "Description should not contain special characters or numbers.";
+                            return false;
+                        }
+
+                        if (description.includes("-")) {
+                            descriptionError.innerHTML = "Description should not contain negative values.";
                             return false;
                         }
 

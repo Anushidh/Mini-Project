@@ -2,31 +2,151 @@
 
 
 
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-6 mt-60">
-            <form method="post" action="/admin/edit-category/<%= category.id %>">
-                <div class="d-grid text-end mt-30 col-md-5">
-                    <button class="btn btn-primary" type="submit">Update category</button>
-                </div>
-                <div class="mb-4 mt-30">
-                    <label for="product_name" class="form-label">Name</label>
-                    <input type="text" name="categoryName" value="<%= category.name %>" class="form-control border" />
-                </div>
-                
-                <div class="mb-4">
-                    <label class="form-label">Description</label>
-                    <textarea name="description" class="form-control border"><%= category.description %></textarea>
-                </div>
-            </form>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 mt-60">
+                <form id="editCategoryForm">
+                    <div class="d-grid text-end mt-30 col-md-5">
+                        <button class="btn btn-primary" type="submit">Update category</button>
+                    </div>
+                    <div class="mb-4 mt-30">
+                        <label for="product_name" class="form-label">Name</label>
+                        <input type="text" name="categoryName" id="categoryName" value="<%= category.name %>"
+                            class="form-control border" />
+                        <div id="error1" class="text-danger"></div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" id="description"
+                            class="form-control border"><%= category.description %></textarea>
+                        <div id="error2" class="text-danger"></div>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
-
-
-      
 
 
 
 
-<%- include("../partials/adminFooter") %>
+
+
+
+    <%- include("../partials/adminFooter") %>
+
+        <script>
+
+            const editCategoryForm = document.getElementById('editCategoryForm');
+            const categoryNameInput = document.getElementById('categoryName');
+            const descriptionInput = document.getElementById('description');
+            const error1 = document.getElementById('error1');
+            const error2 = document.getElementById('error2');
+            // Add an event listener for form submission
+            editCategoryForm.addEventListener('submit', async (event) => {
+                event.preventDefault(); // Prevent the default form submission
+
+                // Extract values from form fields
+                const categoryName = categoryNameInput.value;
+                const description = descriptionInput.value;
+
+                // Create an object with the form data
+                const formData = {
+                    categoryName,
+                    description,
+                };
+                console.log(formData);
+                const categoryId = '<%= category.id %>'; // Get the category ID from the server-side rendering
+                console.log(categoryId);
+                // Check if name is not empty
+                if (!categoryName) {
+                    error1.textContent = 'Name cannot be left blank';
+                    return;
+                }
+
+                // Check if name contains numbers or special characters
+                const nameRegex = /^[a-zA-Z\s]+$/;
+                if (!nameRegex.test(categoryName)) {
+                    error1.textContent = 'Name should not contain numbers or special characters';
+                    return;
+                }
+
+                // Check if name contains negative values (assuming this means negative numbers)
+                if (categoryName.includes('-')) {
+                    error1.textContent = 'Name should not contain negative values';
+                    return;
+                }
+
+                // Check for spaces separately
+                const hasMultipleSpaces = /\s/.test(categoryName);
+                if (hasMultipleSpaces) {
+                    error1.textContent = 'Name should not contain any spaces';
+                    return;
+                }
+
+                if (!description) {
+                    error2.textContent = 'Description cannot be left blank';
+                    return;
+                }
+
+                // Check if name contains numbers or special characters
+                const descRegex = /^[a-zA-Z\s]+$/;
+                if (!descRegex.test(description)) {
+                    error2.textContent = 'Description should not contain numbers or special characters';
+                    return;
+                }
+
+                // Check if name contains negative values (assuming this means negative numbers)
+                if (description.includes('-')) {
+                    error2.textContent = 'Description should not contain negative values';
+                    return;
+                }
+
+                // Check for spaces separately
+                const hasMultipleSpacess = /\s/.test(description);
+                if (hasMultipleSpacess) {
+                    error2.textContent = 'Description should not contain any spaces';
+                    return;
+                }
+                try {
+                    const response = await fetch(`/admin/edit-category/${categoryId}`, {
+                        method: 'POST',
+                        body: JSON.stringify(formData),
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        // Show success message
+                        Toastify({
+                            text: data.message,
+                            backgroundColor: 'green',
+                            position: 'center',
+                            gravity: 'top',
+                        }).showToast();
+                        setTimeout(() => {
+                            window.location.href = '/admin/category';
+                        }, 2000);
+                    } else {
+                        // Show error message
+                        Toastify({
+                            text: data.error,
+                            backgroundColor: 'red',
+                            position: 'center',
+                            gravity: 'top',
+                        }).showToast();
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    // Show error message
+                    Toastify({
+                        text: 'An error occurred while updating the category',
+                        backgroundColor: 'red',
+                        position: 'center',
+                        gravity: 'top',
+                    }).showToast();
+                }
+            });
+
+        </script>

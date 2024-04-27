@@ -178,84 +178,7 @@
 
     <%- include("../partials/footer") %>
         <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-        <script>
-
-
-
-            // $(document).ready(function () {
-            //     $('form').on('submit', function (event) {
-            //         event.preventDefault(); // Prevent the default form submission
-            //         var isCodSelected = $("#payment_cod").is(":checked");
-            //         var isWalletSelected = $("#payment_wallet").is(":checked");
-            //         var isRazorpaySelected = $("#payment_razorpay").is(":checked");
-            //         // Serialize the form data
-            //         var formData = $(this).serialize();
-            //         // Get the value of the selected address
-            //         var selectedAddress = $("input[name='selected_address']:checked").val();
-
-            //         // Append the selected address to the formData
-            //         formData += "&selected_address=" + selectedAddress;
-            //         console.log(formData);
-            //         // Send an AJAX request to the backend
-            //        if(isCodSelected || isWalletSelected) {
-            //         $.ajax({
-            //             type: 'POST',
-            //             url: '/place-order',
-            //             data: formData,
-            //        } 
-            //             success: function (response) {
-            //                 // Handle success response from the server
-            //                 console.log(response.totalAmount); // Log the response for debugging
-            //                 console.log(response.paymentMethod);
-            //                 // Check if payment method is Cash on Delivery and total amount is greater than 1000
-            //                 if (response.paymentMethod === 'Cash on Delivery' && response.totalAmount > 1000) {
-            //                     // Show error message
-            //                     Swal.fire({
-            //                         icon: 'error',
-            //                         title: 'Error',
-            //                         text: 'Orders with Cash on Delivery are only allowed for total amount greater than 1000',
-            //                         confirmButtonColor: '#d33',
-            //                         confirmButtonText: 'OK'
-            //                     });
-            //                 } else {
-            //                     // Show SweetAlert2 confirmation message
-            //                     Swal.fire({
-            //                         icon: 'success',
-            //                         title: 'Order Placed',
-            //                         text: 'Your order has been placed successfully!',
-            //                         confirmButtonColor: '#3085d6',
-            //                         confirmButtonText: 'OK'
-            //                     }).then((result) => {
-            //                         if (result.isConfirmed) {
-            //                             if (response.paymentMethod === 'razorpay') {
-            //                                 // If payment method is Razorpay, proceed with Razorpay payment
-            //                                 paymentMethodRazorpayPayment(response);
-            //                             } else {
-            //                                 // Otherwise, redirect to the homepage
-            //                                 window.location.href = '/order-success';
-            //                             }
-            //                         }
-            //                     });
-            //                 }
-            //             },
-            //             error: function (xhr, status, error) {
-            //                 // Handle error response from the server
-            //                 console.error(error); // Log the error for debugging
-            //                 var errorMessage = xhr.responseJSON ? xhr.responseJSON.message : 'An error occurred while placing the order. Please try again later.';
-            //                 console.log(errorMessage);
-            //                 // Show an error message to the user using SweetAlert2
-            //                 Swal.fire({
-            //                     icon: 'error',
-            //                     title: 'Error',
-            //                     text: errorMessage,
-            //                     confirmButtonColor: '#d33',
-            //                     confirmButtonText: 'OK'
-            //                 });
-            //             }
-            //         });
-            //     });
-            // });
-
+        <script> 
 
             $(document).ready(function () {
                 var totalAmountText = $(".order_total td strong").text().replace('₹', '').trim();
@@ -280,8 +203,14 @@
 
                     // Send an AJAX request to the backend
                     if (isCodSelected || isWalletSelected) {
-                        if(isCodSelected && totalAmount < 1000) {
-                            alert('Orders below 1000 are not allowed for COD');
+                        if (isCodSelected && totalAmount < 1000) {
+                            Toastify({
+                                text: "Orders below 1000 are not allowed for COD",
+                                gravity: "top", // Position at the top of the screen
+                                position: "center", // Centered horizontally
+                                backgroundColor: "red", // Red background color
+                                stopOnFocus: true, // Prevent dismissing notification on click
+                            }).showToast();
                             return;
                         }
                         $.ajax({
@@ -289,34 +218,50 @@
                             url: '/place-order',
                             data: formData,
                             success: function (response) {
-                                // Handle success response from the server
                                 console.log(response);
-                                
-                                // Check if the order was successfully placed
-                                if (response.paymentMethod === 'wallet' || response.paymentMethod === 'Cash on Delivery') {
-                                    // Show a success message using SweetAlert2
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Order Placed',
-                                        text: 'Your order has been successfully placed!',
-                                        confirmButtonColor: '#3085d6',
-                                        confirmButtonText: 'OK'
-                                    }).then((result) => {
-                                        if (result.isConfirmed) {
-                                            // Redirect to the order success page
-                                            window.location.href = '/order-success';
-                                        }
-                                    });
+
+                                if (response.error) {
+                                    // Handle the error case
+                                    Toastify({
+                                        text: response.message,
+                                        gravity: "top", // Position at the top of the screen
+                                        position: "center",
+                                        backgroundColor: 'red',
+                                        stopOnFocus: true
+                                    }).showToast();
                                 } else {
-                                    // Show an error message
-                                    console.error('Error placing order:', response);
-                                    alert('Failed to place order. Please try again.');
+                                    // Handle the success case
+                                    if (response.paymentMethod === 'wallet' || response.paymentMethod === 'Cash on Delivery') {
+                                        Toastify({
+                                            text: 'Your order has been successfully placed!',
+                                            gravity: "top", // Position at the top of the screen
+                                            position: "center",
+                                            backgroundColor: 'green',
+                                            stopOnFocus: true,
+                                            duration: 3000
+                                        }).showToast();
+
+                                        setTimeout(function () {
+                                            window.location.href = '/order-success';
+                                        }, 3000);
+                                    } else {
+                                        Toastify({
+                                            text: 'Failed to place order. Please try again.',
+                                            gravity: "top", // Position at the top of the screen
+                                            position: "center",
+                                            backgroundColor: 'red',
+                                            stopOnFocus: true
+                                        }).showToast();
+                                    }
                                 }
                             },
                             error: function (xhr, status, error) {
-                                // Handle error response from the server
                                 console.error('Error:', error);
-                                alert('An error occurred while processing your request. Please try again later.');
+                                Toastify({
+                                    text: 'An error occurred while processing your request. Please try again later.',
+                                    backgroundColor: 'red',
+                                    stopOnFocus: true
+                                }).showToast();
                             }
                         });
                     } else if (isRazorpaySelected) {
@@ -462,11 +407,6 @@
                 });
             });
 
-
-
-
-
-
             function paymentMethodRazorpayPayment(orderinfo) {
                 console.log("inside ejs razorpayPayment function", orderinfo);
                 console.log(orderinfo.razorpayOrderDetails.amount);
@@ -597,102 +537,6 @@
                     }
                 });
             }
-
-
-
-            document.getElementById('apply_coupon_button').addEventListener('click', function (event) {
-
-                event.preventDefault(); // Prevent default form submission behavior
-                console.log('1');
-                var couponCode = document.getElementById('coupon_code').value; // Get the entered coupon code
-
-                // Send AJAX request to apply the coupon
-                $.ajax({
-                    url: "/applyCoupon",
-                    type: 'POST',
-                    data: { couponCode: couponCode },
-                    success: function (response) {
-                        if (response.success) {
-                            // Update the order total displayed on the page
-                            var orderTotalElement = document.querySelector('.order_total td');
-                            if (orderTotalElement) {
-                                orderTotalElement.innerHTML = '<strong>₹' + response.cart.totalPrice + '</strong>';
-                            }
-                            // Display a success message to the user
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Coupon Applied!',
-                                text: 'Discount applied successfully.'
-                            })
-
-                        } else {
-                            // Display an error message if the coupon code is invalid or coupon is expired
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Coupon Error',
-                                text: response.message // Display the message received from the server
-                            });
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        // Handle AJAX errors
-                        console.error(xhr.responseText);
-                        var response = JSON.parse(xhr.responseText);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Server Error',
-                            text: response.message
-                        });
-                    }
-                });
-            });
-
-
-            // Add event listener to the remove coupon button
-            document.getElementById('remove_coupon_button').addEventListener('click', function (event) {
-                event.preventDefault(); // Prevent default button behavior
-
-                // Send AJAX request to remove the coupon
-                $.ajax({
-                    url: "/removeCoupon",
-                    type: 'POST',
-                    success: function (response) {
-                        if (response.success) {
-                            // Update the order total displayed on the page
-                            var orderTotalElement = document.querySelector('.order_total td strong');
-                            if (orderTotalElement) {
-                                orderTotalElement.innerText = '₹' + response.cart.totalPrice;
-                            }
-
-                            // Display a success message to the user
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Coupon Removed!',
-                                text: 'Coupon removed successfully.'
-                            });
-                        } else {
-                            // Display an error message if the coupon removal was unsuccessful
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Coupon Removal Error',
-                                text: response.message // Display the message received from the server
-                            });
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        // Handle AJAX errors
-                        console.error(xhr.responseText);
-                        // Display an error message
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Server Error',
-                            text: 'An error occurred while processing your request. Please try again later.'
-                        });
-                    }
-                });
-            });
-
-
 
 
 

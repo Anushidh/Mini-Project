@@ -475,14 +475,15 @@ const otpVerify = async (req, res) => {
         await newUserWallet.save();
       }
       req.session.user = saveUserData._id
-      res.redirect('/login')
+      res.json({ success: true });
     }
     else {
       console.log('otp not matching');
-      res.json("status wrong");
+      res.json({ success: false, message: "Invalid OTP" });
     }
   } catch (error) {
     console.error(error);
+    res.json({ success: false, message: "An error occurred. Please try again later." });
   }
 }
 
@@ -807,13 +808,19 @@ const cancelOrder = async (req, res) => {
 
     console.log(totalAmount);
     if (order.orderStatus === 'confirmed' || order.orderStatus === 'pending') {
-      if (order.paymentMethod === 'razorpay') {
+      if (order.paymentMethod === 'razorpay' || order.paymentMethod === 'wallet') {
         const wallet = await Wallet.findOne({ user: req.session.user._id });
         console.log(wallet);
         if (!wallet) {
           return res.status(404).json({ error: 'Wallet not found' });
         }
         wallet.walletBalance += totalAmount;
+        // Create a new history entry
+        wallet.history.push({
+          date: new Date(),
+          status: 'credit',
+          amount: totalAmount
+        });
         await wallet.save();
         console.log(wallet);
       }
@@ -862,13 +869,19 @@ const returnOrder = async (req, res) => {
     let totalAmount = order.totalAmount;
     console.log(totalAmount);
     if (order.orderStatus === 'delivered') {
-      if (order.paymentMethod === 'razorpay') {
+      if (order.paymentMethod === 'razorpay' || order.paymentMethod === 'wallet') {
         const wallet = await Wallet.findOne({ user: req.session.user._id });
         console.log(wallet);
         if (!wallet) {
           return res.status(404).json({ error: 'Wallet not found' });
         }
         wallet.walletBalance += totalAmount;
+        // Create a new history entry
+        wallet.history.push({
+          date: new Date(),
+          status: 'credit',
+          amount: totalAmount
+        });
         await wallet.save();
         console.log(wallet);
       }

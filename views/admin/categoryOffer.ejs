@@ -416,6 +416,30 @@
                     discountErrorContainer.textContent = 'Please enter a discount value';
                     return;
                 }
+                if (discount < 0) {
+                    console.log('inside discount validation');
+                    const discountInput = document.getElementById('editDiscount');
+                    discountErrorContainer = discountInput.parentElement.querySelector('#error2');
+                    discountErrorContainer.textContent = 'Discount value should not be a negative number';
+                    return;
+                }
+                const parsedDiscount = parseInt(discount);
+
+                if (isNaN(parsedDiscount)) {
+                    console.log('inside discount validation');
+                    const discountInput = document.getElementById('editDiscount');
+                    discountErrorContainer = discountInput.parentElement.querySelector('#error2');
+                    discountErrorContainer.textContent = 'Discount must be a valid integer';
+                    return;
+                }
+
+                if (!Number.isInteger(parsedDiscount)) {
+                    console.log('inside discount validation');
+                    const discountInput = document.getElementById('editDiscount');
+                    discountErrorContainer = discountInput.parentElement.querySelector('#error2');
+                    discountErrorContainer.textContent = 'Discount must be a valid integer';
+                    return;
+                }
                 // Validate starting date (should not be left blank)
                 if (!startingDateValue) {
                     console.log('inside starting date validation (blank)');
@@ -462,7 +486,7 @@
                     console.error('Error converting dates:', error);
                     return;
                 }
-                
+
                 // Create an object with the form data
                 const formData = {
                     offerId,

@@ -403,6 +403,12 @@
                                 location.reload();
                             });
                             console.log(`${res.message}`);
+                            // Update the total amount
+                            if (res.cartTotal) {
+                                const totalAmountElement = document.getElementById('totalAmount');
+                                const totalAmountText = totalAmountElement.querySelector('.cart_amount');
+                                totalAmountText.textContent = res.cartTotal;
+                            }
                         }).fail((error) => {
                             console.log(error);
                         });

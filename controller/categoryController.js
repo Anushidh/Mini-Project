@@ -48,7 +48,9 @@ const getEditCategory = async (req, res) => {
 const editCategory = async (req, res) => {
   try {
       const id = req.params.id;
+      console.log(id);
       const { categoryName, description } = req.body;
+      console.log(req.body);
       
      
       const nameLowerCase = categoryName.toLowerCase();
@@ -57,16 +59,16 @@ const editCategory = async (req, res) => {
       const existingCategory = await Category.findOne({ _id: { $ne: id }, name: { $regex: new RegExp('^' + nameLowerCase + '$', 'i') } });
 
       if (existingCategory) {
-          console.log("Category name already exists.");
-         
+        return res.status(400).json({ error: 'Category name already exists.' });
       } else {
           
           await Category.findByIdAndUpdate(id, { name: categoryName, description: description });
-          res.redirect("/admin/category");
+          res.status(200).json({ message: 'Category updated successfully' });
       }
 
   } catch (error) {
       console.log(error.message);
+      res.status(500).json({ error: 'Internal Server Error' });
   }
 };
 

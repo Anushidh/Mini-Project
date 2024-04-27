@@ -34,6 +34,9 @@ const productSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    oldSalePrice: {
+        type: Number
+    },
     totalQuantity: {
         type: Number,
         default: 0 // Default value is set to 0

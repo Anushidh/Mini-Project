@@ -12,29 +12,33 @@ const Cart = require('../model/cartModel');
 const Wallet = require('../model/walletModel');
 const walletHelper = require("../helper/walletHelper");
 const razorpay = require('../middleware/razorpay');
+const Coupon = require("../model/couponModel");
 
 
 const checkout = async (req, res) => {
   try {
+    console.log('inside checkout');
     const user = req.session.user;
     const loggedIn = user;
+    let totalAmount;
     cartCount = await cartHelper.getCartCount(user._id);
-    // wishListCount = await wishlistHelper.getWishListCount(user._id)
     let cartItems = await cartHelper.getAllCartItems(user._id);
-    let totalAmount = await cartHelper.totalSubtotal(user._id, cartItems);
-    req.session.oldTotal = totalAmount;
-    // let walletBalance = await walletHelper.getWalletAmount(user._id)
-    // walletBalance = currencyFormat(walletBalance);
-    if (req.session.updatedTotal) {
-      totalAmount = req.session.updatedTotal;
-    }
-    // const coupons = await couponHelper.findAllCoupons();
+    // let totalAmount = await cartHelper.totalSubtotal(user._id, cartItems);
+    // console.log(totalAmount,"before");
+    const cart = await Cart.findOne({ user: user._id });
+    totalAmount = cart.totalPrice;
+    // if (cart && cart.coupon) {
+    //   const coupon = await Coupon.findOne({ couponCode: cart.coupon });
+    //   if (coupon) {
+    //     // Apply the coupon discount
+    //     totalAmount -= coupon.discount;
+    //   }
+    // }
     const userAddress = await addressHelper.findAllAddress(user._id);
-    // console.log(userAddress);
     res.render('user/checkout', { loggedIn, loginStatus: req.session.user, user, cartItems, totalAmount: totalAmount, address: userAddress, cartCount, currencyFormat: cartHelper.currencyFormat })
   } catch (error) {
     console.log(error);
-    res.status(500).render('user/404',{ loggedIn });
+    res.status(500).render('user/404', { loggedIn });
   }
 }
 
@@ -99,7 +103,7 @@ const failedRazorpay = async (req, res) => {
 
   } catch (error) {
     console.log(error);
-    res.status(500).render('user/404',{ loggedIn });
+    res.status(500).render('user/404', { loggedIn });
   }
 }
 
@@ -119,13 +123,8 @@ const placeOrder = async (req, res) => {
     console.log('inside placeorder');
     let userId = req.session.user._id;
     let coupon = req.session.coupon;
-    console.log(req.body);
-    // Get the selected address ID from the request body
     let selectedAddressId = req.body.selected_address;
-    console.log(selectedAddressId);
-    // Fetch the address details based on the selected address ID
     const addressData = await Address.findById(selectedAddressId);
-    console.log(addressData);
     let paymentStatus = 'pending';
     let cartItems = await cartHelper.getAllCartItems(userId);
     console.log(cartItems, 'cartitemsssssssssssssssssss');
@@ -139,8 +138,12 @@ const placeOrder = async (req, res) => {
       return res.json({ error: true, message: "Please Select any Payment Method before checkout" })
     }
     // console.log('1');
-    const totalAmount = await cartHelper.totalAmount(userId);
-    // console.log(typeof totalAmount);
+    // const totalAmount = await cartHelper.totalAmount(userId);
+    const cart = await Cart.findOne({ user: userId });
+    console.log(cart);
+    const totalAmount = cart.totalPrice;
+
+    console.log(totalAmount);
     let wallet = await Wallet.findOne({ user: userId });
     // console.log(wallet);
     if (!wallet) {
@@ -150,8 +153,9 @@ const placeOrder = async (req, res) => {
     if (req.body.payment_method === 'Cash on Delivery') {
       try {
         if (totalAmount >= 1000) {
+          console.log('inside cod');
           const placeOrder = await orderHelper.forOrderPlacing(req.body, totalAmount, cartItems, userId, coupon, addressData);
-
+          console.log('after placeorder');
           // Update payment status to 'success'
           await Order.findOneAndUpdate(
             { _id: placeOrder._id }, // Use order ID instead of user ID
@@ -163,7 +167,7 @@ const placeOrder = async (req, res) => {
           await productHelper.stockDecrease(cartItems);
           await cartHelper.clearTheCart(userId);
 
-          res.status(202).json({ paymentMethod: 'Cash on Delivery', message: "Purchase Done", totalAmount: totalAmount });
+          res.status(202).json({ error: false, paymentMethod: 'Cash on Delivery', message: "Purchase Done", totalAmount: totalAmount });
         } else {
           console.log('cod error');
           return res.json({ error: true, paymentMethod: 'Cash on Delivery', message: "Orders with Cash on Delivery are only allowed for total amount greater than 1000", totalAmount: totalAmount });
@@ -233,7 +237,7 @@ const placeOrder = async (req, res) => {
 
   } catch (error) {
     console.log(error);
-    res.status(500).render('user/404',{ loggedIn });
+    res.status(500).render('user/404', { loggedIn });
   }
 }
 
@@ -294,6 +298,7 @@ const orderDetails = async (req, res) => {
           paymentMethod: 1,
           totalDiscount: 1,
           paymentStatus: 1,
+          totalAmount: 1,
         }
       }
     ]);
@@ -453,7 +458,7 @@ const verifyPayment = async (req, res) => {
     })
     .catch((error) => {
       console.log(error);
-      res.status(500).render('user/404',{ loggedIn });
+      res.status(500).render('user/404', { loggedIn });
     })
 }
 
@@ -464,7 +469,7 @@ const orderSuccess = (req, res) => {
     res.render('user/success', { loginStatus: req.session.user, loggedIn })
   } catch (error) {
 
-    res.status(500).render('user/404',{ loggedIn });
+    res.status(500).render('user/404', { loggedIn });
   }
 }
 

@@ -327,6 +327,10 @@
                     return; // Exit the function if discount amount is not an integer
                 }
 
+                if (parsedDiscountAmount < 0) {
+                    discountAmountError.textContent = 'Discount amount cannot be negative';
+                    return; // Exit the function if discount amount is negative
+                }
                 if (parsedDiscountAmount > 50) {
                     discountAmountError.textContent = 'Discount amount cannot be greater than 50';
                     return; // Exit the function if discount amount is greater than 50
@@ -449,6 +453,11 @@
                     // Validate discount amount
                     if (!editCouponDiscount) {
                         document.getElementById('error4').textContent = 'Please enter a discount amount';
+                        return;
+                    }
+
+                    if (editCouponDiscount < 0) {
+                        document.getElementById('error4').textContent = 'Discount amount cannot be a negative number';
                         return;
                     }
 

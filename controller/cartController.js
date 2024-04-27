@@ -38,7 +38,7 @@ const addToCart = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    res.status(500).render('user/404',{loggedIn});
+    res.status(500).render('user/404', { loggedIn });
   }
 };
 
@@ -56,33 +56,46 @@ const userCart = async (req, res) => {
       expiryDate: { $gt: new Date() },
       usedBy: { $ne: user._id },
     });
-    console.log(availableCoupons);
-
+    // console.log(availableCoupons);
+    // console.log(req.session.updatedTotal);
     if (req.session.updatedTotal) {
       totalandSubTotal = req.session.updatedTotal;
+      // console.log(totalandSubTotal);
     }
     else {
       totalandSubTotal = await cartHelper.totalSubtotal(user._id, allCartItems);
       totalandSubTotal = cartHelper.currencyFormat(totalandSubTotal);
+      // console.log(totalandSubTotal);
     }
+    
     res.render('user/cart', { loggedIn, loginStatus: req.session.user, allCartItems, cartCount, totalAmount: totalandSubTotal, currencyFormat: cartHelper.currencyFormat, availableCoupons, couponApplied });
   } catch (error) {
     console.log(error);
-    res.status(500).render('user/404',{loggedIn});
+    res.status(500).render('user/404', { loggedIn });
   }
 }
 
-const removeFromCart = (req, res) => {
+const removeFromCart = async (req, res) => {
   try {
     let cartId = req.body.cartId;
     let productId = req.params.id;
     let size = req.body.size;
-    cartHelper.removeAnItemFromCart(cartId, productId, size)
-      .then((response) => {
-        res.status(202).json({ message: "sucessfully item removed" })
-      })
+    const result = await cartHelper.removeAnItemFromCart(cartId, productId, size)
+    if (result.modifiedCount > 0) {
+      // Item removed successfully
+      const updatedCart = await Cart.findById(cartId).populate('items.productId');
+      const cartTotal = updatedCart.items.reduce((total, item) => {
+        const product = item.productId;
+        const itemTotal = product.price * item.quantity;
+        return total + itemTotal;
+      }, 0);
+
+      res.status(202).json({ message: "Successfully item removed", cartTotal });
+    } else {
+      res.status(404).json({ message: "Item not found in cart" });
+    }
   } catch (error) {
-    res.status(500).render('user/404',{loggedIn});
+    res.status(500).render('user/404', { loggedIn });
   }
 }
 
