@@ -21,58 +21,6 @@
     <!--Checkout page section-->
     <div class="Checkout_section" id="accordion">
         <div class="container">
-            <!-- <div class="row">
-                <div class="col-12">
-                     <div class="user-actions">
-                         <h3> 
-                             <i class="fa fa-file-o" aria-hidden="true"></i>
-                             Returning customer?
-                             <a class="Returning" href="#" data-bs-toggle="collapse" data-bs-target="#checkout_login" aria-expanded="true">Click here to login</a>     
- 
-                         </h3>
-                          <div id="checkout_login" class="collapse" data-bs-parent="#accordion">
-                             <div class="checkout_info">
-                                 <p>If you have shopped with us before, please enter your details in the boxes below. If you are a new customer please proceed to the Billing & Shipping section.</p>  
-                                 <form action="#">  
-                                     <div class="form_group">
-                                         <label>Username or email <span>*</span></label>
-                                         <input type="text">     
-                                     </div>
-                                     <div class="form_group">
-                                         <label>Password  <span>*</span></label>
-                                         <input type="text">     
-                                     </div> 
-                                     <div class="form_group group_3 ">
-                                         <button type="submit">Login</button>
-                                         <label for="remember_box">
-                                             <input id="remember_box" type="checkbox">
-                                             <span> Remember me </span>
-                                         </label>     
-                                     </div>
-                                     <a href="#">Lost your password?</a>
-                                 </form>          
-                             </div>
-                         </div>    
-                     </div>
-                     <div class="user-actions">
-                         <h3> 
-                             <i class="fa fa-file-o" aria-hidden="true"></i>
-                             Returning customer?
-                             <a class="Returning" href="#" data-bs-toggle="collapse" data-bs-target="#checkout_coupon" aria-expanded="true">Click here to enter your code</a>     
- 
-                         </h3>
-                          <div id="checkout_coupon" class="collapse" data-bs-parent="#accordion">
-                             <div class="checkout_info">
-                                 <form action="/applyCoupon" method="post">
-                                     <input id="coupon_code" name="couponCode" placeholder="Coupon code" type="text">
-                                     <button id="apply_coupon_button" type="submit">Apply coupon</button>
-                                 </form>
-                             </div>
-                         </div>  
-                         <button id="remove_coupon_button" type="button" style="background-color: lightcoral; color: black; margin-left: 60px; border: none;">Remove coupon</button>  
-                     </div>    
-                </div>
-             </div> -->
             <div class="checkout_form">
                 <form action="/place-order" method="post">
                     <div class="row">
@@ -121,10 +69,6 @@
                                                 <% } %>
                                     </tbody>
                                     <tfoot>
-                                        <!-- <tr>
-                                            <th>Cart Subtotal</th>
-                                            <td></td>
-                                        </tr> -->
                                         <tr class="order_total">
                                             <th>Order Total</th>
                                             <td><strong>₹<%= totalAmount %></strong></td>
@@ -134,10 +78,6 @@
                             </div>
                             <h3>Payment Method</h3>
                             <div class="payment_method">
-                                <!-- <div class="panel-default">
-                                    <input id="payment_defult" name="payment_method" type="radio" value="PayPal" style="margin-right: 10px;">
-                                    <label for="payment_defult">PayPal <img src="assets/img/icon/papyel.png" alt=""></label>
-                                </div> -->
                                 <div class="panel-default">
                                     <input id="payment_cod" name="payment_method" type="radio" value="Cash on Delivery"
                                         style="margin-right: 10px;">
@@ -178,7 +118,7 @@
 
     <%- include("../partials/footer") %>
         <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-        <script> 
+        <script>
 
             $(document).ready(function () {
                 var totalAmountText = $(".order_total td strong").text().replace('₹', '').trim();
@@ -187,7 +127,17 @@
 
                 $('form').on('submit', function (event) {
                     event.preventDefault(); // Prevent the default form submission
-
+                    if (totalAmount === 0) {
+                    Toastify({
+                        text: "Please add items to your cart before proceeding.",
+                        duration: 3000,
+                        gravity: "top",
+                        position: "center",
+                        backgroundColor: "#ff6347",
+                    }).showToast();
+                    return;
+                }
+                    var isPaymentMethodSelected = $("#payment_cod").is(":checked") || $("#payment_wallet").is(":checked") || $("#payment_razorpay").is(":checked");
                     var isCodSelected = $("#payment_cod").is(":checked");
                     var isWalletSelected = $("#payment_wallet").is(":checked");
                     var isRazorpaySelected = $("#payment_razorpay").is(":checked");
@@ -196,9 +146,33 @@
                     var formData = $(this).serialize();
                     // Get the value of the selected address
                     var selectedAddress = $("input[name='selected_address']:checked").val();
-
+                    // Check if an address is selected
+                    if (!selectedAddress) {
+                        Toastify({
+                            text: "Please select an address",
+                            duration: 3000, // Display for 3 seconds
+                            close: true,
+                            gravity: "top", // Position at the top of the screen
+                            position: "center", // Position at the right side of the screen
+                            backgroundColor: "linear-gradient(to right, #ff6c6c, #f66262)",
+                        }).showToast();
+                        return; // Stop further execution
+                    }
+                    // Check if a payment method is selected
+                    if (!isPaymentMethodSelected) {
+                        Toastify({
+                            text: "Please select a payment method",
+                            duration: 3000,
+                            close: true,
+                            gravity: "top",
+                            position: "center",
+                            backgroundColor: "linear-gradient(to right, #ff6c6c, #f66262)",
+                        }).showToast();
+                        return; // Stop further execution
+                    }
                     // Append the selected address as a separate parameter
-                    formData += `&selected_address=${selectedAddress}`;
+                    // formData += `&selected_address=${selectedAddress}`;
+                    formData += "&selected_address=" + encodeURIComponent(selectedAddress);
                     console.log(formData);
 
                     // Send an AJAX request to the backend
@@ -266,7 +240,8 @@
                         });
                     } else if (isRazorpaySelected) {
                         console.log('razorpay');
-                        fetch('/createorder', {
+                        console.log(totalAmount);
+                        fetch('/createOrder', {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json"

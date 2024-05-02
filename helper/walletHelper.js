@@ -41,6 +41,11 @@ const payUsingWallet = async (userId, amount) => {
     }
 
     wallet.walletBalance -= amount;
+    wallet.history.push({
+      date: new Date(), 
+      status: 'debit',
+      amount: amount,
+    });
     await wallet.save();
     // console.log(wallet);
     return true;

@@ -26,7 +26,6 @@ const getHome = async (req, res) => {
   try {
     const userId = req.session.user;
     let products = await productHelper.getAllUnblockedProducts();
-    // console.log(products);
     res.render("user/home", {
       products,
       userData: req.session.user
@@ -42,7 +41,7 @@ const userProfile = async (req, res) => {
     let userId = req.session.user._id;
     const loggedIn = userId;
     let userDetails = await User.findById(userId);
-    let userOrders = await Order.find({ user: userId });
+    let userOrders = await Order.find({ user: userId }).sort({ orderDate: -1 });;
     let allAddress = await addressHelper.findAllAddress(userId);
 
     const pageSize = 10;
@@ -65,21 +64,20 @@ const userProfile = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
+    res.status(500).render('user/404', { loggedIn });
   }
 };
 
 const addAddress = async (req, res) => {
   try {
-    // console.log('1');
-    // console.log(req.body);
+    let userId = req.session.user._id;
+    const loggedIn = userId;
     addressHelper.addAddress(req.body)
       .then((result) => {
         res.status(202).json({ message: "address added successfully" })
       })
-    // console.log('4');
   } catch (error) {
-
-    res.status(500).render('user/404');
+    res.status(500).render('user/404', { loggedIn });
   }
 }
 
@@ -96,15 +94,11 @@ const getAddress = async (req, res) => {
 
 const deleteAddress = async (req, res) => {
   try {
-    console.log('inside delete address');
     const addressId = req.query.id;
     await Address.deleteOne({ _id: addressId });
-    console.log("Address deleted successfully");
-    // Send a success response
     res.status(200).json({ success: true, message: "Address deleted successfully" });
   } catch (error) {
     console.error(error);
-    // Send an error response
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
@@ -120,28 +114,15 @@ const updateAddress = async (req, res) => {
   }
 };
 
-// const editAddressPage = async (req, res) => {
-//   try {
-//     // let userId = req.session.user._id;
-//     let addressId = req.query.id;
-//     let userAddress = await addressHelper.findAnAddress(addressId);
-//     //  console.log(userAddress);
-//     // let allAddress = await addressHelper.findAllAddress(userId);
-//     res.render('user/edit-address', { loginStatus: req.session.user, userAddress: userAddress, });
-//   } catch (error) {
-//     res.status(500).render('user/404');
-//   }
-// }
+
 
 const searchProduct = async (req, res) => {
   try {
     const { query } = req.query;
-    console.log(query);
     const user = req.session.user
     const loggedIn = user;
     let products;
     if (req.session.category) {
-      console.log('1');
       products = await Product.find({
         isBlocked: false,
         productName: { $regex: new RegExp(query, 'i') },
@@ -149,7 +130,6 @@ const searchProduct = async (req, res) => {
       });
     }
     else if (req.session.sort) {
-      console.log('2');
       if (req.session.sort === "highToLow") {
         products = await Product.find({
           productName: { $regex: new RegExp(query, 'i') },
@@ -176,8 +156,6 @@ const searchProduct = async (req, res) => {
         isBlocked: false,
       });
     }
-
-    console.log(products);
     const productOffers = await productOffer.find({ "productOffer.offerStatus": true }).populate('productOffer.product');
     const categoryOffers = await categoryOffer.find({ "categoryOffer.offerStatus": true }).populate('categoryOffer.category');
     const categories = await Category.find({ isBlocked: false });
@@ -194,15 +172,10 @@ const searchProduct = async (req, res) => {
 
 const getProductDetailsPage = async (req, res) => {
   try {
-    console.log('1');
     const user = req.session.user;
     const loggedIn = user;
-    // console.log("wrking");
     const id = req.params.id
-    // console.log(id);
     const findProduct = await Product.findOne({ _id: id });
-    // console.log('product is is here',findProduct);
-    // console.log(findProduct.id, "Hello world");
     let products = await productHelper.getAllUnblockedProducts();
     if (findProduct) {
       res.render("user/product-details", { data: findProduct, user: user, products, loggedIn: loggedIn })
@@ -220,11 +193,9 @@ const getShopPage = async (req, res) => {
   try {
     const sort = req.query.sort;
     req.session.sort = sort;
-    // console.log(sort);
     const user = req.session.id;
     const loggedIn = user;
     let currentProduct;
-
     if (sort === "highToLow") {
       currentProduct = await Product.find({ isBlocked: false }).sort({ salePrice: -1 });
     } else if (sort === "lowToHigh") {
@@ -234,20 +205,16 @@ const getShopPage = async (req, res) => {
     } else {
       currentProduct = await Product.find({ isBlocked: false });
     }
-
     const productOffers = await productOffer.find({ "productOffer.offerStatus": true }).populate('productOffer.product');
     const categoryOffers = await categoryOffer.find({ "categoryOffer.offerStatus": true }).populate('categoryOffer.category');
-
     const count = await Product.find({ isBlocked: false }).count();
     const categories = await Category.find({ isBlocked: false });
-
     const itemsPerPage = 8;
     const currentPage = parseInt(req.query.page) || 1;
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     const totalPages = Math.ceil(currentProduct.length / itemsPerPage);
     const productsOnPage = currentProduct.slice(startIndex, endIndex);
-
     res.render("user/shop", {
       loggedIn: loggedIn,
       user: user,
@@ -267,15 +234,12 @@ const getShopPage = async (req, res) => {
 
 const filterPrice = async (req, res) => {
   try {
-    console.log('1');
     const user = req.session.id;
     const loggedIn = user;
     const { minPrice, maxPrice } = req.body;
-    console.log(minPrice + " " + maxPrice);
     const filteredProducts = await Product.find({
       salePrice: { $gte: minPrice, $lte: maxPrice }
     });
-    console.log(filteredProducts);
     const count = filteredProducts.length;
     const categories = await Category.find({ isBlocked: false });
     const itemsPerPage = 8;
@@ -303,23 +267,18 @@ const filterPrice = async (req, res) => {
 const filterProduct = async (req, res) => {
   try {
     const categoryId = req.query.category;
-    console.log(categoryId);
     req.session.category = categoryId;
-    // console.log(categoryId);
     const user = req.session.id;
     const loggedIn = user;
     const products = await Product.find({ category: categoryId, isBlocked: false });
-
     const count = products.length;
     const categories = await Category.find({ isBlocked: false });
-
     const itemsPerPage = 8;
     const currentPage = parseInt(req.query.page) || 1;
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     const totalPages = Math.ceil(products.length / itemsPerPage);
     const productsOnPage = products.slice(startIndex, endIndex);
-
     res.render("user/shop", {
       loggedIn: loggedIn,
       user: user,
@@ -360,19 +319,10 @@ const getOtp = async (req, res) => {
   }
 }
 
-// const getOtpLostPassword = async (req, res) => {
-//   try {
-//     res.render("user/verify-otp-lostPassword");
-//   } catch (error) {
-//     throw new Error(error.message);
-//   }
-// }
 
 const userSignup = async (req, res) => {
   try {
-    console.log('user signup');
     const { username, email, phone, password, referral } = req.body;
-    // let email = req.body.email;
     req.session.referral = referral;
     const findUser = await User.findOne({ email });
     if (findUser) {
@@ -400,10 +350,7 @@ const userSignup = async (req, res) => {
       if (info) {
         req.session.userOtp = otp
         req.session.userData = req.body
-        console.log('inside info');
         res.render("user/verify-otp", { email })
-        console.log("Email sent", info.messageId);
-        // const newUser = await User.create(req.body);
       } else {
         res.json("email-error");
       }
@@ -414,26 +361,17 @@ const userSignup = async (req, res) => {
   }
 }
 
-// const posOtpLostPassword = async (req,res) => {
-//   try {
 
-//   } catch (error) {
-
-//   }
-// }
 const otpVerify = async (req, res) => {
   try {
-    console.log('otp verify');
     const { otp } = req.body;
     if (otp === req.session.userOtp) {
       const user = req.session.userData
       const passwordHash = await passwordHelper.securePassword(user.password)
       const referralCode = await generateRandomString();
-      console.log("the referralCode  =>" + referralCode);
       let newUserWallet;
       if (req.session.referral) {
         const existingUser = await User.findOne({ referralCode: req.session.referral });
-        console.log(existingUser);
         if (existingUser) {
           // Referrer found, add 50rs to their wallet balance
           const wallet = await Wallet.findOne({ user: existingUser._id });
@@ -458,18 +396,17 @@ const otpVerify = async (req, res) => {
         referralCode: referralCode
       })
       await saveUserData.save()
-      // Create a new wallet for the new user and add 50rs to it
       const existingUser = await User.findOne({ referralCode: req.session.referral });
       if (existingUser) {
         const newUserWallet = new Wallet({
-          user: saveUserData._id, // Now we have the user's ID after saving the user data
+          user: saveUserData._id,
           walletBalance: 50
         });
         await newUserWallet.save();
       }
       else {
         const newUserWallet = new Wallet({
-          user: saveUserData._id, // Now we have the user's ID after saving the user data
+          user: saveUserData._id,
           walletBalance: 0
         });
         await newUserWallet.save();
@@ -478,7 +415,6 @@ const otpVerify = async (req, res) => {
       res.json({ success: true });
     }
     else {
-      console.log('otp not matching');
       res.json({ success: false, message: "Invalid OTP" });
     }
   } catch (error) {
@@ -499,13 +435,9 @@ function generateRandomString() {
 
 const resendOtp = async (req, res) => {
   try {
-    console.log('inside resendotp');
     if (req.session.userData && req.session.userData.email) {
       const email = req.session.userData.email;
-      console.log(email);
       var newOtp = await otpHelper.generateOtp();
-      console.log(newOtp);
-
       const transporter = nodemailer.createTransport({
         service: "gmail",
         port: 587,
@@ -516,7 +448,6 @@ const resendOtp = async (req, res) => {
           pass: process.env.EMAIL_PASSWORD
         }
       });
-
       const info = await transporter.sendMail({
         from: process.env.EMAIL_USER,
         to: email,
@@ -528,7 +459,6 @@ const resendOtp = async (req, res) => {
       if (info) {
         req.session.userOtp = newOtp;
         res.json({ success: true, message: 'OTP resent successfully' });
-        console.log("Email resent", info.messageId);
       } else {
         res.json({ success: false, message: 'Failed to resend OTP' });
       }
@@ -546,8 +476,6 @@ const resendOtp = async (req, res) => {
 const userLogin = async (req, res) => {
 
   try {
-    // console.log('inside login');
-    // console.log(req.body);
     const { email, password } = req.body;
     const findUser = await User.findOne({ isAdmin: '0', email: email });
     if (findUser) {
@@ -557,7 +485,6 @@ const userLogin = async (req, res) => {
         if (samePassword) {
           req.session.user = findUser;
           const products = await Product.find();
-          // res.render("user/home", { products: products });
           res.json({ success: true });
         } else {
           res.json({ success: false, message: "Incorrect password" });
@@ -569,7 +496,6 @@ const userLogin = async (req, res) => {
       res.json({ success: false, message: "User not found" });
     }
   } catch (error) {
-    // Handle database errors or other exceptions
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");
   }
@@ -586,24 +512,14 @@ const getVerifyEmail = async (req, res) => {
 const postVerifyEmail = async (req, res) => {
   try {
     const { email } = req.body;
-    console.log(email);
-    // Check if the email is provided
     if (!email) {
       return res.status(400).json({ success: false, message: "Email is required" });
     }
-
-    // Check if a user with the provided email exists
     const findUser = await User.findOne({ email });
-
     if (!findUser) {
       return res.status(404).json({ success: false, message: "User with this email does not exist" });
     }
-
-    // Generate OTP
     const otp = await otpHelper.generateOtp();
-    console.log(otp);
-
-    // Send OTP via email
     const transporter = nodemailer.createTransport({
       service: "gmail",
       port: 587,
@@ -614,7 +530,6 @@ const postVerifyEmail = async (req, res) => {
         pass: process.env.EMAIL_PASSWORD
       }
     });
-
     const info = await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
@@ -626,14 +541,9 @@ const postVerifyEmail = async (req, res) => {
     if (!info) {
       throw new Error("Failed to send OTP email");
     }
-
-    // Store OTP and user email in session
     req.session.userOtp = otp;
     req.session.email = email;
-    console.log('email sent');
     res.json({ success: true, message: "OTP sent to your email" });
-
-    // console.log("Email sent successfully", info.messageId);
   } catch (error) {
     console.error("Error in forgotEmailValid:", error.message);
     res.status(500).json({ success: false, message: "An error occurred while processing your request" });
@@ -650,13 +560,9 @@ const getForgotPassOtp = async (req, res) => {
 
 const resendOtpAgain = async (req, res) => {
   try {
-    console.log('inside resendotpagain');
     if (req.session.email) {
       const email = req.session.email;
-      console.log(email);
       var newOtp = await otpHelper.generateOtp();
-      console.log(newOtp);
-
       const transporter = nodemailer.createTransport({
         service: "gmail",
         port: 587,
@@ -667,7 +573,6 @@ const resendOtpAgain = async (req, res) => {
           pass: process.env.EMAIL_PASSWORD
         }
       });
-
       const info = await transporter.sendMail({
         from: process.env.EMAIL_USER,
         to: email,
@@ -675,11 +580,9 @@ const resendOtpAgain = async (req, res) => {
         text: `Your new OTP is ${newOtp}`,
         html: `<b>  <h4 >Your new OTP is ${newOtp}</h4>    <br>  <a href="">Click here</a></b>`,
       });
-
       if (info) {
         req.session.userOtp = newOtp;
         res.json({ success: true, message: 'OTP resent successfully' });
-        console.log("Email resent", info.messageId);
       } else {
         res.json({ success: false, message: 'Failed to resend OTP' });
       }
@@ -703,14 +606,11 @@ const getNewPassword = async (req, res) => {
 }
 const verifyForgotPassOtp = async (req, res) => {
   try {
-    console.log(req.body.otp);
     const enteredOtp = req.body.otp;
     if (enteredOtp === req.session.userOtp) {
-      // OTP verification successful
       req.session.isOtpVerified = true;
       res.json({ status: true });
     } else {
-      console.log('Invalid OTP');
       res.json({ status: false, message: 'Invalid OTP' });
     }
   } catch (error) {
@@ -723,10 +623,7 @@ const postNewPassword = async (req, res) => {
   try {
     const { newPass } = req.body
     const email = req.session.email
-    console.log(email);
-    console.log(newPass);
     if (newPass) {
-      console.log('1');
       const passwordHash = await passwordHelper.securePassword(newPass)
       await User.updateOne(
         { email: email },
@@ -739,7 +636,6 @@ const postNewPassword = async (req, res) => {
         .then((data) => console.log(data))
       res.json({ success: true, message: 'Password changed successfully' });
     } else {
-      console.log("Password not match");
       res.status(400).json({ success: false, message: "Password not matching" });
     }
   } catch (error) {
@@ -751,27 +647,15 @@ const postNewPassword = async (req, res) => {
 
 const updatePassword = async (req, res) => {
   try {
-    console.log('1');
     const { currentPassword, newPassword } = req.body;
-    console.log(currentPassword);
-    console.log(newPassword);
-
-    // Retrieve the user from the database
-    const user = await User.findById(req.session.user._id); // Assuming you have implemented authentication middleware to set req.user
-
-    // Verify if the current password matches the one stored in the database
+    const user = await User.findById(req.session.user._id);
     const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
     if (!isPasswordValid) {
       return res.status(400).json({ error: 'Invalid current password' });
     }
-
     const hashedPassword = await passwordHelper.securePassword(newPassword)
-
-    // Update the user's password in the database
     user.password = hashedPassword;
     await user.save();
-    console.log('2');
-    // Send a success response
     res.status(200).json({ message: 'Password updated successfully' });
   } catch (error) {
     console.error('Error updating password:', error);
@@ -786,7 +670,6 @@ const userLogout = async (req, res) => {
       if (err) {
         console.log(err.message);
       }
-      console.log("Logged out");
       res.redirect("/login")
     })
   } catch (error) {
@@ -794,132 +677,97 @@ const userLogout = async (req, res) => {
   }
 }
 
-const cancelOrder = async (req, res) => {
+
+
+
+const cancelProduct = async (req, res) => {
   try {
-    console.log('inside cancel order');
-    const { orderId } = req.body;
-    console.log(orderId);
-    const order = await Order.findById(orderId);
+    const { orderId, orderProductId } = req.body;
+    const orderIdObj = new mongoose.Types.ObjectId(orderId);
+    const order = await Order.findOne({ _id: orderIdObj });
     if (!order) {
-      return res.status(404).json({ error: 'Order not found' });
+      return res.status(404).json({ success: false, error: 'Order not found' });
     }
-    console.log(order);
-    let totalAmount = order.totalAmount;
-
-    console.log(totalAmount);
-    if (order.orderStatus === 'confirmed' || order.orderStatus === 'pending') {
-      if (order.paymentMethod === 'razorpay' || order.paymentMethod === 'wallet') {
-        const wallet = await Wallet.findOne({ user: req.session.user._id });
-        console.log(wallet);
-        if (!wallet) {
-          return res.status(404).json({ error: 'Wallet not found' });
-        }
-        wallet.walletBalance += totalAmount;
-        // Create a new history entry
-        wallet.history.push({
-          date: new Date(),
-          status: 'credit',
-          amount: totalAmount
-        });
-        await wallet.save();
-        console.log(wallet);
-      }
-      order.orderStatus = 'cancelled';
-      await order.save();
-      console.log(order);
-      for (const item of order.orderedItems) {
-        const product = await Product.findById(item.product);
-        if (!product) {
-          console.error(`Product not found for item: ${item}`);
-          continue;
-        }
-        if (!product.productSizes || !Array.isArray(product.productSizes)) {
-          console.error(`Product sizes not defined or not an array for product: ${product}`);
-          continue;
-        }
-        const sizeIndex = product.productSizes.findIndex(size => size.size === item.size);
-        if (sizeIndex !== -1) {
-
-          product.productSizes[sizeIndex].quantity += item.quantity;
-          product.totalQuantity += item.quantity;
-          await product.save();
-        } else {
-          console.error(`Size ${item.size} not found for product: ${product}`);
-        }
-      }
-
-      return res.status(200).json({ message: 'Order cancelled successfully' });
+    const orderProduct = order.orderedItems.find(item => item.orderId.toString() === orderProductId);
+    if (!orderProduct) {
+      return res.status(404).json({ success: false, error: 'Order product not found' });
+    }
+    orderProduct.orderStat = 'cancelled';
+    await order.save();
+    const product = await Product.findById(orderProduct.product);
+    if (!product) {
+      return res.status(404).json({ success: false, error: 'Product not found' });
+    }
+    const productSize = product.productSizes.find(size => size.size === orderProduct.size);
+    if (!productSize) {
+      return res.status(404).json({ success: false, error: 'Product size not found' });
+    }
+    productSize.quantity += orderProduct.quantity;
+    product.totalQuantity += orderProduct.quantity;
+    await product.save();
+    const wallet = await Wallet.findOne({ user: order.user });
+    if (wallet) {
+      wallet.walletBalance += orderProduct.quantity * product.salePrice;
+      wallet.history.push({
+        status: 'credit',
+        amount: orderProduct.quantity * product.salePrice,
+      });
+      await wallet.save();
     } else {
-
-      return res.status(400).json({ error: 'Order cannot be cancelled' });
+      return res.status(404).json({ success: false, error: 'User does not have a wallet' });
     }
+    return res.json({ success: true });
   } catch (error) {
-    console.error('Error cancelling order:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-};
-
-const returnOrder = async (req, res) => {
-  try {
-    const { orderId } = req.body;
-    const order = await Order.findById(orderId);
-    if (!order) {
-      return res.status(404).json({ error: 'Order not found' });
-    }
-    let totalAmount = order.totalAmount;
-    console.log(totalAmount);
-    if (order.orderStatus === 'delivered') {
-      if (order.paymentMethod === 'razorpay' || order.paymentMethod === 'wallet') {
-        const wallet = await Wallet.findOne({ user: req.session.user._id });
-        console.log(wallet);
-        if (!wallet) {
-          return res.status(404).json({ error: 'Wallet not found' });
-        }
-        wallet.walletBalance += totalAmount;
-        // Create a new history entry
-        wallet.history.push({
-          date: new Date(),
-          status: 'credit',
-          amount: totalAmount
-        });
-        await wallet.save();
-        console.log(wallet);
-      }
-      order.orderStatus = 'returned';
-      await order.save();
-      for (const item of order.orderedItems) {
-        const product = await Product.findById(item.product);
-        if (!product) {
-          console.error(`Product not found for item: ${item}`);
-          continue;
-        }
-        if (!product.productSizes || !Array.isArray(product.productSizes)) {
-          console.error(`Product sizes not defined or not an array for product: ${product}`);
-          continue;
-        }
-        const sizeIndex = product.productSizes.findIndex(size => size.size === item.size);
-        if (sizeIndex !== -1) {
-          product.productSizes[sizeIndex].quantity += item.quantity;
-          product.totalQuantity += item.quantity;
-          await product.save();
-        } else {
-          console.error(`Size ${item.size} not found for product: ${product}`);
-        }
-      }
-      return res.status(200).json({ message: 'Order returned successfully' });
-    } else {
-      return res.status(400).json({ error: 'Order cannot be returned' });
-    }
-  } catch (error) {
-    console.error('Error returning order:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Error cancelling product:', error);
+    return res.status(500).json({ success: false, error: 'An error occurred while cancelling the product' });
   }
 };
 
 
 
-
-
+const returnProduct = async (req, res) => {
+  try {
+    const { orderId, orderProductId } = req.body;
+    const orderIdObj = new mongoose.Types.ObjectId(orderId);
+    const order = await Order.findOne({ _id: orderIdObj });
+    if (!order) {
+      return res.status(404).json({ success: false, error: 'Order not found' });
+    }
+    const orderProduct = order.orderedItems.find(item => item.orderId.toString() === orderProductId);
+    if (!orderProduct) {
+      return res.status(404).json({ success: false, error: 'Order product not found' });
+    }
+    orderProduct.orderStat = 'returned';
+    await order.save();
+    const product = await Product.findById(orderProduct.product);
+    if (!product) {
+      return res.status(404).json({ success: false, error: 'Product not found' });
+    }
+    const productSize = product.productSizes.find(size => size.size === orderProduct.size);
+    if (!productSize) {
+      return res.status(404).json({ success: false, error: 'Product size not found' });
+    }
+    productSize.quantity += orderProduct.quantity;
+    product.totalQuantity += orderProduct.quantity;
+    await product.save();
+    const wallet = await Wallet.findOne({ user: order.user });
+    if (wallet) {
+      wallet.walletBalance += orderProduct.quantity * product.salePrice;
+      wallet.history.push({
+        date: new Date(),
+        status: 'credit',
+        amount: orderProduct.quantity * product.salePrice,
+      });
+      await wallet.save();
+    } else {
+      return res.status(404).json({ success: false, error: 'User does not have a wallet' });
+    }
+    return res.json({ success: true });
+  } catch (error) {
+    console.error('Error returning product:', error);
+    return res.status(500).json({ success: false, error: 'An error occurred while returning the product' });
+  }
+};
 module.exports = {
   getHome,
   getLogin,
@@ -940,16 +788,16 @@ module.exports = {
   updateAddress,
   userLogout,
   updatePassword,
-  cancelOrder,
   filterPrice,
   searchProduct,
-  returnOrder,
   filterProduct,
   deleteAddress,
   getAddress,
   getForgotPassOtp,
   getNewPassword,
   resendOtpAgain,
+  cancelProduct,
+  returnProduct,
 }
 
 

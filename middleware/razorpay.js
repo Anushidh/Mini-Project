@@ -14,10 +14,8 @@ const razorpayOrderCreate = async (orderId, totalAmount) => {
       "receipt": `${orderId}`,
       payment_capture: 1,
     });
-    console.log("razorpay orderDetailsorderDetails razorpay :", orderDetails);
     return orderDetails;
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };
@@ -37,8 +35,7 @@ const createOrder = async (req, res) => {
     console.log(orderDetails);
     res.json({ orderId: orderDetails, totalPrice: req.body.totalPrice });
   } catch (error) {
-    console.log(error);
-    throw error;
+    console.log(error.message);
   }
 };
 

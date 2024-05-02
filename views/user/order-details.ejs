@@ -41,8 +41,10 @@
                     <th style="padding: 8px; text-align: center;">Discount</th>
                     <th style="padding: 8px; text-align: center;">Payment Method</th>
                     <th style="padding: 8px; text-align: center;">Status</th>
+                    <th></th>
                     <th style="padding: 8px; text-align: center;">Payment Status</th>
                     <th style="display: none;">Order ID</th>
+                    <th style="display: none;">Order individual ID</th>
                 </tr>
             </thead>
             <tbody>
@@ -73,7 +75,23 @@
                             <%= orderDetails[i].paymentMethod %>
                         </td>
                         <td style="padding: 8px; text-align: center;">
-                            <%= orderDetails[i].orderStatus %>
+                            <%= orderDetails[i].orderedItems.orderStat %>
+                        </td>
+                        <td style="padding: 8px; text-align: center;">
+                            <% const orderStatus=orderDetails[i].orderedItems.orderStat; %>
+                                <% if (orderStatus==='cancelled' ) { %>
+                                    <span>Cancelled</span>
+                                    <% } else if (orderStatus==='returned' ) { %>
+                                        <span>Returned</span>
+                                        <% } else if (orderStatus==='confirmed' || orderStatus==='pending' ) { %>
+                                            <button
+                                                onclick="cancelProduct('<%= orderDetails[i]._id %>','<%= orderDetails[i].orderedItems.orderId %>')">Cancel</button>
+                                            <% } else if (orderStatus==='delivered' ) { %>
+                                                <button
+                                                    onclick="returnOrder('<%= orderDetails[i]._id %>','<%= orderDetails[i].orderedItems.orderId %>')">Return</button>
+                                                <% } else { %>
+                                                    <%= orderStatus %>
+                                                        <% } %>
                         </td>
                         <td style="padding: 8px; text-align: center;">
                             <% if (orderDetails[i].paymentStatus==='success' ) { %>
@@ -84,6 +102,9 @@
                         </td>
                         <td style="display: none;">
                             <%= orderDetails[i]._id %>
+                        </td>
+                        <td style="display: none;">
+                            <%= orderDetails[i].orderedItems.orderId %>
                         </td>
                     </tr>
                     <!-- Repeat this block for each order item -->
@@ -98,30 +119,30 @@
 
         <script>
 
-              // Handle retry button click for Razorpay payment method
-    $(document).on('click', '.retry-btn', function(event) {
-        event.preventDefault(); // Prevent the default link behavior
-        var orderId = $(this).data('order-id');
-        console.log(orderId);
-        // Send an AJAX request to retry Razorpay payment
-        $.ajax({
-            type: 'POST',
-            url: '/second-try', // Use the same endpoint for retry
-            data: { payment_method: 'razorpay', order_id: orderId }, // Specify Razorpay as the payment method
-            success: function(response) {
-                // If retry is successful, proceed with Razorpay payment
-                paymentMethodRazorpayPayment(response);
-            },
-            error: function(xhr, status, error) {
-                // Handle error response from the server
-                console.error(error); // Log the error for debugging
-                var errorMessage = xhr.responseJSON ? xhr.responseJSON.message : 'An error occurred while retrying the payment. Please try again later.';
-                console.log(errorMessage);
-                // Show an error message to the user using SweetAlert2
-                showErrorAlert(errorMessage);
-            }
-        });
-    });
+            // Handle retry button click for Razorpay payment method
+            $(document).on('click', '.retry-btn', function (event) {
+                event.preventDefault(); // Prevent the default link behavior
+                var orderId = $(this).data('order-id');
+                console.log(orderId);
+                // Send an AJAX request to retry Razorpay payment
+                $.ajax({
+                    type: 'POST',
+                    url: '/second-try', // Use the same endpoint for retry
+                    data: { payment_method: 'razorpay', order_id: orderId }, // Specify Razorpay as the payment method
+                    success: function (response) {
+                        // If retry is successful, proceed with Razorpay payment
+                        paymentMethodRazorpayPayment(response);
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle error response from the server
+                        console.error(error); // Log the error for debugging
+                        var errorMessage = xhr.responseJSON ? xhr.responseJSON.message : 'An error occurred while retrying the payment. Please try again later.';
+                        console.log(errorMessage);
+                        // Show an error message to the user using SweetAlert2
+                        showErrorAlert(errorMessage);
+                    }
+                });
+            });
 
 
             function paymentMethodRazorpayPayment(orderinfo) {
@@ -219,13 +240,27 @@
                     cancelButtonText: 'Cancel'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        let products = orderDetails.map((order) => ({
-                            quantity: order.orderedItems.quantity,
-                            description: order.productDetails[0].productName,
-                            tax: 0,
-                            price: order.productDetails[0].salePrice
-                        }));
-
+                        console.log('1');
+                        let products = orderDetails.flatMap((order) => {
+                            const orderedItem = order.orderedItems;
+                            if (orderedItem.orderStat === "delivered") {
+                                return [
+                                    {
+                                        quantity: orderedItem.quantity,
+                                        description: order.productDetails.find(
+                                            (product) => product._id.toString() === orderedItem.product.toString()
+                                        ).productName,
+                                        tax: 0,
+                                        price: order.productDetails.find(
+                                            (product) => product._id.toString() === orderedItem.product.toString()
+                                        ).salePrice,
+                                    },
+                                ];
+                            } else {
+                                return [];
+                            }
+                        });
+                        console.log(products);
                         const data = {
                             "apiKey": "free",
                             "mode": "development",
@@ -267,5 +302,132 @@
 
 
 
+            function cancelProduct(orderId, orderProductId) {
+                console.log(orderProductId);
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'Are you sure you want to cancel this product?',
+                    icon: 'warning',
+                    position: 'top-middle',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, cancel it!',
+                    cancelButtonText: 'No, keep it'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // User confirmed, proceed with cancellation
+                        fetch('/cancel-product', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ orderId, orderProductId })
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Toastify({
+                                        text: 'Product cancelled successfully',
+                                        backgroundColor: 'linear-gradient(to right, #00b09b, #96c93d)',
+                                        className: 'success',
+                                        position: 'center',
+                                        gravity: 'top',
+                                        stopOnFocus: true
+                                    }).showToast();
+                                    setTimeout(() => {
+                                        window.location.reload();
+                                    }, 2000);
+                                } else {
+                                    Toastify({
+                                        text: data.error || 'Failed to cancel product',
+                                        backgroundColor: 'linear-gradient(to right, #ff5f6d, #ffc371)',
+                                        className: 'error',
+                                        position: 'center',
+                                        gravity: 'top',
+                                        stopOnFocus: true
+                                    }).showToast();
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error cancelling product:', error);
+                                Toastify({
+                                    text: 'An error occurred while cancelling the product',
+                                    backgroundColor: 'linear-gradient(to right, #ff5f6d, #ffc371)',
+                                    className: 'error',
+                                    position: 'center',
+                                    gravity: 'top',
+                                    stopOnFocus: true
+                                }).showToast();
+                            });
+                    }
+                });
+            }
+
+
+            function returnOrder(orderId, orderProductId) {
+                console.log(orderProductId);
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'Are you sure you want to return this product?',
+                    icon: 'warning',
+                    position: 'top-middle',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, return it!',
+                    cancelButtonText: 'No, keep it'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // User confirmed, proceed with return
+                        fetch('/return-product', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ orderId, orderProductId })
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Toastify({
+                                        text: 'Product return request submitted successfully',
+                                        duration: 3000,
+                                        gravity: 'top',
+                                        position: 'center',
+                                        style: {
+                                            background: 'green',
+                                        },
+                                    }).showToast();
+                                    setTimeout(() => {
+                                        window.location.reload();
+                                    }, 2000);
+                                } else {
+                                    Toastify({
+                                        text: data.error || 'Failed to submit return request',
+                                        duration: 3000,
+                                        gravity: 'top',
+                                        position: 'center',
+                                        style: {
+                                            background: 'red',
+                                        },
+                                    }).showToast();
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error submitting return request:', error);
+                                Toastify({
+                                    text: error.message || 'An error occurred while submitting the return request',
+                                    duration: 3000,
+                                    gravity: 'top',
+                                    position: 'center',
+                                    style: {
+                                        background: 'red',
+                                    },
+                                }).showToast();
+                            });
+                    }
+                });
+            }
 
         </script>

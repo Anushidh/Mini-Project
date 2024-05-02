@@ -14,6 +14,10 @@ const orderSchema = mongoose.Schema(
     },
     orderedItems: [
       {
+        orderId: {
+          type: mongoose.Schema.Types.ObjectId,
+          default: () => new mongoose.Types.ObjectId(),
+        },
         product: {
           type: mongoose.Schema.Types.ObjectId,
           ref: 'products',
@@ -25,6 +29,20 @@ const orderSchema = mongoose.Schema(
           enum: ["Small", "Medium", "Large"] // Replace with full names
         },
         discountAvailed: Number,
+        orderStat: {
+          type: String,
+          enum: [
+            "pending",
+            "confirmed",
+            "shipped",
+            "outForDelivery",
+            "delivered",
+            "cancelled",
+            "return pending",
+            "returned",
+          ],
+          default: "pending",
+        },
       },
     ],
     address: mongoose.Schema.Types.ObjectId,

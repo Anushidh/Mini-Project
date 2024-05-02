@@ -2,7 +2,7 @@
 
     <!--breadcrumbs area start-->
     <div class="breadcrumbs_area product_bread">
-        <div class="container">   
+        <div class="container">
             <div class="row">
                 <div class="col-12">
                     <div class="breadcrumb_content">
@@ -14,43 +14,49 @@
                     </div>
                 </div>
             </div>
-        </div>         
+        </div>
     </div>
     <!--breadcrumbs area end-->
-    
+
     <!--product details start-->
     <div class="product_details">
         <div class="container">
             <div class="row">
                 <div class="col-lg-5 col-md-5">
-                   <div class="product-details-tab">
+                    <div class="product-details-tab">
 
                         <div id="img-1" class="zoomWrapper single-zoom">
                             <a href="#">
-                                <img id="zoom1" src="/uploads/product-images/<%= data.productImage[0] %>" data-zoom-image="/uploads/product-images/<%= data.productImage[0] %>" alt="big-1">
+                                <img id="zoom1" src="/uploads/product-images/<%= data.productImage[0] %>"
+                                    data-zoom-image="/uploads/product-images/<%= data.productImage[0] %>" alt="big-1">
                             </a>
                         </div>
 
                         <div class="single-zoom-thumb">
                             <ul class="s-tab-zoom owl-carousel single-product-active" id="gallery_01">
-                              <% for (let j = 0; j < data.productImage.length; j++) { %>
-                                <li>
-                                    <a href="#" class="elevatezoom-gallery active" data-update="" data-image="/uploads/product-images/<%= data.productImage[j] %>" data-zoom-image="/uploads/product-images/<%= data.productImage[j] %>">
-                                        <img src="/uploads/product-images/<%= data.productImage[j] %>" alt="zo-th-1"/>
-                                    </a>
+                                <% for (let j=0; j < data.productImage.length; j++) { %>
+                                    <li>
+                                        <a href="#" class="elevatezoom-gallery active" data-update=""
+                                            data-image="/uploads/product-images/<%= data.productImage[j] %>"
+                                            data-zoom-image="/uploads/product-images/<%= data.productImage[j] %>">
+                                            <img src="/uploads/product-images/<%= data.productImage[j] %>"
+                                                alt="zo-th-1" />
+                                        </a>
 
-                                </li>
-                               
-                                <% } %>
+                                    </li>
+
+                                    <% } %>
                             </ul>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-7 col-md-7">
                     <div class="product_d_right">
-                       <form method="POST" action="/addToCart">
-                           
-                            <h1><%= data.productName %></h1>
+                        <form method="POST" action="/addToCart">
+
+                            <h1>
+                                <%= data.productName %>
+                            </h1>
                             <div class=" product_ratting">
                                 <ul>
                                     <li><a href="#"><i class="fa fa-star"></i></a></li>
@@ -66,233 +72,137 @@
                                 <span class="current_price">₹<%= data.salePrice.toFixed(2) %></span>
                             </div>
                             <div class="product_desc">
-                                <p><%= data.productDescription %></p>
+                                <p>
+                                    <%= data.productDescription %>
+                                </p>
                             </div>
 
                             <div class="product_variant size">
                                 <h3>size</h3>
                                 <select class="niceselect_option" id="color1" name="produc_color">
-                                    <option selected value="1">size</option>        
-                                    <option value="Small">Small</option>              
-                                    <option value="Medium">Medium</option>              
-                                    <option value="Large">Large</option>              
-                                </select> 
+                                    <option selected value="1">size</option>
+                                    <option value="Small">Small</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Large">Large</option>
+                                </select>
                             </div>
                             <div class="product_variant quantity">
                                 <label for="quantity">Quantity</label>
                                 <input id="quantity" name="quantity" min="1" max="5" value="1" type="number">
-                                <button type="button" class="button" onclick="addToCart('<%= data._id %>')" >Add to Cart</button>
-                                <!-- <a href="#" class="button" id="addToCartButton" onclick="addToCart('<%= data._id %>')">Add to Cart</a> -->
+                                <button type="button" class="button" onclick="addToCart('<%= data._id %>')">Add to
+                                    Cart</button>
                             </div>
                             <div class="product_stock">
-                                <% let outOfStock = false; %>
-                                <% data.productSizes.forEach(size => { %>
-                                    <% console.log('Size:', size.size, 'Quantity:', size.quantity); %>
-                                    <% if (size.quantity <= 0) { %>
-                                        <span class="out_of_stock">Out of Stock: <%= size.size %></span>
-                                        <% outOfStock = true; %>
-                                    <% } else { %>
-                                        <span class="stock_amount"><%= size.size %>: <%= size.quantity %> left</span>
-                                    <% } %>
-                                <% }); %>
-                                <% if (!outOfStock) { %>
-                                    <span class="stock_amount">In Stock</span>
-                                <% } %>
+                                <% let outOfStock=false; %>
+                                    <% data.productSizes.forEach(size=> { %>
+                                        <% console.log('Size:', size.size, 'Quantity:' , size.quantity); %>
+                                            <% if (size.quantity <=0) { %>
+                                                <span class="out_of_stock">Out of Stock: <%= size.size %></span>
+                                                <% outOfStock=true; %>
+                                                    <% } else { %>
+                                                        <span class="stock_amount">
+                                                            <%= size.size %>: <%= size.quantity %> left
+                                                        </span>
+                                                        <% } %>
+                                                            <% }); %>
+                                                                <% if (!outOfStock) { %>
+                                                                    <span class="stock_amount">In Stock</span>
+                                                                    <% } %>
                             </div>
-                            
-                            
-                            
+
+
+
                             <div class="product_d_action">
                                 <ul>
                                     <!-- Modified anchor tag to include product ID and size in the URL -->
-                                    <li><a href="#" onclick="addToWishlist(event, '<%= data._id %>')" title="Add to wishlist">
-                                        <i class="fa fa-heart-o" aria-hidden="true"></i> Add to Wish List</a></li>
+                                    <li><a href="#" onclick="addToWishlist(event, '<%= data._id %>')"
+                                            title="Add to wishlist">
+                                            <i class="fa fa-heart-o" aria-hidden="true"></i> Add to Wish List</a></li>
                                 </ul>
                             </div>
-                            
-                            
+
+
                         </form>
-                        <!-- <div class="priduct_social">
-                            <h3>Share on:</h3>
-                            <ul>
-                                <li><a href="#"><i class="fa fa-rss"></i></a></li>           
-                                <li><a href="#"><i class="fa fa-vimeo"></i></a></li>           
-                                <li><a href="#"><i class="fa fa-tumblr"></i></a></li>           
-                                <li><a href="#"><i class="fa fa-pinterest"></i></a></li>        
-                                <li><a href="#"><i class="fa fa-linkedin"></i></a></li>        
-                            </ul>      
-                        </div> -->
+
 
                     </div>
                 </div>
             </div>
-        </div>    
+        </div>
     </div>
     <!--product details end-->
-    
-    <!--product info start-->
-    <div class="product_d_info">
-        <div class="container">   
-            <div class="row">
-                <div class="col-12">
-                    <div class="product_d_inner">   
-                        <div class="product_info_button">    
-                            <ul class="nav" role="tablist">
-                                <li >
-                                    <a class="active" data-bs-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false">More info</a>
-                                </li>
-                                <li>
-                                     <a data-bs-toggle="tab" href="#sheet" role="tab" aria-controls="sheet" aria-selected="false">Data sheet</a>
-                                </li>
-                                <li>
-                                   <a data-bs-toggle="tab" href="#reviews" role="tab" aria-controls="reviews" aria-selected="false">Reviews</a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="tab-content">
-                            <div class="tab-pane fade show active" id="info" role="tabpanel" >
-                                <div class="product_info_content">
-                                    <p>Fashion has been creating well-designed collections since 2010. The brand offers feminine designs delivering stylish separates and statement dresses which have since evolved into a full ready-to-wear collection in which every item is a vital part of a woman's wardrobe. The result? Cool, easy, chic looks with youthful elegance and unmistakable signature style. All the beautiful pieces are made in Italy and manufactured with the greatest attention. Now Fashion extends to a range of accessories including shoes, hats, belts and more!</p>
-                                </div>    
-                            </div>
 
-                            <div class="tab-pane fade" id="sheet" role="tabpanel" >
-                                <div class="product_d_table">
-                                   <form action="#">
-                                        <table>
-                                            <tbody>
-                                                <tr>
-                                                    <td class="first_child">Compositions</td>
-                                                    <td>Polyester</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="first_child">Styles</td>
-                                                    <td>Girly</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="first_child">Properties</td>
-                                                    <td>Short Dress</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </form>
-                                </div>
-                                <div class="product_info_content">
-                                    <p>Fashion has been creating well-designed collections since 2010. The brand offers feminine designs delivering stylish separates and statement dresses which have since evolved into a full ready-to-wear collection in which every item is a vital part of a woman's wardrobe. The result? Cool, easy, chic looks with youthful elegance and unmistakable signature style. All the beautiful pieces are made in Italy and manufactured with the greatest attention. Now Fashion extends to a range of accessories including shoes, hats, belts and more!</p>
-                                </div>    
-                            </div>
-                            <div class="tab-pane fade" id="reviews" role="tabpanel" >
-                                <div class="product_info_content">
-                                    <p>Fashion has been creating well-designed collections since 2010. The brand offers feminine designs delivering stylish separates and statement dresses which have since evolved into a full ready-to-wear collection in which every item is a vital part of a woman's wardrobe. The result? Cool, easy, chic looks with youthful elegance and unmistakable signature style. All the beautiful pieces are made in Italy and manufactured with the greatest attention. Now Fashion extends to a range of accessories including shoes, hats, belts and more!</p>
-                                </div>
-                                <div class="product_info_inner">
-                                    <div class="product_ratting mb-10">
-                                        <ul>
-                                            <li><a href="#"><i class="fa fa-star"></i></a></li>
-                                            <li><a href="#"><i class="fa fa-star"></i></a></li>
-                                            <li><a href="#"><i class="fa fa-star"></i></a></li>
-                                            <li><a href="#"><i class="fa fa-star"></i></a></li>
-                                            <li><a href="#"><i class="fa fa-star"></i></a></li>
-                                        </ul>
-                                        <strong>Posthemes</strong> 
-                                        <p>09/07/2022</p>
-                                    </div>
-                                    <div class="product_demo">
-                                        <strong>demo</strong>
-                                        <p>That's OK!</p>
-                                    </div>
-                                </div> 
-                                <div class="product_review_form">
-                                    <form action="#">
-                                        <h2>Add a review </h2>
-                                        <p>Your email address will not be published. Required fields are marked </p>
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <label for="review_comment">Your review </label>
-                                                <textarea name="comment" id="review_comment" ></textarea>
-                                            </div> 
-                                            <div class="col-lg-6 col-md-6">
-                                                <label for="author">Name</label>
-                                                <input id="author"  type="text">
 
-                                            </div> 
-                                            <div class="col-lg-6 col-md-6">
-                                                <label for="email">Email </label>
-                                                <input id="email"  type="text">
-                                            </div>  
-                                        </div>
-                                        <button type="submit">Submit</button>
-                                     </form>   
-                                </div>     
-                            </div>
-                        </div>
-                    </div>     
-                </div>
-            </div>
-        </div>    
-    </div>  
-    <!--product info end-->
-    
     <!--product section area start-->
     <section class="product_section related_product">
         <div class="container">
-            <div class="row">   
+            <div class="row">
                 <div class="col-12">
-                   <div class="section_title">
-                       <h2>Related Products</h2>
-                       <p>Contemporary, minimal and modern designs embody the Lavish Alice handwriting</p>
-                   </div>
-                </div> 
-            </div>    
-            <div class="product_area"> 
-                 <div class="row">
-                    <div class="product_carousel product_three_column4 owl-carousel">
-                      <% for (let i = 0; i < products.length; i++) { %>
-                        <div class="col-lg-3">
-                            <div class="single_product">
-                                <div class="product_thumb">
-                                    <a class="primary_img" href="/productDetails/<%= products[i]._id %>"><img src="/uploads/product-images/<%= products[i].productImage[0] %>" alt=""></a>
-                                    <a class="secondary_img" href="/productDetails/<%= products[i]._id %>"><img src="/uploads/product-images/<%= products[i].productImage[1] %>" alt=""></a>
-                                    <div class="product_action">
-                                        <div class="hover_action">
-                                           <a  href="#"><i class="fa fa-plus"></i></a>
-                                            <div class="action_button">
-                                                <ul>
-
-                                                    <li><a title="add to cart" href="cart.html"><i class="fa fa-shopping-basket" aria-hidden="true"></i></a></li>
-                                                    <li><a href="wishlist.html" title="Add to Wishlist"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-
-                                                    <li><a href="compare.html" title="Add to Compare"><i class="fa fa-sliders" aria-hidden="true"></i></a></li>
-
-                                                </ul>
-                                            </div>
-                                       </div>
-
-                                    </div>
-                                    <div class="quick_button">
-                                        <a href="#" data-bs-toggle="modal" data-bs-target="#modal_box" title="quick_view">+ quick view</a>
-                                    </div>
-
-                                    <% let priceDifference = products[i].regularPrice - products[i].salePrice; %>
-                                    <% if (priceDifference > 0) { %>
-                                    <div class="product_sale">
-                                        <span>₹<%= priceDifference %> off</span>
-                                    </div>
-                                    <% } %>
-                                </div>
-                                <div class="product_content">
-                                    <h3><a href="/productDetails/:id"><%= products[i].productName %></a></h3>
-                                    <span class="current_price">₹<%= products[i].salePrice.toFixed(2) %></span>
-                                    <span class="old_price">₹<%= products[i].regularPrice.toFixed(2) %></span>
-                                </div>
-                            </div>
-                        </div>
-                        <% } %>
-                       
+                    <div class="section_title">
+                        <h2>Related Products</h2>
+                        <p>"Unlock more possibilities with these complementary products tailored to enhance your
+                            experience."</p>
                     </div>
                 </div>
             </div>
-               
+            <div class="product_area">
+                <div class="row">
+                    <div class="product_carousel product_three_column4 owl-carousel">
+                        <% for (let i=0; i < products.length; i++) { %>
+                            <div class="col-lg-3">
+                                <div class="single_product">
+                                    <div class="product_thumb">
+                                        <a class="primary_img" href="/productDetails/<%= products[i]._id %>"><img
+                                                src="/uploads/product-images/<%= products[i].productImage[0] %>"
+                                                alt=""></a>
+                                        <a class="secondary_img" href="/productDetails/<%= products[i]._id %>"><img
+                                                src="/uploads/product-images/<%= products[i].productImage[1] %>"
+                                                alt=""></a>
+                                        <div class="product_action">
+                                            <div class="hover_action">
+                                                <a href="#"><i class="fa fa-plus"></i></a>
+                                                <div class="action_button">
+                                                    <ul>
+
+                                                        <li><a title="add to cart" href="cart.html"><i
+                                                                    class="fa fa-shopping-basket"
+                                                                    aria-hidden="true"></i></a></li>
+                                                        <li><a href="wishlist.html" title="Add to Wishlist"><i
+                                                                    class="fa fa-heart-o" aria-hidden="true"></i></a>
+                                                        </li>
+
+                                                        <li><a href="compare.html" title="Add to Compare"><i
+                                                                    class="fa fa-sliders" aria-hidden="true"></i></a>
+                                                        </li>
+
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <% let priceDifference=products[i].regularPrice - products[i].salePrice; %>
+                                            <% if (priceDifference> 0) { %>
+                                                <div class="product_sale">
+                                                    <span>₹<%= priceDifference %> off</span>
+                                                </div>
+                                                <% } %>
+                                    </div>
+                                    <div class="product_content">
+                                        <h3><a href="/productDetails/:id">
+                                                <%= products[i].productName %>
+                                            </a></h3>
+                                        <span class="current_price">₹<%= products[i].salePrice.toFixed(2) %></span>
+                                        <span class="old_price">₹<%= products[i].regularPrice.toFixed(2) %></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <% } %>
+
+                    </div>
+                </div>
+            </div>
+
         </div>
     </section>
     <!--product section area end-->
@@ -300,92 +210,204 @@
     <%- include("../partials/footer") %>
 
 
-    
-    <script>
-       
-    
-    function addToCart(prodId) {
-    console.log("Adding product to cart...");
-    console.log(prodId);
 
-    // Fetch the quantity from the user input
-    var quantity = $('#quantity').val(); // Assuming your input field has id="quantity"
-    var size = $('#color1').val();
-    // Log both quantity and size
-    console.log("Quantity:", quantity);
-    console.log("Size:", size);
+        <script>
 
-    $.ajax({
-        url: `/addToCart/${prodId}/${quantity}/${size}`,
-        method: 'POST',
-        success: (res) => {
-            // Log the response object
-            if (res.status === "true") {
-                Swal.fire({
-                    title: 'Added to Cart!',
-                    text: 'Continue Shopping',
-                    icon: 'success',
-                    timer: 2000,
-                    showConfirmButton: false
+            document.addEventListener('DOMContentLoaded', function () {
+                const sizeSelect = document.getElementById('color1');
+                const quantityInput = document.getElementById('quantity');
+                const productStock = document.querySelector('.product_stock');
+
+                console.log('sizeSelect:', sizeSelect);
+                console.log('quantityInput:', quantityInput);
+                console.log('productStock:', productStock);
+                let lastSelectedQuantity;
+                sizeSelect.addEventListener('change', handleStockChange);
+                quantityInput.addEventListener('input', handleStockChange);
+
+                function handleStockChange() {
+                    console.log('handleStockChange called');
+                    const selectedSize = sizeSelect.value;
+                    const quantity = quantityInput.value;
+                    const outOfStock = Array.from(productStock.querySelectorAll('.out_of_stock')).some(span => span.textContent.includes(selectedSize));
+
+                    if (outOfStock) {
+                        showToastNotification('error', `The selected size (${selectedSize}) is out of stock.`);
+                        quantityInput.disabled = true;
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 2000);
+                    } else {
+                        quantityInput.disabled = false;
+                        // lastSelectedQuantity = quantity;
+                        sendStockRequest('<%= data._id %>', selectedSize, quantity);
+                    }
+                }
+
+                function sendStockRequest(productId, size, quantity) {
+
+                    fetch('/get-stock-status', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ productId, size, quantity })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                showToastNotification('success', 'product quantity updated.');
+                            } else {
+                                showToastNotification('error', data.message);
+                                quantityInput.disabled = true;
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 2000);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showToastNotification('error', 'An error occurred while checking stock.');
+                            // quantityInput.value = lastSelectedQuantity;
+                        });
+                }
+
+                function showToastNotification(type, message) {
+                    Toastify({
+                        text: message,
+                        duration: 3000,
+                        gravity: 'top',
+                        position: 'center',
+                        backgroundColor: type === 'success' ? '#4CAF50' : '#ff6347',
+                    }).showToast();
+                }
+            });
+
+
+            function addToCart(prodId) {
+                console.log("Adding product to cart...");
+                console.log(prodId);
+
+                // Fetch the quantity from the user input
+                var quantity = $('#quantity').val();
+
+                // Assuming your input field has id="quantity"
+
+                var size = $('#color1').val();
+
+                // Log both quantity and size
+                console.log("Quantity:", quantity);
+                console.log("Size:", size);
+
+                if (size === "1") {
+                    Toastify({
+                        text: "Please select a size.",
+                        duration: 3000,
+                        close: true,
+                        gravity: "top",
+                        position: "center",
+                        backgroundColor: "linear-gradient(to right, #ff6c6c, #f66262)",
+                    }).showToast();
+                    return; // Exit the function if the quantity exceeds the limit
+                }
+
+                $.ajax({
+                    url: `/addToCart/${prodId}/${quantity}/${size}`,
+                    method: 'POST',
+                    success: (res) => {
+                        // Log the response object
+                        if (res.status === "true") {
+                            Toastify({
+                                text: "Added to Cart!",
+                                duration: 3000,
+                                close: true,
+                                gravity: "top",
+                                position: "center",
+                                backgroundColor: "linear-gradient(to right, #4bb543, #98ec2d)",
+                            }).showToast();
+                            setTimeout(() => {
+                                window.location.href = '/cart';
+                            }, 3000);
+                        } else if (res.status === "Out of stock") {
+                            Toastify({
+                                text: "The product is out of stock",
+                                duration: 3000,
+                                close: true,
+                                gravity: "top",
+                                position: "center",
+                                backgroundColor: "linear-gradient(to right, #ff6c6c, #f66262)",
+                            }).showToast();
+                        } else {
+                            Toastify({
+                                text: "You need to Login first",
+                                duration: 3000,
+                                close: true,
+                                gravity: "top",
+                                position: "center",
+                                backgroundColor: "linear-gradient(to right, #ff6c6c, #f66262)",
+                            }).showToast();
+                            setTimeout(() => {
+                                window.location.href = '/login';
+                            }, 3000);
+                        }
+                    },
+                    error: (xhr, status, error) => {
+                        console.error('Error:', error);
+                        Toastify({
+                            text: "An error occurred while processing your request. Please try again later.",
+                            duration: 3000,
+                            close: true,
+                            gravity: "top",
+                            position: "center",
+                            backgroundColor: "linear-gradient(to right, #ff6c6c, #f66262)",
+                        }).showToast();
+                    }
                 });
-            } else if (res.status === "Out of stock") {
-                Swal.fire({
-                    title: 'Stock!!',
-                    text: "The product is out of stock",
-                    icon: 'error',
-                    timer: 2000,
-                });
-            } else {
-                Swal.fire({
-                    title: 'You need to Login first',
-                    text: 'Continue Shopping',
-                    icon: 'warning',
-                    timer: 2000,
-                    showConfirmButton: false
-                }).then(() => { window.location.href = '/login'; });
             }
-        },
-        error: (xhr, status, error) => {
-            console.error('Error:', error);
-            // Display an error message to the user (optional)
-            alert('An error occurred while processing your request. Please try again later.');
-        }
-    });
-}
 
 
-function addToWishlist(event, productId) {
-    event.preventDefault();
-    var size = $('#color1').val();
-    
-    fetch(`/addToWishlist/${productId}/${size}`, {
-        method: 'POST'
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Failed to add item to wishlist');
-        }
-        $('.fa-heart-o').addClass('red-heart');
+            function addToWishlist(event, productId) {
+                event.preventDefault();
+                var size = $('#color1').val();
+                if (size === "1") {
+                    Toastify({
+                        text: "Please select a size.",
+                        duration: 3000,
+                        close: true,
+                        gravity: "top",
+                        position: "center",
+                        backgroundColor: "linear-gradient(to right, #ff6c6c, #f66262)",
+                    }).showToast();
+                    return; // Exit the function if the quantity exceeds the limit
+                }
 
-        // If response is OK, show success message
-        Swal.fire({
-            icon: 'success',
-            title: 'Success',
-            text: 'Item added to wishlist successfully'
-        });
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        // If error occurs, show error message
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Failed to add item to wishlist. Please try again later.'
-        });
-    });
-}
+                fetch(`/addToWishlist/${productId}/${size}`, {
+                    method: 'POST'
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to add item to wishlist');
+                        }
+                        $('.fa-heart-o').addClass('red-heart');
+
+                        // If response is OK, show success message
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: 'Item added to wishlist successfully'
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        // If error occurs, show error message
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Failed to add item to wishlist. Please try again later.'
+                        });
+                    });
+            }
 
 
-    
-    </script>
 
+        </script>

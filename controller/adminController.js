@@ -19,35 +19,26 @@ const dashboard = async (req,res) => {
   try {
     if(req.session.admin) {
       const salesDetails = await Order.find();
-        // console.log(salesDetails);
-        // Fetch all products and categories
         const products = await Product.find();
-        // console.log(products);
         const categories = await Category.find();
-        // console.log(categories);
         const topSellingProducts = await Order.aggregate([
-          { $unwind: "$orderedItems" }, // Split orders into individual items
+          { $unwind: "$orderedItems" }, 
           {
             $group: {
               _id: "$orderedItems.product",
               totalQuantity: { $sum: "$orderedItems.quantity" },
             },
-          }, // Group by productId and sum quantities
-          { $sort: { totalQuantity: -1 } }, // Sort by total quantity descending
-          { $limit: 10 }, // Limit to top 10 products
+          }, 
+          { $sort: { totalQuantity: -1 } }, 
+          { $limit: 10 }, 
         ]);
-        // console.log(topSellingProducts);
-        // Extract product IDs of top selling products
         const productIds = topSellingProducts.map((product) => product._id.toString());
-        // console.log(productIds);
-        // Fetch details of top selling products
         const productsData = await Product.find(
           { _id: { $in: productIds } },
-          { productName: 1, productImage: 1 } // Modify the fields you want to fetch
+          { productName: 1, productImage: 1 } 
         );
-        // console.log(productsData);
         const topSellingCategories = await Order.aggregate([
-          { $unwind: "$orderedItems" }, // Split orders into individual items
+          { $unwind: "$orderedItems" }, 
           {
             $lookup: {
               from: "products",
@@ -55,8 +46,8 @@ const dashboard = async (req,res) => {
               foreignField: "_id",
               as: "product",
             },
-          }, // Lookup products collection to get product details
-          { $unwind: "$product" }, // Unwind the product array
+          }, 
+          { $unwind: "$product" }, 
           {
             $lookup: {
               from: "categories",
@@ -64,27 +55,26 @@ const dashboard = async (req,res) => {
               foreignField: "_id",
               as: "category",
             },
-          }, // Lookup categories collection to get category details
-          { $unwind: "$category" }, // Unwind the category array
+          }, 
+          { $unwind: "$category" }, 
           {
             $group: {
               _id: "$category._id",
-              categoryName: { $first: "$category.name" }, // Get category name
-              totalQuantity: { $sum: "$orderedItems.quantity" }, // Sum quantities of items
+              categoryName: { $first: "$category.name" }, 
+              totalQuantity: { $sum: "$orderedItems.quantity" }, 
             },
-          }, // Group by categoryId and sum quantities
-          { $sort: { totalQuantity: -1 } }, // Sort by total quantity descending
-          { $limit: 10 }, // Limit to top 10 categories
+          }, 
+          { $sort: { totalQuantity: -1 } }, 
+          { $limit: 10 }, 
         ]);
-        // console.log(topSellingCategories);
-        // Extract category IDs of top selling categories
         const categoryIds = topSellingCategories.map((category) => category._id);
-  
-        // Fetch details of the top selling categories
         const topSellingCategoriesData = await Category.find({
           _id: { $in: categoryIds },
         });
-  
+        // Count of delivered orders
+      const deliveredOrdersCount = await Order.countDocuments({
+        orderStatus: "delivered",
+      });
         res.render('admin/dashboard', {
           salesDetails: salesDetails,
           products: products,
@@ -92,6 +82,7 @@ const dashboard = async (req,res) => {
           productsData: productsData,
           topSellingCategories: topSellingCategoriesData,
           topSellingProducts: topSellingProducts,
+          deliveredOrdersCount: deliveredOrdersCount,
         });
     }
     else {
@@ -110,35 +101,26 @@ const adminLoginPost = async (req, res) => {
     if (adminDetails) {
       req.session.admin = adminDetails;
       const salesDetails = await Order.find();
-      // console.log(salesDetails);
-      // Fetch all products and categories
       const products = await Product.find();
-      // console.log(products);
       const categories = await Category.find();
-      // console.log(categories);
       const topSellingProducts = await Order.aggregate([
-        { $unwind: "$orderedItems" }, // Split orders into individual items
+        { $unwind: "$orderedItems" }, 
         {
           $group: {
             _id: "$orderedItems.product",
             totalQuantity: { $sum: "$orderedItems.quantity" },
           },
-        }, // Group by productId and sum quantities
-        { $sort: { totalQuantity: -1 } }, // Sort by total quantity descending
-        { $limit: 10 }, // Limit to top 10 products
+        }, 
+        { $sort: { totalQuantity: -1 } }, 
+        { $limit: 10 }, 
       ]);
-      // console.log(topSellingProducts);
-      // Extract product IDs of top selling products
       const productIds = topSellingProducts.map((product) => product._id.toString());
-      // console.log(productIds);
-      // Fetch details of top selling products
       const productsData = await Product.find(
         { _id: { $in: productIds } },
-        { productName: 1, productImage: 1 } // Modify the fields you want to fetch
+        { productName: 1, productImage: 1 } 
       );
-      // console.log(productsData);
       const topSellingCategories = await Order.aggregate([
-        { $unwind: "$orderedItems" }, // Split orders into individual items
+        { $unwind: "$orderedItems" }, 
         {
           $lookup: {
             from: "products",
@@ -146,8 +128,8 @@ const adminLoginPost = async (req, res) => {
             foreignField: "_id",
             as: "product",
           },
-        }, // Lookup products collection to get product details
-        { $unwind: "$product" }, // Unwind the product array
+        }, 
+        { $unwind: "$product" }, 
         {
           $lookup: {
             from: "categories",
@@ -155,27 +137,22 @@ const adminLoginPost = async (req, res) => {
             foreignField: "_id",
             as: "category",
           },
-        }, // Lookup categories collection to get category details
-        { $unwind: "$category" }, // Unwind the category array
+        }, 
+        { $unwind: "$category" }, 
         {
           $group: {
             _id: "$category._id",
-            categoryName: { $first: "$category.name" }, // Get category name
-            totalQuantity: { $sum: "$orderedItems.quantity" }, // Sum quantities of items
+            categoryName: { $first: "$category.name" }, 
+            totalQuantity: { $sum: "$orderedItems.quantity" }, 
           },
-        }, // Group by categoryId and sum quantities
-        { $sort: { totalQuantity: -1 } }, // Sort by total quantity descending
-        { $limit: 10 }, // Limit to top 10 categories
+        }, 
+        { $sort: { totalQuantity: -1 } }, 
+        { $limit: 10 }, 
       ]);
-      // console.log(topSellingCategories);
-      // Extract category IDs of top selling categories
       const categoryIds = topSellingCategories.map((category) => category._id);
-
-      // Fetch details of the top selling categories
       const topSellingCategoriesData = await Category.find({
         _id: { $in: categoryIds },
       });
-
       res.render('admin/dashboard', {
         salesDetails: salesDetails,
         products: products,
@@ -197,64 +174,59 @@ const adminLoginPost = async (req, res) => {
 const showChart = async (req, res) => {
   try {
     if (req.body.msg) {
-      // Aggregate monthly sales data
       const monthlySalesData = await Order.aggregate([
         {
-          $match: { "orderStatus": "delivered" }, // Consider only delivered orders
+          $match: { "orderStatus": "delivered" }, 
         },
         {
           $group: {
-            _id: { $month: "$createdAt" }, // Group by month
-            totalAmount: { $sum: "$totalAmount" }, // Calculate total sales amount for each month
+            _id: { $month: "$createdAt" }, 
+            totalAmount: { $sum: "$totalAmount" }, 
           },
         },
         {
-          $sort: { _id: 1 }, // Sort by month
+          $sort: { _id: 1 }, 
         },
       ]);
-      // Aggregate daily sales data
       const dailySalesData = await Order.aggregate([
         {
-          $match: { "orderStatus": "delivered" }, // Consider only delivered orders
+          $match: { "orderStatus": "delivered" }, 
         },
         {
           $group: {
-            _id: { $dayOfMonth: "$createdAt" }, // Group by day of month
-            totalAmount: { $sum: "$totalAmount" }, // Calculate total sales amount for each day
+            _id: { $dayOfMonth: "$createdAt" }, 
+            totalAmount: { $sum: "$totalAmount" }, 
           },
         },
         {
-          $sort: { _id: 1 }, // Sort by day of month
+          $sort: { _id: 1 }, 
         },
       ]);
       const yearlySalesData = await Order.aggregate([
         {
-          $match: { "orderStatus": "delivered" }, // Consider only delivered orders
+          $match: { "orderStatus": "delivered" }, 
         },
         {
           $group: {
-            _id: { $year: "$createdAt" }, // Group by year
-            totalAmount: { $sum: "$totalAmount" }, // Calculate total sales amount for each year
+            _id: { $year: "$createdAt" }, 
+            totalAmount: { $sum: "$totalAmount" }, 
           },
         },
         {
-          $sort: { _id: 1 }, // Sort by year
+          $sort: { _id: 1 }, 
         },
       ]);
-      
-      // Count occurrences of each order status
       const orderStatuses = await Order.aggregate([
         {
-          $unwind: "$orderedItems", // Unwind the orderedItems array
+          $unwind: "$orderedItems", 
         },
         {
           $group: {
-            _id: "$orderedItems.orderStatus", // Group by order status
-            count: { $sum: 1 }, // Count occurrences of each status
+            _id: "$orderedItems.orderStatus", 
+            count: { $sum: 1 }, 
           },
         },
       ]);
-      // Map order statuses to object format
       const eachOrderStatusCount = {};
       orderStatuses.forEach((status) => {
         eachOrderStatusCount[status._id] = status.count;
@@ -280,19 +252,15 @@ const adminLogout = async (req, res) => {
 
 const salesReportPage = async (req, res) => {
   try {
-    // console.log('salesreportpage');
     const sales = await orderHelper.getAllDeliveredOrders();
     const deliveredOrders = await Order.find({ orderStatus: 'delivered' });
     const count = deliveredOrders.length;
-    console.log(count);
     let totalOrderAmount = 0;
     let totalDiscountAmount = 0;
     for (const order of deliveredOrders) {
       totalOrderAmount += order.totalAmount;
       totalDiscountAmount += order.totalDiscount + order.couponAmount;
     }
-    console.log(totalOrderAmount);
-    console.log(totalDiscountAmount);
     sales.forEach((order) => {
       const orderDate = new Date(order.orderDate)
       const formattedDate = orderDate.toLocaleDateString('en-GB', {
@@ -315,18 +283,13 @@ const salesReportPage = async (req, res) => {
 const salesReport = async (req, res) => {
   try {
     let { startDate, endDate } = req.body;
-    console.log(startDate);
-    console.log(endDate);
     startDate = new Date(startDate)
     endDate = new Date(endDate)
-    console.log(startDate);
-    console.log(endDate);
     const salesReport = await orderHelper.getAllDeliveredOrdersByDate(startDate, endDate);
     for (let i = 0; i < salesReport.length; i++) {
       salesReport[i].orderDate = dateFormat(salesReport[i].orderDate)
       salesReport[i].totalAmount = currencyFormat(salesReport[i].totalAmount)
     }
-    console.log(salesReport);
     res.status(200).json({ sales: salesReport })
   } catch (error) {
     throw error;

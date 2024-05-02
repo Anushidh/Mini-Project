@@ -16,19 +16,17 @@
             <article class="icontext">
               <span class="icon icon-sm rounded-circle bg-primary-light"><i
                   class="text-primary material-icons md-monetization_on"></i></span>
-              <div class="text">
-                <h6 class="mb-1 card-title">Revenue</h6>
-                <% let totalRevenue=0; %>
-                  <% for (let i=0; i < salesDetails.length; i++) { %>
-                    <% totalRevenue +=salesDetails[i].totalAmount; %>
+                  <div class="text">
+                    <h6 class="mb-1 card-title">Revenue</h6>
+                    <% let totalRevenue = 0; %>
+                    <% for (let i = 0; i < salesDetails.length; i++) { %>
+                      <% if (salesDetails[i].orderStatus === 'delivered') { %>
+                        <% totalRevenue += salesDetails[i].totalAmount; %>
                       <% } %>
-                        <span id="totalRevenue" style="font-size: 18px;">
-                          ₹ <%= totalRevenue %>
-                        </span>
-                        <span class="text-sm">
-                          Shipping fees are not included
-                        </span>
-              </div>
+                    <% } %>
+                    <span id="totalRevenue" style="font-size: 18px;">₹ <%= totalRevenue %></span>
+                    <span class="text-sm">Shipping fees are not included</span>
+                  </div>
             </article>
           </div>
         </div>
@@ -38,9 +36,14 @@
               <span class="icon icon-sm rounded-circle bg-success-light"><i
                   class="text-success material-icons md-local_shipping"></i></span>
               <div class="text">
-                <h6 class="mb-1 card-title">Orders</h6> <span>
-                  <%= salesDetails.length %>
-                </span>
+                <h6 class="mb-1 card-title">Orders</h6> 
+                <% let deliveredOrdersCount = 0; %>
+                <% for (let i = 0; i < salesDetails.length; i++) { %>
+                  <% if (salesDetails[i].orderStatus === 'delivered') { %>
+                    <% deliveredOrdersCount++; %>
+                  <% } %>
+                <% } %>
+                <span><%= deliveredOrdersCount %></span>
                 <span class="text-sm">
                   Excluding orders in transit
                 </span>
@@ -75,7 +78,7 @@
             </article>
           </div>
         </div>
-        <div class="col-lg-4">
+        <!-- <div class="col-lg-4">
           <div class="card mb-4">
             <article class="card-body">
               <h5 class="card-title">Order Statuses</h5>
@@ -83,7 +86,7 @@
               <canvas id="myChart2" height="217"></canvas>
             </article>
           </div>
-        </div>
+        </div> -->
       </div>
       
       <div class="row">

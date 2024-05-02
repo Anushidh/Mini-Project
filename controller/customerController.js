@@ -21,7 +21,6 @@ const getCustomersInfo = async (req, res) => {
       }).limit(limit * 1)
           .skip((page - 1) * limit)
           .exec()
-
       const count = await User.find({
           isAdmin: "0",
           $or: [
@@ -29,7 +28,6 @@ const getCustomersInfo = async (req, res) => {
               { email: { $regex: ".*" + search + ".*" } },
           ]
       }).countDocuments()
-
       res.render("admin/customers", {
           data: userData,
           totalPages: Math.ceil(count / limit),

@@ -69,11 +69,7 @@
                                 <div id="error-coupon-name" class="error-message"></div>
                             </div>
 
-                            <!-- <div class="mb-4">
-                                    <label for="coupon-code" class="form-label">Coupon Code</label>
-                                    <input type="text" id="coupon-code" name="couponCode" placeholder="Enter coupon code" class="form-control" />
-                                     <div id="error-coupon-code" class="error-message"></div> 
-                                </div> -->
+                            
 
                             <div>
                                 <label for="startingDate" class="form-label">Start Date</label>
@@ -87,11 +83,7 @@
                                 <div id="error-end-date" class="error-message"></div>
                             </div>
 
-                            <!-- <div>
-                                    <label for="offer-price" class="form-label">Offer Price</label>
-                                    <input type="text" name="offerPrice" placeholder="Type here" class="form-control" />
-                                    <div id="error-offer-price" class="error-message"></div>
-                                </div> -->
+                        
 
                             <div>
                                 <label for="minimum-price" class="form-label">Discount Amount</label>
@@ -167,6 +159,31 @@
                             </table>
 
                         </div>
+                        <!-- Pagination -->
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center">
+                                <% if (currentPage> 1) { %>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=<%= currentPage - 1 %>">Previous</a>
+                                    </li>
+                                    <% } %>
+
+                                        <% for (let i=1; i <=totalPages; i++) { %>
+                                            <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                                <a class="page-link" href="?page=<%= i %>">
+                                                    <%= i %>
+                                                </a>
+                                            </li>
+                                            <% } %>
+
+                                                <% if (currentPage < totalPages) { %>
+                                                    <li class="page-item">
+                                                        <a class="page-link"
+                                                            href="?page=<%= currentPage + 1 %>">Next</a>
+                                                    </li>
+                                                    <% } %>
+                            </ul>
+                        </nav>
                     </div> <!-- .col// -->
                 </div> <!-- .row // -->
             </div> <!-- card body .// -->
@@ -302,6 +319,11 @@
 
                 if (endDate < startDate) {
                     endDateError.textContent = 'End date cannot be earlier than start date';
+                    return; // Exit the function if end date is earlier than start date
+                }
+
+                if (endDate === startDate) {
+                    endDateError.textContent = 'End date cannot be same as start date';
                     return; // Exit the function if end date is earlier than start date
                 }
 
@@ -447,6 +469,11 @@
 
                     if (editCouponEndDate < editCouponStartDate) {
                         document.getElementById('error3').textContent = 'End date cannot be earlier than start date';
+                        return;
+                    }
+
+                    if (editCouponEndDate === editCouponStartDate) {
+                        document.getElementById('error3').textContent = 'End date cannot be same as start date';
                         return;
                     }
 

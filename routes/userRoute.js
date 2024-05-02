@@ -18,9 +18,6 @@ userRoute.get("/signup", userController.getSignup);
 userRoute.post("/signup", userController.userSignup);
 userRoute.get("/otp", userController.getOtp);
 userRoute.post("/otp", userController.otpVerify);
-// userRoute.get("/otp-lost-password",userController.getOtpLostPassword);
-// userRoute.post("/otp-lost-password",userController.postOtpLostPassword);
-// userRoute.get("/resendOtp",userController.resendOtpPage)
 userRoute.post("/resendOtp", userController.resendOtp);
 userRoute.post("/resendOtpAgain", userController.resendOtpAgain);
 userRoute.get("/verifyEmail", userController.getVerifyEmail);
@@ -29,7 +26,6 @@ userRoute.get("/verifyForgotPassOtp", userController.getForgotPassOtp);
 userRoute.post("/verifyForgotPassOtp", userController.verifyForgotPassOtp);
 userRoute.get("/newPassword", userController.getNewPassword);
 userRoute.post("/newPassword", userController.postNewPassword);
-// userRoute.post('/search-product/:query',userController.searchProduct);
 userRoute.get("/logout", userController.userLogout);
 
 // Products based routes
@@ -38,8 +34,10 @@ userRoute.get("/search-product", isLoggedIn, userController.searchProduct);
 userRoute.get("/shop", userController.getShopPage);
 userRoute.post("/filter-price", isLoggedIn, userController.filterPrice);
 userRoute.get("/filter", isLoggedIn, userController.filterProduct);
+
 // Cart based routes
 userRoute.get('/cart', isLoggedIn, cartController.userCart);
+userRoute.post('/get-stock-status', cartController.checkStock);
 userRoute.post("/addToCart/:prodId/:quantity/:size", isLoggedIn, cartController.addToCart);
 userRoute.post('/remove-cart-item/:id', isLoggedIn, cartController.removeFromCart);
 userRoute.post('/quantity-change', isLoggedIn, cartController.incDecQuantity);
@@ -53,7 +51,6 @@ userRoute.post('/removeFromWishlist/:id', isLoggedIn, wishlistController.removeF
 // purchase based routes
 userRoute.get('/checkoutPage', isLoggedIn, orderController.checkout);
 userRoute.post('/place-order', isLoggedIn, orderController.placeOrder);
-// userRoute.post('/place-orderRazorpay',isLoggedIn,orderController.placeOrderRazorpay);
 userRoute.post("/createOrder", isLoggedIn, razorpay.createOrder);
 userRoute.post('/paymentSuccess', isLoggedIn, orderController.paymentSuccess);
 userRoute.post('/failedRazorpay', isLoggedIn, orderController.failedRazorpay);
@@ -65,16 +62,14 @@ userRoute.post('/verify-payment', isLoggedIn, orderController.verifyPayment);
 // User-Account based routes
 userRoute.get('/user-profile', isLoggedIn, userController.userProfile);
 userRoute.post('/add-address', isLoggedIn, userController.addAddress);
-// userRoute.get('/edit-address', isLoggedIn,userController.editAddressPage);
 userRoute.get('/get-address', isLoggedIn, userController.getAddress);
 userRoute.delete('/delete-address', isLoggedIn, userController.deleteAddress);
 userRoute.post('/updateAddress', isLoggedIn, userController.updateAddress);
 userRoute.post('/change-password', isLoggedIn, userController.updatePassword);
-userRoute.post('/cancel-order', isLoggedIn, userController.cancelOrder);
-userRoute.post('/return-order', isLoggedIn, userController.returnOrder);
+userRoute.post('/cancel-product', isLoggedIn, userController.cancelProduct);
+userRoute.post('/return-product', isLoggedIn, userController.returnProduct);
 
 //Coupon based routes
-// userRoute.post('/applyOrRemoveCoupon', isLoggedIn, couponController.applyOrRemoveCoupon);
 userRoute.post('/applyCoupon', isLoggedIn, couponController.applyCoupon);
 userRoute.post('/removeCoupon', isLoggedIn, couponController.removeCoupon);
 

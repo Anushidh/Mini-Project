@@ -4,10 +4,8 @@ const Category = require('../model/categoryModel');
 const addCategoryToDb = (body) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let name = body.categoryName.toLowerCase(); // Convert category name to lowercase
-
-      let oldCategory = await Category.findOne({ name: { $regex: new RegExp('^' + name + '$', 'i') } }); // Case-insensitive regex search
-
+      let name = body.categoryName.toLowerCase(); 
+      let oldCategory = await Category.findOne({ name: { $regex: new RegExp('^' + name + '$', 'i') } }); 
       if (oldCategory) {
         resolve({ status: false });
       } else {
@@ -32,10 +30,8 @@ const getAllCategory = (currentPage, pageSize) => {
       const categories = await Category.find()
         .skip(skip)
         .limit(pageSize);
-
       const totalCategories = await Category.countDocuments();
       const totalPages = Math.ceil(totalCategories / pageSize);
-
       resolve({ categories, totalPages });
     } catch (error) {
       reject(error);
@@ -46,7 +42,6 @@ const getAllCategory = (currentPage, pageSize) => {
 const softDeleteCategory = async (categoryId) => {
   return new Promise(async (resolve, reject) => {
     let category = await Category.findById({ _id: categoryId });
-  
     category.isBlocked = !category.isBlocked;
     category.save()
     resolve(category)

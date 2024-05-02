@@ -16,47 +16,31 @@ const allProductOffer = async (req, res) => {
 
 const addProductOffer = async (req, res) => {
   try {
-    console.log('inside addproductoffer');
-    console.log(req.body);
     const { name, product, discount, startingDate, endingDate } = req.body;
-
-    // Validate input data
     if (!name || !product || !discount || !startingDate || !endingDate) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
-
     // Check if an offer with the same name already exists
     const existingOffer = await productOffer.findOne({ name });
     if (existingOffer) {
       return res.status(400).json({ message: 'An offer with the same name already exists' });
     }
-    console.log(existingOffer);
     const existingProduct = await Product.findById(product);
     if (!existingProduct) {
       return res.status(404).json({ message: 'Product not found' });
     }
-    console.log(existingProduct);
     if (existingProduct.isBlocked) {
       return res.status(403).json({ message: 'Product is blocked' });
     }
-    // const existingProductOffer = await productOffer.findOne({
-    //   'productOffer.product': product,
-    // });
-    // if (!existingProductOffer) {
-    //   return res.status(404).json({ message: 'Product offer not found' });
-    // }
-
     // Check if the product has an active category offer
     const productCategory = existingProduct.category;
     const activeCategoryOffer = await categoryOffer.findOne({
       'categoryOffer.category': productCategory,
       status: true,
     });
-
     if (activeCategoryOffer) {
       return res.status(400).json({ message: 'Product already has an active category offer' });
     }
-
     // If all validations pass, create the new offer
     const newOffer = new productOffer({
       name: name,
@@ -68,18 +52,13 @@ const addProductOffer = async (req, res) => {
       },
       discount: discount,
     });
-
     await newOffer.save();
-
-    const currentSalePrice = existingProduct.salePrice;
+    const currentSalePrice = existingProduct.regularPrice;
     existingProduct.oldSalePrice = currentSalePrice;
-    console.log(currentSalePrice);
     const offerDiscount = discount;
     const newSalePrice = currentSalePrice - offerDiscount;
     existingProduct.salePrice = newSalePrice;
     await existingProduct.save();
-    console.log(existingProduct);
-
     res.status(200).json({ message: 'Product offer created successfully' });
   } catch (error) {
     console.error('Error adding product offer:', error);
@@ -95,10 +74,24 @@ const deleteProductOffer = async (req, res) => {
     const offerDiscount = deletedOffer.discount;
     const affectedProduct = await Product.findById(productId);
     const currentSalePrice = affectedProduct.salePrice;
-    // const newSalePrice = currentSalePrice + offerDiscount;
     affectedProduct.salePrice = affectedProduct.oldSalePrice;
     await affectedProduct.save();
     await deletedOffer.deleteOne();
+    // Check if a category offer exists for the product
+    const categoryId = affectedProduct.category;
+    const activeCategoryOffer = await categoryOffer.findOne({
+      'categoryOffer.category': categoryId,
+      'endingDate': { $gte: new Date() },
+      'status': true
+    });
+    if (activeCategoryOffer) {
+      // Apply the category offer discount
+      const categoryDiscount = activeCategoryOffer.discount;
+      const newSalePrice = affectedProduct.regularPrice - categoryDiscount;
+      affectedProduct.salePrice = newSalePrice;
+      affectedProduct.oldSalePrice = affectedProduct.regularPrice;
+      await affectedProduct.save();
+    }
     res.redirect('/admin/productOffer');
   } catch (error) {
     console.error('Error deleting product offer:', error);
@@ -109,7 +102,6 @@ const deleteProductOffer = async (req, res) => {
 
 const editProductOffer = async (req, res) => {
   try {
-    console.log('inside editproduct offer');
     const offerId = req.body.offerId;
     const existingOffer = await productOffer.findById(offerId);
     if (!existingOffer) {
@@ -155,7 +147,6 @@ const allCategoryOffer = async (req, res) => {
 const addCategoryOffer = async (req, res) => {
   try {
     const { name, category, discount, startingDate, endingDate } = req.body;
-    // Check if an offer with the same name already exists
     const existingOffer = await categoryOffer.findOne({ name });
     if (existingOffer) {
       return res.status(400).json({ message: 'An offer with this name already exists' });
@@ -166,15 +157,12 @@ const addCategoryOffer = async (req, res) => {
       return res.status(400).json({ message: 'No products available for the selected category' });
     }
     const productIds = await Product.find({ category, isBlocked: false }, '_id');
-    console.log(productIds);
     // Check which products have an active product offer
     const productsWithProductOffer = await productOffer.find({
       'productOffer.product': { $in: productIds },
       'productOffer.offerStatus': true,
     }, 'productOffer.product');
-    console.log(productsWithProductOffer);
     const productsWithoutProductOffer = productIds.filter(id => !productsWithProductOffer.some(offer => offer.productOffer.product.toString() === id._id.toString()));
-    console.log(productsWithoutProductOffer);
     if (productsWithoutProductOffer.length === 0) {
       return res.status(400).json({ message: 'All products in the category have an active product offer' });
     }
@@ -191,13 +179,12 @@ const addCategoryOffer = async (req, res) => {
     await newOffer.save();
     for (let i = 0; i < productsWithoutProductOffer.length; i++) {
       const productToUpdate = await Product.findById(productsWithoutProductOffer[i]);
-      const oldSalePrice = productToUpdate.salePrice;
+      const oldSalePrice = productToUpdate.regularPrice;
       productToUpdate.oldSalePrice = oldSalePrice;
-      const newSalePrice = oldSalePrice - discount;
+      const newSalePrice = productToUpdate.regularPrice - discount;
       productToUpdate.salePrice = newSalePrice;
       await productToUpdate.save();
     }
-    console.log(productsWithProductOffer);
     res.status(200).json({ message: 'Category offer added successfully' });
   } catch (error) {
     console.error('Error adding product offer:', error);
@@ -217,7 +204,6 @@ const deleteCategoryOffer = async (req, res) => {
     const productsToUpdate = await Product.find({ category: categoryId });
     for (let i = 0; i < productsToUpdate.length; i++) {
       const productToUpdate = productsToUpdate[i];
-      // productToUpdate.salePrice += offerDiscount;
       productToUpdate.salePrice = productToUpdate.oldSalePrice;
       await productToUpdate.save();
     }
@@ -231,14 +217,12 @@ const deleteCategoryOffer = async (req, res) => {
 
 const editCategoryOffer = async (req, res) => {
   try {
-    console.log('inside editcategoryoffer');
     const offerId = req.body.offerId;
     const existingOffer = await categoryOffer.findById(offerId);
     if (!existingOffer) {
       return res.status(404).send('Offer not found');
     }
     const { name, category, discount, startingDate, endingDate } = req.body;
-    console.log(`${name} ${category} ${discount} ${startingDate} ${endingDate}`);
     const oldDiscount = existingOffer.discount;
     existingOffer.name = name;
     existingOffer.startingDate = startingDate;

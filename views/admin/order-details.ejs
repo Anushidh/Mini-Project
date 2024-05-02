@@ -1,167 +1,170 @@
 <%- include("../partials/adminHeader") %>
 
-        <section class="content-main">
-            <div class="content-header">
-                <div>
-                    <h2 class="content-title card-title">Order detail</h2>
-                    <p>Details for Order ID: 3453012</p>
-                </div>
-            </div>
-            <div class="card">
-               
-                <div class="card-body">
-                    <div class="row mb-50 mt-20 order-info-wrap">
-                        <div class="col-md-4">
-                            <article class="icontext align-items-start">
-                                <span class="icon icon-sm rounded-circle bg-primary-light">
-                                    <i class="text-primary material-icons md-person"></i>
-                                </span>
-                                <div class="text">
-                                    <h6 class="mb-1">Customer</h6>
-                                    <p class="mb-1">
-                                      <%= orderDetails[0].userDetails[0].name %> <br> <%= orderDetails[0].userDetails[0].email %> <br> <%= orderDetails[0].userDetails[0].phone %>
-                                    </p>
-                                    <!-- <a href="#">View profile</a> -->
-                                </div>
-                            </article>
-                        </div> <!-- col// -->
-                        <!-- <div class="col-md-4">
-                            <article class="icontext align-items-start">
-                                <span class="icon icon-sm rounded-circle bg-primary-light">
-                                    <i class="text-primary material-icons md-local_shipping"></i>
-                                </span>
-                                <div class="text">
-                                    <h6 class="mb-1">Order info</h6>
-                                    <p class="mb-1">
-                                        Shipping: Fargo express <br> Pay method: card <br> Status: new
-                                    </p>
-                                    <a href="#">Download info</a>
-                                </div>
-                            </article>
-                        </div>  -->
-                        <div class="col-md-4">
-                            <article class="icontext align-items-start">
-                                <span class="icon icon-sm rounded-circle bg-primary-light">
-                                    <i class="text-primary material-icons md-place"></i>
-                                </span>
-                                <div class="text">
-                                    <h6 class="mb-1">Deliver to</h6>
-                                    <p class="mb-1">
-                                        City: <%= orderDetails[0].addressDetails[0].city %>, <%= orderDetails[0].addressDetails[0].state %> <br><%= orderDetails[0].addressDetails[0].house %> <br> Po Box <%= orderDetails[0].addressDetails[0].pincode %>
-                                    </p>
-                                    <!-- <a href="#">View profile</a> -->
-                                </div>
-                            </article>
+  <section class="content-main">
+    <div class="content-header">
+      <div>
+        <h2 class="content-title card-title">Order detail</h2>
+        <p>Details for Order ID: 3453012</p>
+      </div>
+    </div>
+    <div class="card">
+
+      <div class="card-body">
+        <div class="row mb-50 mt-20 order-info-wrap">
+          <div class="col-md-4">
+            <article class="icontext align-items-start">
+              <span class="icon icon-sm rounded-circle bg-primary-light">
+                <i class="text-primary material-icons md-person"></i>
+              </span>
+              <div class="text">
+                <h6 class="mb-1">Customer</h6>
+                <p class="mb-1">
+                  <%= orderDetails[0].userDetails[0].name %> <br>
+                    <%= orderDetails[0].userDetails[0].email %> <br>
+                      <%= orderDetails[0].userDetails[0].phone %>
+                </p>
+                <!-- <a href="#">View profile</a> -->
+              </div>
+            </article>
+          </div> <!-- col// -->
+          
+          <div class="col-md-4">
+            <article class="icontext align-items-start">
+              <span class="icon icon-sm rounded-circle bg-primary-light">
+                <i class="text-primary material-icons md-place"></i>
+              </span>
+              <div class="text">
+                <h6 class="mb-1">Deliver to</h6>
+                <p class="mb-1">
+                  City: <%= orderDetails[0].addressDetails[0].city %>, <%= orderDetails[0].addressDetails[0].state %>
+                      <br>
+                      <%= orderDetails[0].addressDetails[0].house %> <br> Po Box <%=
+                          orderDetails[0].addressDetails[0].pincode %>
+                </p>
+                
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover" style="text-align: center;">
+              <thead>
+                <tr>
+                  <th style="text-align: left;">Product</th>
+                  <th scope="col" style="text-align: center;">Unit Price</th>
+                  <th scope="col" style="text-align: center;">Quantity</th>
+                  <th scope="col" style="text-align: center;">Sub Total</th>
+                  <th scope="col" style="text-align: center;">Status</th>
+                  <th scope="col" style="text-align: center;">Change status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% for (let i=0; i < orderDetails.length; i++) { %>
+                  <tr>
+                    <td style="text-align: center;">
+                      <a class="itemside" href="#">
+                        <div class="center">
+                          <img src="/uploads/product-images/<%= orderDetails[i].productDetails[0].productImage[0] %>"
+                            width="40" height="40" class="img-xs" alt="Item">
                         </div>
-                    </div> 
-                   
-                    <div class="card-body">
-                      <div class="table-responsive">
-                          <table class="table table-hover" style="text-align: center;">
-                              <thead>
-                                  <tr>
-                                      <th style="text-align: left;">Product</th>
-                                      <th scope="col" style="text-align: center;">Unit Price</th>
-                                      <th scope="col" style="text-align: center;">Quantity</th>
-                                      <th scope="col" style="text-align: center;">Sub Total</th>
-                                      <th scope="col" style="text-align: center;">Status</th>
-                                      <th scope="col" style="text-align: center;">Change status</th>
-                                  </tr>
-                              </thead>
-                              <tbody>
-                                  <% for (let i = 0; i < orderDetails.length; i++) { %>
-                                      <tr>
-                                        <td style="text-align: center;">
-                                          <a class="itemside" href="#">
-                                              <div class="center">
-                                                  <img src="/uploads/product-images/<%= orderDetails[i].productDetails[0].productImage[0] %>" width="40" height="40" class="img-xs" alt="Item">
-                                              </div>
-                                              <div class="info"> <%= orderDetails[i].productDetails[0].productName %>, <%= orderDetails[i].orderedItems.size %> </div>
-                                          </a>
-                                      </td>
-                                      <td style="text-align: center;"> ₹<%= orderDetails[i].productDetails[0].salePrice %> </td>
-                                      <td style="text-align: center;"> <%= orderDetails[i].orderedItems.quantity %> </td>
-                                      <td style="text-align: center;"> ₹<%= orderDetails[i].productDetails[0].salePrice * orderDetails[i].orderedItems.quantity %> </td>
-                                      <td style="text-align: center;"> <%= orderDetails[0].orderStatus %> </td>
-                                      <td> 
-                                        <% const orderStatus =  orderDetails[0].orderStatus; %>
-                                        <% if (orderStatus === 'pending') { %>
-                                            <button class="btn btn-primary" style="width: 140px;" onclick="toggleOrderStatus('<%= orderDetails[i]._id %>', 'confirmed')">Confirm</button>
-                                        <% } else if (orderStatus === 'confirmed') { %>
-                                            <button class="btn btn-warning" style="width: 140px;" onclick="toggleOrderStatus('<%= orderDetails[i]._id %>', 'shipped')">Ship</button>
-                                        <% } else if (orderStatus === 'shipped') { %>
-                                            <button class="btn btn-info" style="width: 140px;" onclick="toggleOrderStatus('<%= orderDetails[i]._id %>', 'outForDelivery')">Out for Delivery</button>
-                                        <% } else if (orderStatus === 'outForDelivery') { %>
-                                            <button class="btn btn-success" style="width: 140px;" onclick="toggleOrderStatus('<%= orderDetails[i]._id %>', 'delivered')">Deliver</button>
-                                        <% } else if (orderStatus === 'delivered') { %>
-                                            <button class="btn btn-secondary" style="width: 140px;" onclick="toggleOrderStatus('<%= orderDetails[i]._id %>', 'returned')">Return</button>
-                                        <% } else if (orderStatus === 'cancelled') { %>
-                                            <button class="btn btn-danger" style="width: 140px;" onclick="toggleOrderStatus('<%= orderDetails[i]._id %>', 'pending')">Reopen</button>
-                                        <% } else if (orderStatus === 'returned') { %>
-                                            <button class="btn btn-primary" style="width: 140px;" onclick="toggleOrderStatus('<%= orderDetails[i]._id %>', 'pending')">Reopen</button>
-                                        <% } %>
-                                    </td>
-                                    
-                                  </tr>    
-                                <%  } %>
-                                <tr>
-                                  <td colspan="4" style="padding-top: 20px;"> <!-- Add padding-top for spacing -->
-                                    <article class="float-end">
-                                        <dl class="dlist">
-                                            <dt>Total:</dt>
-                                            <dd>₹<%= orderDetails[0].totalAmount %></dd>
-                                        </dl>
-                                        <dl class="dlist">
-                                            <dt>Shipping cost:</dt>
-                                            <dd>₹10.00</dd>
-                                        </dl>
-                                        <dl class="dlist">
-                                            <dt>Grand total:</dt>
-                                            <dd> <b class="h5">₹<%= (orderDetails[0].totalAmount + 10).toFixed(2) %></b> </dd>
-                                        </dl>
-                                        <!-- <dl class="dlist">
-                                            <dt class="text-muted">Status:</dt>
-                                             <dd>
-                                                <span class="badge rounded-pill alert-success text-success">Payment done</span>
-                                            </dd> 
-                                        </dl> -->
-                                    </article>
-                                </td>
-                                
-                              </tr>
-                              </tbody>
-                          </table>
-                      </div> <!-- table-responsive //end -->
-                  </div> <!-- card-body end// -->
-                </div> <!-- card-body end// -->
-            </div> <!-- card end// -->
-        </section> <!-- content-main end// -->
-       
+                        <div class="info">
+                          <%= orderDetails[i].productDetails[0].productName %>, <%= orderDetails[i].orderedItems.size %>
+                        </div>
+                      </a>
+                    </td>
+                    <td style="text-align: center;"> ₹<%= orderDetails[i].productDetails[0].salePrice %>
+                    </td>
+                    <td style="text-align: center;">
+                      <%= orderDetails[i].orderedItems.quantity %>
+                    </td>
+                    <td style="text-align: center;"> ₹<%= orderDetails[i].productDetails[0].salePrice *
+                        orderDetails[i].orderedItems.quantity %>
+                    </td>
+                    <td style="text-align: center;">
+                      <%= orderDetails[i].orderedItems.orderStat %>
+                    </td>
+                    <td>
+                      <% const orderStatus=orderDetails[i].orderedItems.orderStat; %>
+                        <% if (orderStatus==='pending' ) { %>
+                          <button class="btn btn-primary" style="width: 140px;"
+                            onclick="toggleOrderStatus('<%= orderDetails[i].orderedItems.orderId %>', 'confirmed')">Confirm</button>
+                          <% } else if (orderStatus==='confirmed' ) { %>
+                            <button class="btn btn-warning" style="width: 140px;"
+                              onclick="toggleOrderStatus('<%= orderDetails[i].orderedItems.orderId %>', 'shipped')">Ship</button>
+                            <% } else if (orderStatus==='shipped' ) { %>
+                              <button class="btn btn-info" style="width: 140px;"
+                                onclick="toggleOrderStatus('<%= orderDetails[i].orderedItems.orderId %>', 'outForDelivery')">Out
+                                for Delivery</button>
+                              <% } else if (orderStatus==='outForDelivery' ) { %>
+                                <button class="btn btn-success" style="width: 140px;"
+                                  onclick="toggleOrderStatus('<%= orderDetails[i].orderedItems.orderId %>', 'delivered')">Deliver</button>
+                                <% } else if (orderStatus==='delivered' ) { %>
+                                  <button class="btn btn-secondary" style="width: 140px;"
+                                    onclick="toggleOrderStatus('<%= orderDetails[i].orderedItems.orderId %>', 'returned')">Return</button>
+                                  <% } else if (orderStatus==='cancelled' ) { %>
+                                    <button class="btn btn-danger" style="width: 140px;"
+                                      onclick="toggleOrderStatus('<%= orderDetails[i].orderedItems.orderId %>', 'pending')">Reopen</button>
+                                    <% } else if (orderStatus==='returned' ) { %>
+                                      <button class="btn btn-primary" style="width: 140px;"
+                                        onclick="toggleOrderStatus('<%= orderDetails[i].orderedItems.orderId %>', 'pending')">Reopen</button>
+                                      <% } %>
+                    </td>
+                  </tr>
+                  <% } %>
+                    <tr>
+                      <td colspan="4" style="padding-top: 20px;"> <!-- Add padding-top for spacing -->
+                        <article class="float-end">
+                          <dl class="dlist">
+                            <dt>Total:</dt>
+                            <dd>₹<%= orderDetails[0].totalAmount %>
+                            </dd>
+                          </dl>
+                          <dl class="dlist">
+                            <dt>Shipping cost:</dt>
+                            <dd>₹10.00</dd>
+                          </dl>
+                          <dl class="dlist">
+                            <dt>Grand total:</dt>
+                            <dd> <b class="h5">₹<%= (orderDetails[0].totalAmount + 10).toFixed(2) %></b> </dd>
+                          </dl>
+                        </article>
+                      </td>
+                    </tr>
+              </tbody>
+            </table>
+          </div> <!-- table-responsive //end -->
+        </div> <!-- card-body end// -->
+      </div> <!-- card-body end// -->
+    </div> <!-- card end// -->
+  </section> <!-- content-main end// -->
 
-        <%- include("../partials/adminFooter") %>
 
-        <script>
-          // Frontend JavaScript code
-function toggleOrderStatus(orderId, newStatus) {
-  console.log(orderId);
-  console.log(newStatus);
-  fetch(`/admin/updateOrderStatus/${orderId}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ newStatus }),
-  })
-    .then(response => response.json())
-    .then(data => {
-      // Handle successful update
-      console.log('Order status updated:', data);
-      window.location.reload();
-    })
-    .catch(error => {
-      // Handle error
-      console.error('Error updating order status:', error);
-    });
-}
+  <%- include("../partials/adminFooter") %>
 
-        </script>
+    <script>
+      // Frontend JavaScript code
+      function toggleOrderStatus(orderId, newStatus) {
+        console.log(orderId);
+        console.log(newStatus);
+        fetch(`/admin/updateOrderStatus/${orderId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ newStatus }),
+        })
+          .then(response => response.json())
+          .then(data => {
+            // Handle successful update
+            console.log('Order status updated:', data);
+            window.location.reload();
+          })
+          .catch(error => {
+            // Handle error
+            console.error('Error updating order status:', error);
+          });
+      }
+
+    </script>

@@ -4,13 +4,10 @@ const categoryHelper = require("../helper/categoryHelper");
 
 
 const getCategory = async (req, res) => {
-  const currentPage = parseInt(req.params.page) || 1; // Get the current page number from the query parameter
-  console.log(currentPage);
-  const pageSize = 5; // Set the desired page size
-  console.log(pageSize);
+  const currentPage = parseInt(req.params.page) || 1; 
+  const pageSize = 5; 
   try {
     const { categories, totalPages } = await categoryHelper.getAllCategory(currentPage, pageSize);
-
     res.render('admin/category', {
       categories,
       currentPage,
@@ -24,7 +21,6 @@ const getCategory = async (req, res) => {
 
 const addCategory = (req, res) => {
   try {
-    console.log(req.body);
     categoryHelper.addCategoryToDb(req.body).then((response) => {
       return res.json(response);
     })
@@ -48,24 +44,15 @@ const getEditCategory = async (req, res) => {
 const editCategory = async (req, res) => {
   try {
       const id = req.params.id;
-      console.log(id);
       const { categoryName, description } = req.body;
-      console.log(req.body);
-      
-     
       const nameLowerCase = categoryName.toLowerCase();
-      
-     
       const existingCategory = await Category.findOne({ _id: { $ne: id }, name: { $regex: new RegExp('^' + nameLowerCase + '$', 'i') } });
-
       if (existingCategory) {
         return res.status(400).json({ error: 'Category name already exists.' });
-      } else {
-          
+      } else {  
           await Category.findByIdAndUpdate(id, { name: categoryName, description: description });
           res.status(200).json({ message: 'Category updated successfully' });
       }
-
   } catch (error) {
       console.log(error.message);
       res.status(500).json({ error: 'Internal Server Error' });
@@ -74,7 +61,6 @@ const editCategory = async (req, res) => {
 
 
 const softDeleteCategory = async (req, res) => {
-  console.log(req.params.id);
   categoryHelper.softDeleteCategory(req.params.id)
     .then((response) => {
       if (response.status) {
@@ -88,7 +74,6 @@ const softDeleteCategory = async (req, res) => {
 const getListCategory = async (req, res) => {
   try {
       let id = req.query.id
-      console.log("getListCategory");
       await Category.updateOne({ _id: id }, { $set: { isBlocked: false } })
       res.redirect("/admin/category")
   } catch (error) {
@@ -100,7 +85,6 @@ const getListCategory = async (req, res) => {
 const getUnlistCategory = async (req, res) => {
   try {
       let id = req.query.id
-      console.log('getUnlistCategory');
       await Category.updateOne({ _id: id }, { $set: { isBlocked: true } })
       res.redirect("/admin/category")
   } catch (error) {
