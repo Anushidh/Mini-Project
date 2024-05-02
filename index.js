@@ -17,7 +17,7 @@ const adminRoute = require("./routes/adminRoute");
 const app = express()
 
 // Database connection
-mongoose.connect("mongodb://localhost:27017/ProjectDb")
+mongoose.connect(process.env.MONGODB_URL)
 
 // Middleware setup
 app.use('/',express.static(path.join(__dirname, 'public')));
