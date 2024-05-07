@@ -115,6 +115,7 @@ const getCartCount = async (userId) => {
 
 const getAllCartItems = async (userId) => {
   try {
+    console.log('inside getallcartitems');
     const userCartItems = await Cart.aggregate([
       {
         $match: { user: new mongoose.Types.ObjectId(userId) }

@@ -128,15 +128,15 @@
                 $('form').on('submit', function (event) {
                     event.preventDefault(); // Prevent the default form submission
                     if (totalAmount === 0) {
-                    Toastify({
-                        text: "Please add items to your cart before proceeding.",
-                        duration: 3000,
-                        gravity: "top",
-                        position: "center",
-                        backgroundColor: "#ff6347",
-                    }).showToast();
-                    return;
-                }
+                        Toastify({
+                            text: "Please add items to your cart before proceeding.",
+                            duration: 3000,
+                            gravity: "top",
+                            position: "center",
+                            backgroundColor: "#ff6347",
+                        }).showToast();
+                        return;
+                    }
                     var isPaymentMethodSelected = $("#payment_cod").is(":checked") || $("#payment_wallet").is(":checked") || $("#payment_razorpay").is(":checked");
                     var isCodSelected = $("#payment_cod").is(":checked");
                     var isWalletSelected = $("#payment_wallet").is(":checked");
@@ -250,132 +250,153 @@
                         }).then(response => response.json())
                             .then(data => {
                                 console.log(data);
-                                const parseAmount = parseInt(data.totalPrice)
-                                console.log(parseAmount);
-                                var options = {
-                                    "key": "rzp_test_XnnB8x997qkm5Z",
-                                    "amount": data.orderId.amount,
-                                    "currency": "INR",
-                                    "name": "Reid",
-                                    "description": "Test Transaction",
-                                    "image": "https://example.com/your_logo",
-                                    "order_id": data.orderId.id,
-                                    "handler": function (response) {
-                                        console.log(response);
-                                        console.log("Hello")
+                                if (data.error) {
+                                    Toastify({
+                                        text: data.message,
+                                        duration: 3000,
+                                        gravity: "top",
+                                        position: "center",
+                                        style: {
+                                            background: "linear-gradient(to right, #ff6c6c, #f66262)",
+                                        }
+                                    }).showToast();
+                                } else {
+                                    const parseAmount = parseInt(data.totalPrice)
+                                    console.log(parseAmount);
+                                    var options = {
+                                        "key": "rzp_test_XnnB8x997qkm5Z",
+                                        "amount": data.orderId.amount,
+                                        "currency": "INR",
+                                        "name": "Reid",
+                                        "description": "Test Transaction",
+                                        "image": "https://example.com/your_logo",
+                                        "order_id": data.orderId.id,
+                                        "handler": function (response) {
+                                            console.log(response);
+                                            console.log("Hello")
 
-                                        verify(response, data.orderId.id, formData)
-                                        console.log("hey")
-                                    },
-                                    "prefill": {
-                                        "name": "Gaurav Kumar",
-                                        "email": "gaurav.kumar@example.com",
-                                        "contact": "9000090000"
-                                    },
-                                    "notes": {
-                                        "address": "Razorpay Corporate Office"
-                                    },
-                                    "theme": {
-                                        "color": "#3399cc"
+                                            verify(response, data.orderId.id, formData)
+                                            console.log("hey")
+                                        },
+                                        "prefill": {
+                                            "name": "Gaurav Kumar",
+                                            "email": "gaurav.kumar@example.com",
+                                            "contact": "9000090000"
+                                        },
+                                        "notes": {
+                                            "address": "Razorpay Corporate Office"
+                                        },
+                                        "theme": {
+                                            "color": "#3399cc"
+                                        }
+                                    };
+                                    var rzp = new Razorpay(options)
+                                    rzp.open();
+                                    rzp.on("payment.failed", function (response) {
+                                        console.log('Payment failed:', response.error.description);
+                                        handleFailure(response.error.description);
+                                    });
+
+                                    function handleFailure(description) {
+                                        console.log('Payment failed:', description);
+
+                                        // Redirect to appropriate page or handle as required
+                                        createOrderWithStatusPending();
+                                        window.location.href = "/user-profile"
+
                                     }
-                                };
-                                var rzp = new Razorpay(options)
-                                rzp.open();
-                                rzp.on("payment.failed", function (response) {
-                                    console.log('Payment failed:', response.error.description);
-                                    handleFailure(response.error.description);
-                                });
 
-                                function handleFailure(description) {
-                                    console.log('Payment failed:', description);
-
-                                    // Redirect to appropriate page or handle as required
-                                    createOrderWithStatusPending();
-                                    window.location.href = "/user-profile"
-
-                                }
-
-                                function createOrderWithStatusPending() {
-                                    console.log('inside createOrderWithStatusPending');
-                                    fetch('/failedRazorpay', {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/x-www-form-urlencoded',
-                                        },
-                                        body: formData
-                                    })
-                                        .then(response => {
-                                            if (!response.ok) {
-                                                throw new Error('Failed to create order.');
-                                            }
-                                            return response.json();
+                                    function createOrderWithStatusPending() {
+                                        console.log('inside createOrderWithStatusPending');
+                                        fetch('/failedRazorpay', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/x-www-form-urlencoded',
+                                            },
+                                            body: formData
                                         })
-                                        .then(data => {
-                                            console.log(data);
-                                            if (data.success) {
+                                            .then(response => {
+                                                if (!response.ok) {
+                                                    throw new Error('Failed to create order.');
+                                                }
+                                                return response.json();
+                                            })
+                                            .then(data => {
+                                                console.log(data);
+                                                if (data.success) {
 
-                                                // Redirect to the appropriate page with the newly created order ID
-                                                window.location.href = '/user-profile';
-                                            } else {
-                                                console.error('Error: Order creation failed');
-                                                // Handle the error case where order creation fails
-                                                // You may redirect to an error page or display a message to the user
-                                            }
+                                                    // Redirect to the appropriate page with the newly created order ID
+                                                    window.location.href = '/user-profile';
+                                                } else {
+                                                    console.error('Error: Order creation failed');
+                                                    // Handle the error case where order creation fails
+                                                    // You may redirect to an error page or display a message to the user
+                                                }
+                                            })
+                                            .catch((error) => {
+                                                console.error('Error:', error);
+                                                // Handle any errors that occur during the fetch operation
+                                                // You may redirect to an error page or display a message to the user
+                                            });
+                                    }
+
+                                    function verify(response, orderId, formData) {
+                                        console.log('inside verify');
+                                        console.log(response);
+                                        console.log(orderId);
+                                        console.log(formData);
+                                        fetch('/paymentSuccess', {
+                                            method: 'post',
+                                            headers: {
+                                                "Content-Type": "application/json"
+                                            },
+                                            body: JSON.stringify({
+                                                paymentid: response.razorpay_payment_id,
+                                                razorpayorderid: response.razorpay_order_id,
+                                                signature: response.razorpay_signature,
+                                                orderId
+                                            })
                                         })
-                                        .catch((error) => {
-                                            console.error('Error:', error);
-                                            // Handle any errors that occur during the fetch operation
-                                            // You may redirect to an error page or display a message to the user
-                                        });
-                                }
+                                            .then(response => {
+                                                if (response.ok) {
 
-                                function verify(response, orderId, formData) {
-                                    console.log('inside verify');
-                                    console.log(response);
-                                    console.log(orderId);
-                                    console.log(formData);
-                                    fetch('/paymentSuccess', {
-                                        method: 'post',
-                                        headers: {
-                                            "Content-Type": "application/json"
-                                        },
-                                        body: JSON.stringify({
-                                            paymentid: response.razorpay_payment_id,
-                                            razorpayorderid: response.razorpay_order_id,
-                                            signature: response.razorpay_signature,
-                                            orderId
-                                        })
-                                    })
-                                        .then(response => {
-                                            if (response.ok) {
-
-                                                fetch('/place-order', {
-                                                    method: 'POST',
-                                                    headers: {
-                                                        'Content-Type': 'application/x-www-form-urlencoded',
-                                                    },
-                                                    body: formData
-                                                })
-
-                                                    .then(response => response.json())
-                                                    .then(data => {
-                                                        console.log(data);
-                                                        window.location.href = '/order-success'
+                                                    fetch('/place-order', {
+                                                        method: 'POST',
+                                                        headers: {
+                                                            'Content-Type': 'application/x-www-form-urlencoded',
+                                                        },
+                                                        body: formData
                                                     })
-                                                    .catch((error) => {
-                                                        console.error('Error:', error);
-                                                    })
-                                            } else {
 
-                                                console.error('Payment failed:');
+                                                        .then(response => response.json())
+                                                        .then(data => {
+                                                            console.log(data);
+                                                            window.location.href = '/order-success'
+                                                        })
+                                                        .catch((error) => {
+                                                            console.error('Error:', error);
+                                                        })
+                                                } else {
 
-                                                alert('Payment failed. Please try again later.');
-                                            }
-                                        })
-                                        .catch(error => {
-                                            // Handle any errors that occur during the fetch operation
-                                            console.error('Error:', error);
-                                        });
+                                                    console.error('Payment failed:');
+
+                                                    alert('Payment failed. Please try again later.');
+                                                }
+                                            })
+                                            .catch(error => {
+                                                // Handle any errors that occur during the fetch operation
+                                                console.error('Error:', error);
+                                                Toastify({
+                                                    text: error.message,
+                                                    duration: 3000, // Duration in milliseconds
+                                                    gravity: "top", // Position (top, bottom, left, right)
+                                                    position: "center", // Offset position
+                                                    style: {
+                                                        background: "linear-gradient(to right, #ff6c6c, #f66262)",
+                                                    }
+                                                }).showToast();
+                                            });
+                                    }
                                 }
                             })
                     }

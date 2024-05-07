@@ -1,4 +1,6 @@
 const Razorpay = require("razorpay");
+const cartHelper = require("../helper/cartHelper");
+const Product = require("../model/productModel");
 
 
 var razorpay = new Razorpay({
@@ -24,6 +26,35 @@ const createOrder = async (req, res) => {
   try {
     console.log('inside create order');
     console.log(req.body.totalPrice);
+     // Get the user's cart items
+     const userId = req.session.user._id;
+     let cartItems = await cartHelper.getAllCartItems(userId);
+    console.log(cartItems);
+     // Check if the cart is empty
+     if (!cartItems.length) {
+       return res.json({ error: true, message: "Please add items to cart before checkout" });
+     }
+ 
+     // Check stock availability for each cart item
+     for (let i = 0; i < cartItems.length; i++) {
+       const { item: productId, size, quantity } = cartItems[i];
+       const product = await Product.findById(productId);
+ 
+       if (!product) {
+         return res.json({ error: true, message: `Product with ID ${productId} not found` });
+       }
+ 
+       const sizeIndex = product.productSizes.findIndex(s => s.size === size);
+       if (sizeIndex === -1) {
+         return res.json({ error: true, message: `Size ${size} not found for product ${product.productName}` });
+       }
+ 
+       const availableQuantity = product.productSizes[sizeIndex].quantity;
+       if (availableQuantity < quantity) {
+         return res.json({ error: true, message: `Insufficient stock for product ${product.productName} in size ${size}` });
+       }
+     }
+     console.log('after for loop');
     const amount = parseInt(req.body.totalPrice);
     console.log(amount);
     const orderDetails = await razorpay.orders.create({
