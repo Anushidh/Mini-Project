@@ -102,7 +102,7 @@ const placeOrder = async (req, res) => {
     const addressData = await Address.findById(selectedAddressId);
     let paymentStatus = 'pending';
     let cartItems = await cartHelper.getAllCartItems(userId);
-    console.log(cartItems, 'cartitemsssssssssssssssssss');
+    // console.log(cartItems, 'cartitemsssssssssssssssssss');
     if (!cartItems.length) {
       return res.json({ error: true, message: "Please add items to cart before checkout" })
     }
@@ -110,9 +110,9 @@ const placeOrder = async (req, res) => {
       return res.json({ error: true, message: "Please Select any Payment Method before checkout" })
     }
     const cart = await Cart.findOne({ user: userId });
-    console.log(cart);
+    // console.log(cart);
     const totalAmount = cart.totalPrice;
-    console.log(totalAmount);
+    // console.log(totalAmount);
     let wallet = await Wallet.findOne({ user: userId });
     if (!wallet) {
       wallet = new Wallet({ user: userId });
@@ -129,7 +129,39 @@ const placeOrder = async (req, res) => {
             { paymentStatus: 'success' },
             { new: true }
           );
-          await productHelper.stockDecrease(cartItems);
+          // await productHelper.stockDecrease(cartItems);
+          for (let i = 0; i < cartItems.length; i++) {
+            const { item: productId, size, quantity } = cartItems[i];
+            const product = await Product.findById(productId);
+            if (!product) {
+              return res.json({ error: true, message: `Product with ID ${productId} not found` });
+            }
+            const sizeIndex = product.productSizes.findIndex(s => s.size === size);
+            if (sizeIndex === -1) {
+              return res.json({ error: true, message: `Size ${size} not found for product ${product.productName}` });
+            }
+            const availableQuantity = product.productSizes[sizeIndex].quantity - quantity;
+            console.log(availableQuantity);
+            if (availableQuantity >= 0) {
+              console.log('inside if');
+              product.productSizes[sizeIndex].quantity = availableQuantity;
+            } else {
+              console.log('inside else');
+              return res.json({ error: true, message: `Insufficient stock for product ${product.productName} in size ${size}` });
+            }
+            await product.save();
+          }
+
+          const productIds = cartItems.map(item => item.item);
+          const products = await Product.find({ _id: { $in: productIds } });
+          for (const product of products) {
+            let totalQuantity = 0;
+            for (const size of product.productSizes) {
+              totalQuantity += size.quantity;
+            }
+            product.totalQuantity = totalQuantity;
+            await product.save();
+          }
           await cartHelper.clearTheCart(userId);
           req.session.coupon = null;
           res.status(202).json({ error: false, paymentMethod: 'Cash on Delivery', message: "Purchase Done", totalAmount: totalAmount });
@@ -152,7 +184,39 @@ const placeOrder = async (req, res) => {
           { paymentStatus: 'success' },
           { new: true }
         );
-        await productHelper.stockDecrease(cartItems);
+        // await productHelper.stockDecrease(cartItems);
+        for (let i = 0; i < cartItems.length; i++) {
+          const { item: productId, size, quantity } = cartItems[i];
+          const product = await Product.findById(productId);
+          if (!product) {
+            return res.json({ error: true, message: `Product with ID ${productId} not found` });
+          }
+          const sizeIndex = product.productSizes.findIndex(s => s.size === size);
+          if (sizeIndex === -1) {
+            return res.json({ error: true, message: `Size ${size} not found for product ${product.productName}` });
+          }
+          const availableQuantity = product.productSizes[sizeIndex].quantity - quantity;
+          console.log(availableQuantity);
+          if (availableQuantity >= 0) {
+            console.log('inside if');
+            product.productSizes[sizeIndex].quantity = availableQuantity;
+          } else {
+            console.log('inside else');
+            return res.json({ error: true, message: `Insufficient stock for product ${product.productName} in size ${size}` });
+          }
+          await product.save();
+        }
+
+        const productIds = cartItems.map(item => item.item);
+        const products = await Product.find({ _id: { $in: productIds } });
+        for (const product of products) {
+          let totalQuantity = 0;
+          for (const size of product.productSizes) {
+            totalQuantity += size.quantity;
+          }
+          product.totalQuantity = totalQuantity;
+          await product.save();
+        }
         await cartHelper.clearTheCart(userId);
         req.session.coupon = null;
         res.json({ paymentMethod: 'razorpay', orderDetails, });
@@ -172,7 +236,39 @@ const placeOrder = async (req, res) => {
             { paymentStatus: 'success' },
             { new: true }
           );
-          await productHelper.stockDecrease(cartItems);
+          // await productHelper.stockDecrease(cartItems);
+          for (let i = 0; i < cartItems.length; i++) {
+            const { item: productId, size, quantity } = cartItems[i];
+            const product = await Product.findById(productId);
+            if (!product) {
+              return res.json({ error: true, message: `Product with ID ${productId} not found` });
+            }
+            const sizeIndex = product.productSizes.findIndex(s => s.size === size);
+            if (sizeIndex === -1) {
+              return res.json({ error: true, message: `Size ${size} not found for product ${product.productName}` });
+            }
+            const availableQuantity = product.productSizes[sizeIndex].quantity - quantity;
+            console.log(availableQuantity);
+            if (availableQuantity >= 0) {
+              console.log('inside if');
+              product.productSizes[sizeIndex].quantity = availableQuantity;
+            } else {
+              console.log('inside else');
+              return res.json({ error: true, message: `Insufficient stock for product ${product.productName} in size ${size}` });
+            }
+            await product.save();
+          }
+
+          const productIds = cartItems.map(item => item.item);
+          const products = await Product.find({ _id: { $in: productIds } });
+          for (const product of products) {
+            let totalQuantity = 0;
+            for (const size of product.productSizes) {
+              totalQuantity += size.quantity;
+            }
+            product.totalQuantity = totalQuantity;
+            await product.save();
+          }
           await cartHelper.clearTheCart(userId);
           req.session.coupon = null;
           res.status(202).json({ paymentMethod: 'wallet', message: "Purchase Done" });

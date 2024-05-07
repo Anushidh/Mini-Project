@@ -44,21 +44,25 @@ const getAllUnblockedProducts = async () => {
 
 const stockDecrease = async (cartItems) => {
   try {
+    console.log('inside stockdecrease');
     for (let i = 0; i < cartItems.length; i++) {
       const { item: productId, size, quantity } = cartItems[i];
       const product = await Product.findById(productId);
       if (!product) {
-        throw new Error(`Product with ID ${productId} not found`);
+        return { error: true, message: `Product with ID ${productId} not found` };
       }
       const sizeIndex = product.productSizes.findIndex(s => s.size === size);
       if (sizeIndex === -1) {
-        throw new Error(`Size ${size} not found for product ${product.productName}`);
+        return { error: true, message: `Size ${size} not found for product ${product.productName}` };
       }
       const availableQuantity = product.productSizes[sizeIndex].quantity - quantity;
+      console.log(availableQuantity);
       if (availableQuantity >= 0) {
+        console.log('inside if');
         product.productSizes[sizeIndex].quantity = availableQuantity;
       } else {
-        throw new Error(`Insufficient stock for product ${product.productName} in size ${size}`);
+        console.log('inside else');
+        return { error: true, message: `Insufficient stock for product ${product.productName} in size ${size}` };
       }
       await product.save();
     }
@@ -74,7 +78,7 @@ const stockDecrease = async (cartItems) => {
   }
     return true;
   } catch (error) {
-    throw error;
+    return { error: true, message: error.message };
   }
 };
 

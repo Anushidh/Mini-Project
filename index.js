@@ -1,5 +1,5 @@
 const express = require("express")
-const dotenv = require('dotenv').config();
+ require('dotenv').config();
 const PORT = process.env.PORT || 3600;
 const ejs = require("ejs");
 const multer  = require('multer')
@@ -17,7 +17,9 @@ const adminRoute = require("./routes/adminRoute");
 const app = express()
 
 // Database connection
-mongoose.connect(process.env.MONGODB_URL)
+ mongoose.connect(process.env.MONGODB_URL)
+
+
 
 // Middleware setup
 app.use('/',express.static(path.join(__dirname, 'public')));
