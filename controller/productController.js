@@ -4,6 +4,7 @@ const productHelper = require("../helper/productHelper");
 const fs = require("fs");
 const path = require("path");
 const { log } = require("console");
+const sharp = require('sharp');
 
 const stocks = async (req, res) => {
     try {
@@ -32,7 +33,7 @@ const addProducts = async (req, res) => {
     try {
         console.log(req.body);
         const { productName, productDescription, category, regularPrice, salePrice, small_quantity, medium_quantity, large_quantity } = req.body;
-
+        console.log(req.files);
         // Backend validation
         if (!productName || !productDescription || !category || !regularPrice || !salePrice || !small_quantity || !medium_quantity || !large_quantity) {
             return res.status(400).json({ error: "Missing required fields" });
@@ -42,7 +43,8 @@ const addProducts = async (req, res) => {
         if (isNaN(regularPrice) || isNaN(salePrice) || isNaN(small_quantity) || isNaN(medium_quantity) || isNaN(large_quantity)) {
             return res.status(400).json({ error: "Invalid numeric values" });
         }
-
+        // const fetchedProducts = Product.productSizes.find({size:small});
+        // const lessThan = fetchedProducts.find({salePrice})
         const smallQuantity = parseInt(small_quantity, 10) || 0;
         const mediumQuantity = parseInt(medium_quantity, 10) || 0;
         const largeQuantity = parseInt(large_quantity, 10) || 0;
@@ -65,10 +67,25 @@ const addProducts = async (req, res) => {
             // Add more sizes if needed
         ];
 
-        const images = []
+        const images = [];
+        const imagesDir = path.join('E:', 'New folder', 'public', 'uploads', 'product-images');
+
         if (req.files && req.files.length > 0) {
             for (let i = 0; i < req.files.length; i++) {
-                images.push(req.files[i].filename);
+                const imagePath = req.files[i].path; // Use the path provided in req.files
+
+                // Crop the image using sharp
+                const croppedImage = await sharp(imagePath)
+                    .extract({ left: 0, top: 0, width: 800, height: 600 })
+                    .toFormat('jpeg')
+                    .toBuffer();
+
+                // Save the cropped image to a new file
+                const croppedFilename = `cropped_${req.files[i].filename}`;
+                const croppedFilePath = path.join(imagesDir, croppedFilename);
+                await sharp(croppedImage).toFile(croppedFilePath);
+
+                images.push(croppedFilename);
             }
         }
         console.log(images);
@@ -84,12 +101,9 @@ const addProducts = async (req, res) => {
         });
         console.log(newProduct);
         await newProduct.save();
-
-        // Send a success response
         res.status(200).json({ success: "Product added successfully" });
     } catch (error) {
         console.log(error.message);
-        // Send an error response
         res.status(500).json({ error: "Internal server error" });
     }
 }
@@ -138,7 +152,7 @@ const getEditProduct = async (req, res) => {
     try {
         const id = req.query.id;
         console.log(id);
-        const findProduct = await Product.findOne({ _id: id });
+        const findProduct = await Product.findOne({ _id: id }).populate('category');
         const category = await Category.find({});
         // const findBrand = await Brand.find({})
         res.render("admin/edit-product", { product: findProduct, cat: category })
@@ -148,89 +162,118 @@ const getEditProduct = async (req, res) => {
     }
 }
 
+
 const editProduct = async (req, res) => {
-    console.log('editproduct');
-    try {
-        const id = req.params.id
-        const data = req.body
-        const images = []
-        // console.log(data.small_quantity + " " + data.medium_quantity + " " + data.large_quantity);
-        const smallQuantity = parseInt(data.small_quantity, 10) || 0;
-        const mediumQuantity = parseInt(data.medium_quantity, 10) || 0;
-        const largeQuantity = parseInt(data.large_quantity, 10) || 0;
-        const totalQuantity = parseInt(data.small_quantity) + parseInt(data.medium_quantity) + parseInt(data.large_quantity);
+  try {
+    const id = req.params.id;
+    const data = req.body;
+    const images = [];
 
-        if (req.files && req.files.length > 0) {
-            for (let i = 0; i < req.files.length; i++) {
-                images.push(req.files[i].filename);
-            }
-        }
-        // console.log(req.files)
+    const smallQuantity = parseInt(data.small_quantity, 10) || 0;
+    const mediumQuantity = parseInt(data.medium_quantity, 10) || 0;
+    const largeQuantity = parseInt(data.large_quantity, 10) || 0;
+    const totalQuantity = parseInt(data.small_quantity) + parseInt(data.medium_quantity) + parseInt(data.large_quantity);
 
-
-        const existingProduct = await Product.findById(id);
-        const productSizes = [
-            { size: "Small", quantity: smallQuantity },
-            { size: "Medium", quantity: mediumQuantity },
-            { size: "Large", quantity: largeQuantity }
-        ];
-
-        console.log();
-        // Check if any new images were uploaded
-        if (req.files.length > 0) {
-            console.log("Yes, images are there")
-            // Check if the uploaded image is different from the existing image(s)
-            const newImages = images.filter(image => !existingProduct.productImage.includes(image));
-            if (newImages.length > 0) {
-                const updatedProduct = await Product.findByIdAndUpdate(id, {
-                    productName: data.productName,
-                    productDescription: data.description,
-                    category: data.category,
-                    regularPrice: data.regularPrice,
-                    productSizes,
-                    salePrice: data.salePrice,
-                    totalQuantity: totalQuantity,
-                    $push: { productImage: { $each: newImages } } // Add new images to the existing images
-                }, { new: true });
-                console.log("Product updated");
-                return res.status(200).json({ success: 'Product updated successfully!' });
-            } else {
-                console.log("Same images were present");
-                // No new images were uploaded, so update the product without changing the images
-                const updatedProduct = await Product.findByIdAndUpdate(id, {
-                    productName: data.productName,
-                    productDescription: data.description,
-                    category: data.category,
-                    regularPrice: data.regularPrice,
-                    productSizes,
-                    salePrice: data.salePrice,
-                    totalQuantity: totalQuantity,
-                }, { new: true });
-                console.log("Product updated");
-                return res.status(200).json({ success: 'Product updated successfully!' });
-            }
-        } else {
-            console.log("No images were present");
-            // No images were uploaded, so update the product without changing the images
-            const updatedProduct = await Product.findByIdAndUpdate(id, {
-                productName: data.productName,
-                productDescription: data.description,
-                category: data.category,
-                regularPrice: data.regularPrice,
-                productSizes,
-                salePrice: data.salePrice,
-                totalQuantity: totalQuantity,
-            }, { new: true });
-            console.log(updatedProduct);
-            console.log("Product updated");
-            return res.status(200).json({ success: 'Product updated successfully!' });
-        }
-    } catch (error) {
-        console.log(error.message);
-        return res.status(500).json({ error: 'An error occurred while updating the product.' });
+    if (req.files && req.files.length > 0) {
+      for (let i = 0; i < req.files.length; i++) {
+        images.push(req.files[i].filename);
+      }
     }
-}
 
+    const existingProduct = await Product.findById(id);
+    const productSizes = [
+      { size: "Small", quantity: smallQuantity },
+      { size: "Medium", quantity: mediumQuantity },
+      { size: "Large", quantity: largeQuantity }
+    ];
+
+    const imagesDir = path.join('E:', 'New folder', 'public', 'uploads', 'product-images');
+
+    if (req.files.length > 0) {
+      console.log("Yes, images are there");
+
+      const newImages = images.filter(image => !existingProduct.productImage.includes(image));
+      const croppedNewImages = [];
+
+      if (newImages.length > 0) {
+        for (let i = 0; i < newImages.length; i++) {
+          const imagePath = path.join(imagesDir, newImages[i]);
+
+          const croppedImage = await sharp(imagePath)
+            .extract({ left: 0, top: 0, width: 800, height: 600 })
+            .toFormat('jpeg')
+            .toBuffer();
+
+          const croppedFilename = `cropped_${newImages[i]}`;
+          const croppedFilePath = path.join(imagesDir, croppedFilename);
+          await sharp(croppedImage).toFile(croppedFilePath);
+
+          croppedNewImages.push(croppedFilename);
+        }
+      }
+
+      if (croppedNewImages.length > 0) {
+        const updatedProduct = await Product.findByIdAndUpdate(
+          id,
+          {
+            productName: data.productName,
+            productDescription: data.description,
+            category: data.category,
+            regularPrice: data.regularPrice,
+            productSizes,
+            salePrice: data.salePrice,
+            totalQuantity: totalQuantity,
+            $push: { productImage: { $each: croppedNewImages } }
+          },
+          { new: true }
+        );
+
+        console.log("Product updated");
+        return res.status(200).json({ success: 'Product updated successfully!' });
+      } else {
+        console.log("Same images were present");
+        const updatedProduct = await Product.findByIdAndUpdate(
+          id,
+          {
+            productName: data.productName,
+            productDescription: data.description,
+            category: data.category,
+            regularPrice: data.regularPrice,
+            productSizes,
+            salePrice: data.salePrice,
+            totalQuantity: totalQuantity,
+          },
+          { new: true }
+        );
+
+        console.log("Product updated");
+        return res.status(200).json({ success: 'Product updated successfully!' });
+      }
+    } else {
+      console.log("No images were present");
+      const updatedProduct = await Product.findByIdAndUpdate(
+        id,
+        {
+          productName: data.productName,
+          productDescription: data.description,
+          category: data.category,
+          regularPrice: data.regularPrice,
+          productSizes,
+          salePrice: data.salePrice,
+          totalQuantity: totalQuantity,
+        },
+        { new: true }
+      );
+
+      console.log(updatedProduct);
+      console.log("Product updated");
+      return res.status(200).json({ success: 'Product updated successfully!' });
+    }
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({ error: 'An error occurred while updating the product.' });
+  }
+}
 
 
 const getBlockProduct = async (req, res) => {

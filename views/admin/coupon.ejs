@@ -86,7 +86,7 @@
                         
 
                             <div>
-                                <label for="minimum-price" class="form-label">Discount Amount</label>
+                                <label for="minimum-price" class="form-label">Discount</label>
                                 <input type="text" name="discountAmount" placeholder="Type here" class="form-control" />
                                 <div id="error-discount-amount" class="error-message"></div>
                             </div>
@@ -111,7 +111,7 @@
                                         <th>Coupon Code</th>
                                         <th>Created On</th>
                                         <th>Expire On</th>
-                                        <th>Discount Amount</th>
+                                        <th>Discount</th>
                                         <th>Edit</th>
                                         <th>Delete</th>
 
@@ -135,7 +135,7 @@
                                             <%= new Date(coupons[i].expiryDate).toLocaleDateString() %>
                                         </td>
                                         <td class="text-start">
-                                            <%= coupons[i].discount %>
+                                            <%= coupons[i].discount %> %
                                         </td>
                                         <td>
                                             <button type="button" class="btn btn-primary edit-offer-btn"
@@ -143,7 +143,7 @@
                                                 data-bs-target="#editCoupon" data-bs-whatever="@getbootstrap"
                                                 data-coupon-id="<%= coupons[i]._id %>"
                                                 data-coupon-name="<%= coupons[i].couponName %>"
-                                                data-discount="<%= coupons[i].discount %>"
+                                                data-discount="<%= coupons[i].discount %> %"
                                                 data-start-date="<%= coupons[i].createdOn.toISOString().split('T')[0] %>"
                                                 data-end-date="<%= coupons[i].expiryDate.toISOString().split('T')[0] %>">
                                                 Edit
@@ -329,32 +329,36 @@
 
                 // Validate discount amount
                 if (!discountAmount) {
-                    discountAmountError.textContent = 'Please enter a discount amount';
+                    discountAmountError.textContent = 'Please enter a discount';
                     return; // Exit the function if discount amount is not entered
                 }
 
                 if (/\s/.test(discountAmount)) {
-                    discountAmountError.textContent = 'Discount amount cannot contain spaces';
+                    discountAmountError.textContent = 'Discount cannot contain spaces';
                     return; // Exit the function if discount amount contains spaces
                 }
 
                 const parsedDiscountAmount = parseInt(discountAmount);
                 if (isNaN(parsedDiscountAmount)) {
-                    discountAmountError.textContent = 'Discount amount must be a number';
+                    discountAmountError.textContent = 'Discount must be a number';
                     return; // Exit the function if discount amount is not a valid number
                 }
 
                 if (!Number.isInteger(parsedDiscountAmount)) {
-                    discountAmountError.textContent = 'Discount amount must be an integer';
+                    discountAmountError.textContent = 'Discount must be an integer';
                     return; // Exit the function if discount amount is not an integer
                 }
 
                 if (parsedDiscountAmount < 0) {
-                    discountAmountError.textContent = 'Discount amount cannot be negative';
+                    discountAmountError.textContent = 'Discount cannot be negative';
+                    return; // Exit the function if discount amount is negative
+                }
+                if (parsedDiscountAmount === 0) {
+                    discountAmountError.textContent = 'Discount cannot be zero';
                     return; // Exit the function if discount amount is negative
                 }
                 if (parsedDiscountAmount > 50) {
-                    discountAmountError.textContent = 'Discount amount cannot be greater than 50';
+                    discountAmountError.textContent = 'Discount cannot be greater than 20';
                     return; // Exit the function if discount amount is greater than 50
                 }
                 const couponData = {
@@ -479,23 +483,23 @@
 
                     // Validate discount amount
                     if (!editCouponDiscount) {
-                        document.getElementById('error4').textContent = 'Please enter a discount amount';
+                        document.getElementById('error4').textContent = 'Please enter a discount';
                         return;
                     }
 
                     if (editCouponDiscount < 0) {
-                        document.getElementById('error4').textContent = 'Discount amount cannot be a negative number';
+                        document.getElementById('error4').textContent = 'Discount cannot be a negative number';
                         return;
                     }
 
                     if (editCouponDiscount.includes(' ')) {
-                        document.getElementById('error4').textContent = 'Discount amount cannot contain spaces';
+                        document.getElementById('error4').textContent = 'Discount cannot contain spaces';
                         return;
                     }
 
                     const discountValue = parseFloat(editCouponDiscount);
                     if (isNaN(discountValue) || discountValue > 50) {
-                        document.getElementById('error4').textContent = 'Discount amount should be less than or equal to 50';
+                        document.getElementById('error4').textContent = 'Discount should be less than or equal to 20';
                         return;
                     }
 

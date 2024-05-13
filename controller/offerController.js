@@ -54,8 +54,8 @@ const addProductOffer = async (req, res) => {
     });
     await newOffer.save();
     const currentSalePrice = existingProduct.regularPrice;
-    existingProduct.oldSalePrice = currentSalePrice;
-    const offerDiscount = discount;
+    existingProduct.oldSalePrice = existingProduct.salePrice;
+    const offerDiscount = (currentSalePrice * discount) / 100;
     const newSalePrice = currentSalePrice - offerDiscount;
     existingProduct.salePrice = newSalePrice;
     await existingProduct.save();
@@ -86,10 +86,11 @@ const deleteProductOffer = async (req, res) => {
     });
     if (activeCategoryOffer) {
       // Apply the category offer discount
-      const categoryDiscount = activeCategoryOffer.discount;
-      const newSalePrice = affectedProduct.regularPrice - categoryDiscount;
+      const regularPrice = affectedProduct.regularPrice;
+      const categoryDiscountAmount = (regularPrice * categoryDiscount) / 100;
+      const newSalePrice = regularPrice - categoryDiscountAmount;
       affectedProduct.salePrice = newSalePrice;
-      affectedProduct.oldSalePrice = affectedProduct.regularPrice;
+      // affectedProduct.oldSalePrice = affectedProduct.regularPrice;
       await affectedProduct.save();
     }
     res.redirect('/admin/productOffer');
@@ -122,7 +123,11 @@ const editProductOffer = async (req, res) => {
     if (!productToUpdate) {
       return res.status(404).json({ message: 'Product not found' });
     }
-    productToUpdate.salePrice += oldDiscount - discount;
+    const currentSalePrice = productToUpdate.regularPrice;
+    const newDiscountAmount = (currentSalePrice * discount) / 100;
+    const newSalePrice = currentSalePrice - newDiscountAmount;
+    // productToUpdate.oldSalePrice = productToUpdate.salePrice;
+    productToUpdate.salePrice = newSalePrice;
     await productToUpdate.save();
     res.status(200).json({ message: 'Product offer updated successfully' });
   } catch (error) {
@@ -179,9 +184,9 @@ const addCategoryOffer = async (req, res) => {
     await newOffer.save();
     for (let i = 0; i < productsWithoutProductOffer.length; i++) {
       const productToUpdate = await Product.findById(productsWithoutProductOffer[i]);
-      const oldSalePrice = productToUpdate.regularPrice;
-      productToUpdate.oldSalePrice = oldSalePrice;
-      const newSalePrice = productToUpdate.regularPrice - discount;
+      const regularPrice = productToUpdate.regularPrice;
+      const discountAmount = (regularPrice * discount) / 100;
+      const newSalePrice = regularPrice - discountAmount;
       productToUpdate.salePrice = newSalePrice;
       await productToUpdate.save();
     }
@@ -200,7 +205,6 @@ const deleteCategoryOffer = async (req, res) => {
       return res.status(404).send('Category offer not found');
     }
     const categoryId = deletedOffer.categoryOffer.category;
-    const offerDiscount = deletedOffer.discount;
     const productsToUpdate = await Product.find({ category: categoryId });
     for (let i = 0; i < productsToUpdate.length; i++) {
       const productToUpdate = productsToUpdate[i];
@@ -223,16 +227,17 @@ const editCategoryOffer = async (req, res) => {
       return res.status(404).send('Offer not found');
     }
     const { name, category, discount, startingDate, endingDate } = req.body;
-    const oldDiscount = existingOffer.discount;
     existingOffer.name = name;
     existingOffer.startingDate = startingDate;
     existingOffer.endingDate = endingDate;
     existingOffer.discount = discount;
     await existingOffer.save();
-    const discountDifference = oldDiscount - discount;
     const productsToUpdate = await Product.find({ category: category });
     for (const productToUpdate of productsToUpdate) {
-      productToUpdate.salePrice += discountDifference;
+      const regularPrice = productToUpdate.regularPrice;
+      const newDiscountAmount = (regularPrice * discount) / 100;
+      const newSalePrice = regularPrice - newDiscountAmount;
+      productToUpdate.salePrice = newSalePrice;
       await productToUpdate.save();
     }
     res.status(200).json({ message: 'Category offer updated successfully' });

@@ -7,12 +7,12 @@ const userHelper = require('../helper/userHelper');
 
 const getCouponPage = async (req, res) => {
   try {
-    const page = req.query.page || 1; 
-    const limit = 7; 
-    const skip = (page - 1) * limit; 
+    const page = req.query.page || 1;
+    const limit = 7;
+    const skip = (page - 1) * limit;
 
-    const couponsCount = await couponHelper.countCoupons(); 
-    const allCoupons = await couponHelper.findAllCoupons(skip, limit); 
+    const couponsCount = await couponHelper.countCoupons();
+    const allCoupons = await couponHelper.findAllCoupons(skip, limit);
 
     for (let i = 0; i < allCoupons.length; i++) {
       if (allCoupons[i].expiryDate) {
@@ -21,7 +21,7 @@ const getCouponPage = async (req, res) => {
       }
     }
 
-    const totalPages = Math.ceil(couponsCount / limit); 
+    const totalPages = Math.ceil(couponsCount / limit);
 
     res.render('admin/coupon', {
       coupons: allCoupons,
@@ -39,6 +39,9 @@ const addCoupon = async (req, res) => {
     if (existingCoupon) {
       return res.status(400).json({ message: 'A coupon with the same name already exists' });
     }
+    if(req.body.couponAmount > 20) {
+      return res.status(400).json({ message: 'Discount cannot be greater than 20' });
+    }
     const coupon = await couponHelper.addCouponToDb(req.body)
     res.status(200).json({ message: 'coupon added successfully' });
   } catch (error) {
@@ -53,8 +56,8 @@ const editCoupon = async (req, res) => {
     if (!couponId || !couponName || !createdOn || !expiryDate || discount === undefined || !discount) {
       return res.status(400).json({ message: 'All fields are required' });
     }
-    if (discount > 50) {
-      return res.status(400).json({ message: 'Discount amount should be less than or equal to 50' });
+    if (discount > 20) {
+      return res.status(400).json({ message: 'Discount cannot be greater than 20' });
     }
     const existingCoupon = await Coupon.findById(couponId);
     if (!existingCoupon) {
@@ -99,6 +102,7 @@ const applyCoupon = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Cart not found for this user' });
     }
     req.session.originalTotal = cart.totalPrice;
+    console.log(req.session.originalTotal);
     const couponCode = req.body.couponCode;
     const coupon = await Coupon.findOne({ couponCode });
     if (!coupon) {
@@ -107,7 +111,7 @@ const applyCoupon = async (req, res) => {
       req.session.coupon = couponCode;
     }
     if (req.session.coupon) {
-      if (cart.totalPrice < coupon.minimumPurchaseAmount) {
+      if (cart.totalPrice <= 500) {
         return res.status(400).json({ success: false, message: 'Minimum purchase amount not met for this coupon' });
       }
       if (coupon.expiryDate < new Date()) {
@@ -116,7 +120,9 @@ const applyCoupon = async (req, res) => {
       if (coupon.usedBy.includes(userId)) {
         return res.status(400).json({ success: false, message: 'Coupon has already been used' });
       }
-      cart.totalPrice -= coupon.discount;
+      const discountAmount = (cart.totalPrice * coupon.discount) / 100; 
+      cart.totalPrice -= discountAmount;
+      console.log(cart.totalPrice);
       cart.coupon = couponCode;
       couponApplied = req.session.coupon;
       await Coupon.updateOne({ couponCode }, { $push: { usedBy: userId } });
@@ -144,7 +150,7 @@ const removeCoupon = async (req, res) => {
     if (cart.coupon !== couponCode) {
       return res.status(400).json({ success: false, message: 'Coupon is not applied to this cart' });
     }
-    cart.totalPrice = req.session.originalTotal; 
+    cart.totalPrice = req.session.originalTotal;
     cart.coupon = null;
     req.session.coupon = null;
     await Coupon.updateOne({ couponCode }, { $pull: { usedBy: userId } });

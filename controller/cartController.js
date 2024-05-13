@@ -44,40 +44,131 @@ const checkStock = async (req, res) => {
 
 const addToCart = async (req, res) => {
   try {
+    console.log('inside addtocart');
+    console.log(req.params);
     const { prodId, quantity, size } = req.params;
     const addedQuantity = parseInt(quantity);
     let user = req.session.user;
     const loggedIn = user;
+
     const isInWishlist = await Wishlist.findOne({
       user: user._id,
       'products.productItemId': prodId,
-      'products.size': size
+      'products.size': size,
     });
+
     if (isInWishlist) {
       await Wishlist.findOneAndUpdate(
         { user: user._id },
         { $pull: { products: { productItemId: prodId, size: size } } }
       );
     }
-    let response = await cartHelper.addToUserCart(user._id, prodId, addedQuantity, size);
-    if (response) {
-      cartCount = await cartHelper.getCartCount(user._id)
-      res.status(202).json({ status: "true", message: "product added to cart" })
+
+    const maxUser = 5;
+    let cart = await Cart.findOne({ user: user._id });
+    console.log(cart);
+    if (!cart) {
+      console.log('1');
+      const product = await Product.findOne({ _id: prodId });
+      if (!product || product.isBlocked) {
+        return res
+          .status(404)
+          .json({ error: true, message: 'Product not found or blocked' });
+      }
+      const productSize = product.productSizes.find(
+        (sizeObj) => sizeObj.size === size
+      );
+      if (addedQuantity > productSize.quantity) {
+        return res
+          .status(400)
+          .json({
+            error: true,
+            message: 'Requested quantity exceeds available quantity',
+          });
+      }
+      const totalPrice = product.salePrice * addedQuantity;
+      cart = new Cart({ user: user._id, items: [] });
+      cart.items.push({
+        productId: prodId,
+        quantity: addedQuantity,
+        size,
+        total: totalPrice,
+      });
     } else {
-      res.status(400).json({ status: "error", message: "Failed to add product to cart" });
+      console.log('2');
+      let existingItem = cart.items.find(
+        (item) =>
+          String(item.productId) === String(prodId) && item.size === size
+      );
+      if (existingItem) {
+        console.log('inside existing item');
+        const newQuantity = addedQuantity + existingItem.quantity;
+        if (newQuantity > maxUser) {
+          return res
+            .status(400)
+            .json({
+              error: true,
+              message: 'Requested quantity exceeds available quantity',
+            });
+        }
+        const product = await Product.findOne({ _id: prodId });
+        if (!product || product.isBlocked) {
+          return res
+            .status(404)
+            .json({ error: true, message: 'Product not found or blocked' });
+        }
+        const productSize = product.productSizes.find(
+          (sizeObj) => sizeObj.size === size
+        );
+        if (newQuantity > productSize.quantity) {
+          return res
+            .status(400)
+            .json({
+              error: true,
+              message: 'Requested quantity exceeds available quantity',
+            });
+        }
+        existingItem.quantity = newQuantity;
+        existingItem.total = product.salePrice * newQuantity;
+      } else {
+        console.log('inside else case');
+        const product = await Product.findOne({ _id: prodId });
+        console.log('1');
+        if (!product || product.isBlocked) {
+          return res
+            .status(404)
+            .json({ error: true, message: 'Product not found or blocked' });
+        }
+        const productSize = product.productSizes.find(
+          (sizeObj) => sizeObj.size === size
+        );
+        console.log('2');
+        if (addedQuantity > productSize.quantity) {
+          return res.status(400).json({ error: true, message: 'Requested quantity exceeds available quantity', });
+        }
+        console.log('3');
+        const totalPrice = product.salePrice * addedQuantity;
+        console.log('4');
+        cart.items.push({
+          productId: prodId,
+          quantity: addedQuantity,
+          size,
+          total: totalPrice,
+        });
+      }
     }
+    console.log('5');
+    cart.totalPrice = cart.items.reduce((acc, curr) => acc + curr.total, 0);
+    console.log('6');
+    await cart.save();
+    console.log('7');
+    res.status(202).json({ status: 'true', message: 'product added to cart' });
   } catch (error) {
     console.log(error);
-    if (error.message === "Product Not Found or Blocked") {
-      res.status(404).json({ status: "error", message: "Product not found or blocked" });
-    } else if (error.message === "Requested quantity exceeds available quantity") {
-      res.status(400).json({ status: "error", message: "Requested quantity exceeds available quantity" });
-    } else {
-      // If it's a different error, send a generic error message
-      res.status(500).json({ status: "error", message: "An error occurred" });
-    }
+    res.status(500).json({ error: true, message: error.message });
   }
 };
+
 
 const userCart = async (req, res) => {
   try {

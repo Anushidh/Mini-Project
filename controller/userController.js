@@ -707,10 +707,10 @@ const cancelProduct = async (req, res) => {
     await product.save();
     const wallet = await Wallet.findOne({ user: order.user });
     if (wallet) {
-      wallet.walletBalance += orderProduct.quantity * product.salePrice;
+      wallet.walletBalance += order.totalAmount;
       wallet.history.push({
         status: 'credit',
-        amount: orderProduct.quantity * product.salePrice,
+        amount: order.totalAmount,
       });
       await wallet.save();
     } else {
@@ -737,7 +737,7 @@ const returnProduct = async (req, res) => {
     if (!orderProduct) {
       return res.status(404).json({ success: false, error: 'Order product not found' });
     }
-    orderProduct.orderStat = 'returned';
+    orderProduct.orderStat = 'return pending';
     await order.save();
     const product = await Product.findById(orderProduct.product);
     if (!product) {
@@ -752,11 +752,11 @@ const returnProduct = async (req, res) => {
     await product.save();
     const wallet = await Wallet.findOne({ user: order.user });
     if (wallet) {
-      wallet.walletBalance += orderProduct.quantity * product.salePrice;
+      wallet.walletBalance += order.totalAmount;
       wallet.history.push({
         date: new Date(),
         status: 'credit',
-        amount: orderProduct.quantity * product.salePrice,
+        amount: order.totalAmount,
       });
       await wallet.save();
     } else {

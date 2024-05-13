@@ -97,8 +97,10 @@
                                             <label class="form-label">Category</label>
                                             <select class="form-select border" style="width: 150px;" name="category">
                                                 <% for (let i=0; i < cat.length; i++) { %>
-                                                    <option value="<%= cat[i]._id %>">
-                                                        <%= cat[i].name %>
+                                                    <option value="<%= cat[i]._id %>" <% if (product.category &&
+                                                        product.category._id.toString()===cat[i]._id.toString()) { %>
+                                                        selected<% } %>>
+                                                            <%= cat[i].name %>
                                                     </option>
                                                     <% } %>
                                             </select>
@@ -181,36 +183,25 @@
         document.getElementById("imageInput").addEventListener("change", handleFileSelect);
 
         function handleFileSelect(event) {
-            const newFiles = Array.from(event.target.files); // Create a copy of the FileList object
-
+            const newFiles = Array.from(event.target.files);
             // Clear previous content
             addedImagesContainer.innerHTML = "";
 
-            const allValidFiles = [];
-
             // Process previously selected images
-            selectedImages.forEach(file => {
-                if (isValidImage(file)) {
-                    allValidFiles.push(file);
-                    const thumbnail = createThumbnail(file);
-                    addedImagesContainer.appendChild(thumbnail);
-                }
+            const validPreviousFiles = selectedImages.filter(isValidImage);
+            validPreviousFiles.forEach(file => {
+                const thumbnail = createThumbnail(file);
+                addedImagesContainer.appendChild(thumbnail);
             });
 
             // Process newly selected files
-            newFiles.forEach(file => {
-                if (isValidImage(file)) {
-                    if (!allValidFiles.includes(file)) {
-                        allValidFiles.push(file);
-                        const thumbnail = createThumbnail(file);
-                        addedImagesContainer.appendChild(thumbnail);
-                    }
-                }
+            const validNewFiles = newFiles.filter(isValidImage);
+            const uniqueNewFiles = validNewFiles.filter(file => !selectedImages.includes(file));
+            uniqueNewFiles.forEach(file => {
+                selectedImages.push(file);
+                const thumbnail = createThumbnail(file);
+                addedImagesContainer.appendChild(thumbnail);
             });
-
-            // Update the selectedImages array with the allValidFiles array
-            selectedImages.length = 0;
-            selectedImages.push(...allValidFiles);
         }
 
         // Function to validate image files
@@ -328,7 +319,7 @@
         }
 
 
-     
+
 
         function deleteSingleImage(productId, filename) {
             // alert("hi")

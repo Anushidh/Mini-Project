@@ -4,7 +4,7 @@
         <div>
             <h2 class="content-title card-title">Product Offer Management</h2>
         </div>
-       
+
         <div>
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCoupon"
                 data-bs-whatever="@getbootstrap">Add Offer +</button>
@@ -19,7 +19,6 @@
                     <th scope="col"><b>No</b></th>
                     <th scope="col"><b>Offer Name</b></th>
                     <th scope="col"><b>Product</b></th>
-                    <!-- <th scope="col"><b>Brand</b></th> -->
                     <th scope="col"><b>Discount</b></th>
                     <th scope="col"><b>Starting Date</b></th>
                     <th scope="col"><b>Ending Date</b></th>
@@ -40,7 +39,7 @@
                             <%= prodoffers[i].productOffer.product.productName %>
                         </td>
                         <td>
-                            <%= prodoffers[i].discount %> ₹
+                            <%= prodoffers[i].discount %> %
                         </td>
                         <td>
                             <%= prodoffers[i].startingDate.toLocaleDateString() %>
@@ -94,7 +93,7 @@
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="recipient-name" class="col-form-label">Discount </label>
+                            <label for="recipient-name" class="col-form-label">Discount %</label>
                             <input type="text" class="form-control" name="discount" id="prodOfferAmount">
                             <div id="error2" class="text-danger"></div>
                         </div>
@@ -147,7 +146,7 @@
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="editOfferDiscount" class="col-form-label">Discount Amount</label>
+                            <label for="editOfferDiscount" class="col-form-label">Discount %</label>
                             <input type="text" class="form-control" name="discount" id="editOfferDiscount">
                             <div id="error2" class="text-danger"></div>
                         </div>
@@ -214,6 +213,11 @@
                 const discountRegex = /^\d+$/;
                 if (!discountRegex.test(discount)) {
                     document.getElementById('error2').textContent = 'Discount should be a valid integer';
+                    return;
+                }
+                // Check if the discount is greater than 20%
+                if (parseInt(discount) > 20) {
+                    document.getElementById('error2').textContent = 'Discount should not be greater than 20%';
                     return;
                 }
                 console.log('3');
@@ -389,12 +393,19 @@
                 console.log('2');
 
                 // const discountRegex = /^\d+$/;
-                if(!discount) {
+                if (!discount) {
                     console.log('inside discount validation');
                     const discountInput = document.getElementById('editOfferDiscount');
                     const discountErrorContainer = discountInput.parentElement.querySelector('#error2');
                     discountErrorContainer.textContent = 'Please enter a discount';
-                    return; 
+                    return;
+                }
+                if (discount > 20) {
+                    console.log('inside discount validation');
+                    const discountInput = document.getElementById('editOfferDiscount');
+                    const discountErrorContainer = discountInput.parentElement.querySelector('#error2');
+                    discountErrorContainer.textContent = 'Discount should not be greater than 20%';
+                    return;
                 }
                 // Validate if discount contains spaces
                 if (/\s/.test(discount)) {
@@ -412,7 +423,7 @@
                     return;
                 }
 
-                
+
 
                 console.log('3');
 

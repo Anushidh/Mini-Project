@@ -27,7 +27,7 @@
               </div>
             </article>
           </div> <!-- col// -->
-          
+
           <div class="col-md-4">
             <article class="icontext align-items-start">
               <span class="icon icon-sm rounded-circle bg-primary-light">
@@ -41,7 +41,7 @@
                       <%= orderDetails[0].addressDetails[0].house %> <br> Po Box <%=
                           orderDetails[0].addressDetails[0].pincode %>
                 </p>
-                
+
               </div>
             </article>
           </div>
@@ -102,14 +102,17 @@
                                   onclick="toggleOrderStatus('<%= orderDetails[i].orderedItems.orderId %>', 'delivered')">Deliver</button>
                                 <% } else if (orderStatus==='delivered' ) { %>
                                   <button class="btn btn-secondary" style="width: 140px;"
-                                    onclick="toggleOrderStatus('<%= orderDetails[i].orderedItems.orderId %>', 'returned')">Return</button>
-                                  <% } else if (orderStatus==='cancelled' ) { %>
-                                    <button class="btn btn-danger" style="width: 140px;"
-                                      onclick="toggleOrderStatus('<%= orderDetails[i].orderedItems.orderId %>', 'pending')">Reopen</button>
-                                    <% } else if (orderStatus==='returned' ) { %>
-                                      <button class="btn btn-primary" style="width: 140px;"
+                                    onclick="toggleOrderStatus('<%= orderDetails[i].orderedItems.orderId %>', 'return pending')">Return</button>
+                                  <% } else if (orderStatus==='return pending' ) { %>
+                                    <button class="btn btn-secondary" style="width: 140px;"
+                                      onclick="toggleOrderStatus('<%= orderDetails[i].orderedItems.orderId %>', 'returned')">Return</button>
+                                    <% } else if (orderStatus==='cancelled' ) { %>
+                                      <button class="btn btn-danger" style="width: 140px;"
                                         onclick="toggleOrderStatus('<%= orderDetails[i].orderedItems.orderId %>', 'pending')">Reopen</button>
-                                      <% } %>
+                                      <% } else if (orderStatus==='returned' ) { %>
+                                        <button class="btn btn-primary" style="width: 140px;"
+                                          onclick="toggleOrderStatus('<%= orderDetails[i].orderedItems.orderId %>', 'pending')">Reopen</button>
+                                        <% } %>
                     </td>
                   </tr>
                   <% } %>
@@ -121,14 +124,14 @@
                             <dd>₹<%= orderDetails[0].totalAmount %>
                             </dd>
                           </dl>
-                          <dl class="dlist">
+                          <!-- <dl class="dlist">
                             <dt>Shipping cost:</dt>
                             <dd>₹10.00</dd>
-                          </dl>
-                          <dl class="dlist">
+                          </dl> -->
+                          <!-- <dl class="dlist">
                             <dt>Grand total:</dt>
                             <dd> <b class="h5">₹<%= (orderDetails[0].totalAmount + 10).toFixed(2) %></b> </dd>
-                          </dl>
+                          </dl> -->
                         </article>
                       </td>
                     </tr>

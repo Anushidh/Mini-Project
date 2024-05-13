@@ -18,14 +18,17 @@ const getWallet = async (req, res) => {
     const loggedIn = userId;
     let user = await User.findById(userId);
     console.log(user);
-    const wallet = await Wallet.findOne({ user: userId });
+    const page = req.query.page ? parseInt(req.query.page) : 1;
+    const limit = 5;
+    const skip = (page - 1) * limit;
+    const wallet = await Wallet.findOne({ user: userId }).skip(skip).limit(limit);
     console.log(wallet);
     let walletAmount = await walletHelper.getWalletAmount(userId);
     console.log(walletAmount);
-    res.render('user/wallet', { walletAmount: walletAmount, loggedIn, userDetails: user, walletDetails: wallet });
+    res.render('user/wallet', { walletAmount: walletAmount, loggedIn, userDetails: user, walletDetails: wallet,currentPage: page, });
   } catch (error) {
     console.log(error);
-    res.status(500).render('user/404',{loggedIn});
+    res.status(500).render('user/404', { loggedIn });
   }
 }
 
@@ -91,21 +94,21 @@ const verify_payment = async (req, res) => {
     let amount = parseInt(details.order.order.amount) / 100;
     console.log(amount);
 
-    // Find the user's wallet and update the walletBalance
-    const wallet = await Wallet.findOneAndUpdate(
-      { user: req.session.user },
-      { $inc: { walletBalance: amount } },
-      { new: true }
-    );
+    // // Find the user's wallet and update the walletBalance
+    // const wallet = await Wallet.findOneAndUpdate(
+    //   { user: req.session.user },
+    //   { $inc: { walletBalance: amount } },
+    //   { new: true }
+    // );
 
-    if (!wallet) {
-      // If the wallet doesn't exist, create a new one
-      const newWallet = new Wallet({
-        user: req.session.user,
-        walletBalance: amount,
-      });
-      await newWallet.save();
-    }
+    // if (!wallet) {
+    //   // If the wallet doesn't exist, create a new one
+    //   const newWallet = new Wallet({
+    //     user: req.session.user,
+    //     walletBalance: amount,
+    //   });
+    //   await newWallet.save();
+    // }
 
     res.json({ success: true });
   } catch (error) {

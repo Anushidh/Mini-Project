@@ -40,6 +40,26 @@ const secondTry = async (req, res) => {
     }
     if (req.body.payment_method === 'razorpay') {
       const razorpayOrderDetails = await razorpay.razorpayOrderCreate(order._id, order.totalAmount);
+      if (order.orderedItems && Array.isArray(order.orderedItems)) {
+        for (let i = 0; i < order.orderedItems.length; i++) {
+          const { product: productId, size, quantity } = order.orderedItems[i];
+          const product = await Product.findById(productId);
+          if (!product) {
+            return res.json({ error: true, message: `Product with ID ${productId} not found` });
+          }
+          const sizeIndex = product.productSizes.findIndex(s => s.size === size);
+          if (sizeIndex === -1) {
+            return res.json({ error: true, message: `Size ${size} not found for product ${product.productName}` });
+          }
+          const availableQuantity = product.productSizes[sizeIndex].quantity - quantity;
+          if (availableQuantity >= 0) {
+            product.productSizes[sizeIndex].quantity = availableQuantity;
+          } else {
+            return res.json({ error: true, message: `Insufficient stock for product ${product.productName} in size ${size}` });
+          }
+          await product.save();
+        }
+      }
       const updatedOrder = await Order.findOneAndUpdate(
         { _id: order._id },
         { paymentStatus: 'success' },

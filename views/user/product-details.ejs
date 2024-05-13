@@ -316,6 +316,8 @@
                     method: 'POST',
                     success: (res) => {
                         // Log the response object
+                        console.log(res);
+
                         if (res.status === "true") {
                             Toastify({
                                 text: "Added to Cart!",
@@ -328,33 +330,25 @@
                             setTimeout(() => {
                                 window.location.href = '/cart';
                             }, 3000);
-                        } else if (res.status === "Out of stock") {
-                            Toastify({
-                                text: "The product is out of stock",
-                                duration: 3000,
-                                close: true,
-                                gravity: "top",
-                                position: "center",
-                                backgroundColor: "linear-gradient(to right, #ff6c6c, #f66262)",
-                            }).showToast();
                         } else {
                             Toastify({
-                                text: "You need to Login first",
+                                text: res.message || "An error occurred while processing your request.",
                                 duration: 3000,
                                 close: true,
                                 gravity: "top",
                                 position: "center",
                                 backgroundColor: "linear-gradient(to right, #ff6c6c, #f66262)",
                             }).showToast();
-                            setTimeout(() => {
-                                window.location.href = '/login';
-                            }, 3000);
                         }
                     },
                     error: (xhr, status, error) => {
                         console.error('Error:', error);
+                        const errorMessage = xhr.responseJSON && xhr.responseJSON.message
+                            ? xhr.responseJSON.message
+                            : "An error occurred while processing your request. Please try again later.";
+
                         Toastify({
-                            text: "An error occurred while processing your request. Please try again later.",
+                            text: errorMessage,
                             duration: 3000,
                             close: true,
                             gravity: "top",

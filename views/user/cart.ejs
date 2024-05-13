@@ -100,8 +100,8 @@
                                             <% availableCoupons.forEach(function(coupon) { %>
                                                 <option value="<%= coupon.couponCode %>"
                                                     data-discount="<%= coupon.discount %>">
-                                                    <%= coupon.couponCode %> - <%= currencyFormat(coupon.discount) %>
-                                                            OFF
+                                                    <%= coupon.couponCode %> - <%= coupon.discount %>
+                                                          %  OFF
                                                             <% if (coupon.isActive==='Active' ) { %>
                                                                 (Expires: <%= coupon.expiryDate.toLocaleDateString() %>)
                                                                     <% } else { %>
@@ -154,49 +154,6 @@
 
         <script>
 
-            // document.addEventListener("DOMContentLoaded", function () {
-            //     // Add event listener to the Apply/Remove Coupon button
-            //     document.getElementById("couponButton").addEventListener("click", function () {
-            //         // Get the selected coupon code from the dropdown menu
-            //         var couponCode = document.getElementById("couponSelect").value;
-            //         var button = document.getElementById("couponButton");
-            //         // Send an AJAX request to apply/remove the coupon
-            //         var xhr = new XMLHttpRequest();
-            //         xhr.open("POST", "/applyOrRemoveCoupon", true);
-            //         xhr.setRequestHeader("Content-Type", "application/json");
-            //         xhr.onreadystatechange = function () {
-            //             if (xhr.readyState === XMLHttpRequest.DONE) {
-            //                 if (xhr.status === 200) {
-            //                     // Coupon applied/removed successfully
-            //                     var response = JSON.parse(xhr.responseText);
-            //                     swal.fire({
-            //                         icon: 'success',
-            //                         title: 'Success',
-            //                         text: response.message,
-            //                         showConfirmButton: false,
-            //                         timer: 1500
-            //                     });
-            //                     // Toggle button label
-            //                     if (button.textContent.trim() === "Apply Coupon") {
-            //                         button.textContent = "Remove Coupon";
-            //                     } else {
-            //                         button.textContent = "Apply Coupon";
-            //                     }
-            //                 } else {
-            //                     // Error applying/removing coupon
-            //                     var errorMessage = JSON.parse(xhr.responseText).message;
-            //                     swal.fire({
-            //                         icon: 'error',
-            //                         title: 'Error',
-            //                         text: errorMessage
-            //                     });
-            //                 }
-            //             }
-            //         };
-            //         xhr.send(JSON.stringify({ couponCode: couponCode }));
-            //     });
-            // });
-
             document.addEventListener("DOMContentLoaded", function () {
                 // Add event listener to the Apply/Remove Coupon button
                 document.getElementById("couponButton").addEventListener("click", function () {
@@ -218,10 +175,20 @@
             async function applyCoupon(couponCode) {
                 const totalAmountElement = document.querySelector('#totalAmount .cart_amount');
                 const totalAmount = parseFloat(totalAmountElement.textContent.replace(/[^0-9.-]+/g, ""));
-
+                console.log(totalAmount);
                 if (totalAmount === 0) {
                     Toastify({
                         text: 'Please add products to your cart before applying a coupon.',
+                        duration: 3000,
+                        gravity: 'top',
+                        position: 'center',
+                        backgroundColor: '#ff6347',
+                    }).showToast();
+                    return;
+                }
+                if (totalAmount <= 500) {
+                    Toastify({
+                        text: 'Minimum purchase amount not met.',
                         duration: 3000,
                         gravity: 'top',
                         position: 'center',

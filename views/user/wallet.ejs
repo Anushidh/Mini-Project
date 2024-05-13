@@ -112,6 +112,20 @@
                 </tbody>
               </table>
             </div>
+            <nav aria-label="Wallet History Pagination">
+              <ul class="pagination justify-content-center">
+                <% if (currentPage> 1) { %>
+                  <li class="page-item">
+                    <a class="page-link" href="/wallet?page=<%= currentPage - 1 %>">Previous</a>
+                  </li>
+                  <% } %>
+                    <% if (walletDetails && walletDetails.history.length===5) { %>
+                      <li class="page-item">
+                        <a class="page-link" href="/wallet?page=<%= currentPage + 1 %>">Next</a>
+                      </li>
+                      <% } %>
+              </ul>
+            </nav>
           </div>
         </div>
       </div>
