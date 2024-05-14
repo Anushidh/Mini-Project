@@ -68,26 +68,12 @@ const addProducts = async (req, res) => {
         ];
 
         const images = [];
-        const imagesDir = path.join('E:', 'New folder', 'public', 'uploads', 'product-images');
-
         if (req.files && req.files.length > 0) {
-            for (let i = 0; i < req.files.length; i++) {
-                const imagePath = req.files[i].path; // Use the path provided in req.files
-
-                // Crop the image using sharp
-                const croppedImage = await sharp(imagePath)
-                    .extract({ left: 0, top: 0, width: 800, height: 600 })
-                    .toFormat('jpeg')
-                    .toBuffer();
-
-                // Save the cropped image to a new file
-                const croppedFilename = `cropped_${req.files[i].filename}`;
-                const croppedFilePath = path.join(imagesDir, croppedFilename);
-                await sharp(croppedImage).toFile(croppedFilePath);
-
-                images.push(croppedFilename);
-            }
+          for (let i = 0; i < req.files.length; i++) {
+            images.push(req.files[i].filename);
+          }
         }
+  
         console.log(images);
         const newProduct = new Product({
             productName,
@@ -187,88 +173,54 @@ const editProduct = async (req, res) => {
       { size: "Large", quantity: largeQuantity }
     ];
 
-    const imagesDir = path.join('E:', 'New folder', 'public', 'uploads', 'product-images');
-
     if (req.files.length > 0) {
-      console.log("Yes, images are there");
-
-      const newImages = images.filter(image => !existingProduct.productImage.includes(image));
-      const croppedNewImages = [];
-
-      if (newImages.length > 0) {
-        for (let i = 0; i < newImages.length; i++) {
-          const imagePath = path.join(imagesDir, newImages[i]);
-
-          const croppedImage = await sharp(imagePath)
-            .extract({ left: 0, top: 0, width: 800, height: 600 })
-            .toFormat('jpeg')
-            .toBuffer();
-
-          const croppedFilename = `cropped_${newImages[i]}`;
-          const croppedFilePath = path.join(imagesDir, croppedFilename);
-          await sharp(croppedImage).toFile(croppedFilePath);
-
-          croppedNewImages.push(croppedFilename);
+        console.log("Yes, images are there")
+        // Check if the uploaded image is different from the existing image(s)
+        const newImages = images.filter(image => !existingProduct.productImage.includes(image));
+        if (newImages.length > 0) {
+            const updatedProduct = await Product.findByIdAndUpdate(id, {
+                productName: data.productName,
+                productDescription: data.description,
+                category: data.category,
+                regularPrice: data.regularPrice,
+                productSizes,
+                salePrice: data.salePrice,
+                totalQuantity: totalQuantity,
+                $push: { productImage: { $each: newImages } } // Add new images to the existing images
+            }, { new: true });
+            console.log("Product updated");
+            return res.status(200).json({ success: 'Product updated successfully!' });
+        } else {
+            console.log("Same images were present");
+            // No new images were uploaded, so update the product without changing the images
+            const updatedProduct = await Product.findByIdAndUpdate(id, {
+                productName: data.productName,
+                productDescription: data.description,
+                category: data.category,
+                regularPrice: data.regularPrice,
+                productSizes,
+                salePrice: data.salePrice,
+                totalQuantity: totalQuantity,
+            }, { new: true });
+            console.log("Product updated");
+            return res.status(200).json({ success: 'Product updated successfully!' });
         }
-      }
-
-      if (croppedNewImages.length > 0) {
-        const updatedProduct = await Product.findByIdAndUpdate(
-          id,
-          {
-            productName: data.productName,
-            productDescription: data.description,
-            category: data.category,
-            regularPrice: data.regularPrice,
-            productSizes,
-            salePrice: data.salePrice,
-            totalQuantity: totalQuantity,
-            $push: { productImage: { $each: croppedNewImages } }
-          },
-          { new: true }
-        );
-
-        console.log("Product updated");
-        return res.status(200).json({ success: 'Product updated successfully!' });
-      } else {
-        console.log("Same images were present");
-        const updatedProduct = await Product.findByIdAndUpdate(
-          id,
-          {
-            productName: data.productName,
-            productDescription: data.description,
-            category: data.category,
-            regularPrice: data.regularPrice,
-            productSizes,
-            salePrice: data.salePrice,
-            totalQuantity: totalQuantity,
-          },
-          { new: true }
-        );
-
-        console.log("Product updated");
-        return res.status(200).json({ success: 'Product updated successfully!' });
-      }
     } else {
-      console.log("No images were present");
-      const updatedProduct = await Product.findByIdAndUpdate(
-        id,
-        {
-          productName: data.productName,
-          productDescription: data.description,
-          category: data.category,
-          regularPrice: data.regularPrice,
-          productSizes,
-          salePrice: data.salePrice,
-          totalQuantity: totalQuantity,
-        },
-        { new: true }
-      );
-
-      console.log(updatedProduct);
-      console.log("Product updated");
-      return res.status(200).json({ success: 'Product updated successfully!' });
-    }
+        console.log("No images were present");
+        // No images were uploaded, so update the product without changing the images
+        const updatedProduct = await Product.findByIdAndUpdate(id, {
+            productName: data.productName,
+            productDescription: data.description,
+            category: data.category,
+            regularPrice: data.regularPrice,
+            productSizes,
+            salePrice: data.salePrice,
+            totalQuantity: totalQuantity,
+        }, { new: true });
+        console.log(updatedProduct);
+        console.log("Product updated");
+        return res.status(200).json({ success: 'Product updated successfully!' });
+    }  
   } catch (error) {
     console.log(error.message);
     return res.status(500).json({ error: 'An error occurred while updating the product.' });
